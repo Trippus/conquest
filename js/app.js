@@ -13,13 +13,17 @@ import { createBoard, PLAYER_COLORS as COLORS } from './board.js';
 // Saves only replay on the map they were played on: v1 was the test map, v2 the 30-territory world.
 const KEY = 'conquest.v3';
 const DELAY = { normal: 650, fast: 140 };
+const SETTINGS = 'conquest.settings';
+const DEFAULTS = { opponents: 2, level: 'normal', mode: 'mission', humans: 1, speed: 'normal' };
+// The computer opponents. Made-up commanders, so the table has someone to play against.
+const OPPONENTS = ['Grevinde Holm', 'Oberst Vind', 'Admiral Storm', 'Generalinde Ravn', 'Major Falk', 'Hertug Ulv'];
 
 const map = G.prepareMap(WORLD.WORLD);
 const rules = MODERN;
 const $ = (id) => document.getElementById(id);
 const board = createBoard($('board'), WORLD, map, { onTap: (t) => tap(t) });
 
-let game = null; // { setup, seats: ['human' | 'easy' | 'normal'], speed, actions }
+let game = null; // { setup, seats: ['human' | 'easy' | 'normal'], colors, speed, actions }
 let s = null; // the current state
 let sel = { from: -1, to: -1, n: 0 }; // what the player has tapped
 let botTimer = 0;
@@ -35,10 +39,45 @@ const DANISH = {
 
 /* ---------- game flow ---------- */
 
-function startGame(seats, speed, mode = 'mission', seed = (Math.random() * 2 ** 31) | 0) {
-  const humans = seats.filter((x) => x === 'human').length;
-  const players = seats.map((x, i) => (x !== 'human' ? `Computer ${i + 1}` : humans === 1 ? 'Dig' : `Spiller ${i + 1}`));
-  game = { setup: { players, seed, mode }, seats, speed, actions: [] };
+// A player's colour: the humans have the first colours (you are always red), the opponents the
+// next, whatever order the turns come in.
+const colorOf = (p) => COLORS[game?.colors?.[p] ?? p];
+
+function loadSettings() {
+  try {
+    return { ...DEFAULTS, ...JSON.parse(localStorage.getItem(SETTINGS)) };
+  } catch {
+    return { ...DEFAULTS };
+  }
+}
+function saveSettings(settings) {
+  try {
+    localStorage.setItem(SETTINGS, JSON.stringify(settings));
+  } catch {}
+}
+
+// A new game from the settings: who plays, then the turn order is drawn.
+function startFromSettings(settings = loadSettings()) {
+  const people = Array.from({ length: settings.humans }, (_, i) => ({
+    kind: 'human',
+    name: settings.humans === 1 ? 'Dig' : `Spiller ${i + 1}`,
+    color: i,
+  }));
+  const names = [...OPPONENTS].sort(() => Math.random() - 0.5);
+  const bots = Array.from({ length: settings.opponents }, (_, i) => ({ kind: settings.level, name: names[i], color: settings.humans + i }));
+  startGame([...people, ...bots].sort(() => Math.random() - 0.5), settings.speed, settings.mode);
+}
+
+// order: [{ kind: 'human' | 'easy' | 'normal', name, color }] in turn order.
+function startGame(order, speed, mode = 'mission', seed = (Math.random() * 2 ** 31) | 0) {
+  const humans = order.filter((x) => x.kind === 'human').length;
+  game = {
+    setup: { players: order.map((x) => x.name), seed, mode },
+    seats: order.map((x) => x.kind),
+    colors: order.map((x) => x.color),
+    speed,
+    actions: [],
+  };
   s = G.newGame(map, rules, game.setup);
   clearSel();
   save();
@@ -159,19 +198,23 @@ function render() {
     if (s.phase === 'fortify') G.fortifyTargets(map, rules, s, sel.from).forEach((t) => targets.add(t));
   }
   const occ = s.occupy;
-  board.update(s, {
-    selected: new Set([sel.from, occ?.from].filter((t) => t >= 0)),
-    chosen: new Set([sel.to, occ?.to].filter((t) => t >= 0)),
-    targets,
-  });
+  board.update(
+    s,
+    {
+      selected: new Set([sel.from, occ?.from].filter((t) => t >= 0)),
+      chosen: new Set([sel.to, occ?.to].filter((t) => t >= 0)),
+      targets,
+    },
+    game.colors,
+  );
 
   $('players').replaceChildren(
     ...s.players.map((pl, i) => {
       const li = document.createElement('li');
       li.className = (i === p && s.phase !== 'over' ? 'current ' : '') + (pl.alive ? '' : 'out');
       const land = G.owned(s, i).length;
-      li.title = `${pl.name}: ${land} områder, ${pl.cards.length} kort`;
-      li.innerHTML = `<span class="dot" style="background:${COLORS[i]}"></span>${pl.name}
+      li.title = `${pl.name}: ${land} områder, ${pl.cards.length} krigslykkekort`;
+      li.innerHTML = `<span class="dot" style="background:${colorOf(i)}"></span>${pl.name}
         <span class="stats">${land} · ${pl.cards.length} kort</span>`;
       return li;
     }),
@@ -199,7 +242,8 @@ function renderBar() {
   if (s.phase === 'over') {
     phase = 'Spillet er slut';
     text = `${s.players[s.winner].name} har vundet.`;
-    button('Nyt spil', openNewGame, { primary: true });
+    button('Skift opsætning', () => openNewGame(true));
+    button('Spil igen', () => startFromSettings(), { primary: true });
   } else if (isBot()) {
     phase = `Runde ${s.round} · ${PHASE_NAMES[s.phase]}`;
     text = `${name} tænker …`;
@@ -210,15 +254,18 @@ function renderBar() {
     if (hand.length >= rules.maxHand) text = `Du har ${hand.length} kort. Byt et sæt, før du placerer hære.`;
     else if (s.reserve) text = `Du har ${s.reserve} ${s.reserve === 1 ? 'ny hær' : 'nye hære'}. Tryk på dine områder for at placere dem.`;
     else text = 'Alle hære er placeret.';
-    if (set) button(`Byt kort (+${G.tradeValue(rules, s.trades)})`, () => act({ type: 'trade', cards: set }));
+    if (set && hand.length < rules.maxHand) text += ` Du har et sæt krigslykkekort, der kan byttes til ${G.tradeValue(rules, s.trades)} hære.`;
+    if (set) button(`Byt krigslykkekort (+${G.tradeValue(rules, s.trades)})`, () => act({ type: 'trade', cards: set }));
     if (s.reserve && sel.from >= 0 && s.owner[sel.from] === p && hand.length < rules.maxHand) {
       button(`Resten på ${map.territories[sel.from].name}`, () => act({ type: 'place', t: sel.from, n: s.reserve }));
     }
     button('Til angreb', () => act({ type: 'end' }), { primary: true, disabled: s.reserve > 0 || hand.length >= rules.maxHand });
   } else if (s.phase === 'attack') {
     phase = `Runde ${s.round} · Angrib`;
-    if (sel.from < 0) text = 'Vælg et af dine områder at angribe fra, eller gå videre.';
-    else if (sel.to < 0) text = `Angrib fra ${map.territories[sel.from].name}: vælg en nabo.`;
+    if (sel.from < 0) {
+      text = 'Vælg et af dine områder at angribe fra, eller gå videre.';
+      if (!s.conquered) text += ' Erobrer du mindst ét område i denne tur, får du et krigslykkekort.';
+    } else if (sel.to < 0) text = `Angrib fra ${map.territories[sel.from].name}: vælg en nabo.`;
     else text = `${map.territories[sel.from].name} (${s.armies[sel.from]}) mod ${map.territories[sel.to].name} (${s.armies[sel.to]}).`;
     if (sel.to >= 0) {
       button('Angrib', () => act({ type: 'attack', from: sel.from, to: sel.to }), { primary: true });
@@ -263,6 +310,14 @@ const PHASE_NAMES = { reinforce: 'Forstærker', attack: 'Angriber', occupy: 'Ang
 
 const hint = (text) => ($('hint').textContent = text);
 
+let toastTimer = 0;
+function toast(text) {
+  $('toast').textContent = text;
+  $('toast').hidden = false;
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => ($('toast').hidden = true), 3200);
+}
+
 const flash = (t) => board.flash(t);
 
 /* ---------- what happened: dice and messages ---------- */
@@ -274,6 +329,12 @@ function showEvents(events) {
   if (rolls.length) showDice(rolls, events.find((e) => e.type === 'conquer'), out);
   for (const e of events) {
     if (e.type === 'win') openGameOver();
+    if (e.type === 'card' && game.seats[e.p] === 'human') {
+      const t = G.cardTerritory(map, e.card);
+      const who = game.seats.filter((x) => x === 'human').length > 1 ? `${s.players[e.p].name} fik` : 'Du fik';
+      toast(`${who} et krigslykkekort for at erobre: ${SYMBOLS[G.cardSymbol(map, e.card)]} ${t >= 0 ? map.territories[t].name : 'joker'}`);
+    }
+    if (e.type === 'trade' && game.seats[e.p] !== 'human') toast(`${s.players[e.p].name} byttede krigslykkekort til ${e.armies} hære.`);
     if (e.type === 'place' || e.type === 'move') flash(e.to ?? e.t);
   }
 }
@@ -290,8 +351,8 @@ function showDice(rolls, conquest, out) {
   const pairs = Math.min(last.a.length, last.d.length);
   const box = $('dice');
   box.innerHTML = `
-    <div class="dice-row">${dice(last.a, COLORS[pa], (i) => i < pairs && last.a[i] <= last.d[i])}</div>
-    <div class="dice-row">${dice(last.d, COLORS[pd], (i) => i < pairs && last.a[i] > last.d[i])}</div>
+    <div class="dice-row">${dice(last.a, colorOf(pa), (i) => i < pairs && last.a[i] <= last.d[i])}</div>
+    <div class="dice-row">${dice(last.d, colorOf(pd), (i) => i < pairs && last.a[i] > last.d[i])}</div>
     <div>${rolls.length > 1 ? `${rolls.length} slag · ` : ''}angriber −${lostA}, forsvarer −${lostD}</div>
     ${conquest ? `<div><b>${map.territories[conquest.to].name} er erobret!</b></div>` : ''}
     ${out ? `<div><b>${s.players[out.p].name} er slået ud.</b></div>` : ''}`;
@@ -302,50 +363,61 @@ function showDice(rolls, conquest, out) {
 
 /* ---------- dialogs ---------- */
 
-function openNewGame() {
-  const seats = $('seats');
-  const current = (game?.seats ?? ['human', 'normal', 'normal']).map(level);
-  seats.replaceChildren(
-    ...COLORS.map((c, i) => {
-      const row = document.createElement('label');
-      row.className = 'row';
-      const value = current[i] ?? 'none';
-      row.innerHTML = `<span class="dot" style="background:${c}"></span><span>Plads ${i + 1}</span>
-        <select data-seat="${i}">
-          <option value="human">Menneske</option>
-          <option value="easy">Computer, let</option>
-          <option value="normal">Computer, normal</option>
-          ${i >= 2 ? '<option value="none">Ingen</option>' : ''}
-        </select>`;
-      row.querySelector('select').value = value;
-      return row;
-    }),
-  );
-  seats.querySelectorAll('select').forEach((x) => x.addEventListener('change', seatNote));
-  seatNote();
-  $('speed').value = game?.speed ?? 'normal';
-  $('mode').value = game?.setup.mode ?? 'mission';
+// The new game dialog: a summary of the last setup and Start. The choices sit folded away under
+// "Skift opsætning", since most of the time you just want another game like the last one.
+let draft = loadSettings();
+const CHOICES = {
+  opponents: () => {
+    const least = draft.humans > 1 ? 0 : 1;
+    return Array.from({ length: 6 - draft.humans - least + 1 }, (_, i) => [least + i, String(least + i)]);
+  },
+  level: () => [['easy', 'Let'], ['normal', 'Normal']],
+  mode: () => [['mission', 'Hemmelig mission'], ['world', 'Hele verden']],
+  humans: () => [[1, 'Kun mig'], [2, '2'], [3, '3']],
+  speed: () => [['normal', 'Roligt'], ['fast', 'Hurtigt']],
+};
+
+function summary(x) {
+  const them = x.opponents ? `${x.opponents} ${x.opponents === 1 ? 'modstander' : 'modstandere'} (${x.level === 'easy' ? 'lette' : 'normale'})` : '';
+  const who = x.humans === 1 ? `Dig mod ${them}` : `${x.humans} spillere på denne telefon${them ? ` mod ${them}` : ''}`;
+  return `${who} · ${x.mode === 'mission' ? 'hemmelig mission' : 'erobr hele verden'}`;
+}
+
+function renderSetup() {
+  $('setup-summary').textContent = summary(draft);
+  document.querySelectorAll('.pills').forEach((box) => {
+    const name = box.dataset.name;
+    box.replaceChildren(
+      ...CHOICES[name]().map(([value, label]) => {
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.textContent = label;
+        b.setAttribute('aria-pressed', String(draft[name] === value));
+        b.addEventListener('click', () => {
+          draft[name] = value;
+          // Keep the table between 2 and 6 players.
+          draft.opponents = Math.max(draft.humans > 1 ? 0 : 1, Math.min(6 - draft.humans, draft.opponents));
+          renderSetup();
+        });
+        return b;
+      }),
+    );
+  });
+}
+
+function openNewGame(change = false) {
+  draft = loadSettings();
+  renderSetup();
+  $('setup-details').open = change;
   $('cancel-new').hidden = !game || s.phase === 'over';
   $('new-game').showModal();
 }
 
-// Tells why later seats start with more armies (the ruleset's laterSeatArmies).
-function seatNote() {
-  const n = [...document.querySelectorAll('[data-seat]')].filter((x) => x.value !== 'none').length;
-  const extra = G.seatArmies(rules, n);
-  $('seat-note').textContent = !extra
-    ? ''
-    : n === 2
-      ? `Plads 1 begynder. Til gengæld starter plads 2 med ${extra} ekstra hære.`
-      : `Plads 1 begynder. Til gengæld får hver plads efter den ${extra} ${extra === 1 ? 'hær' : 'hære'} mere fra start end pladsen før.`;
-}
-
 $('new-game').addEventListener('close', () => {
   if ($('new-game').returnValue !== 'start') return;
-  const seats = [...document.querySelectorAll('[data-seat]')].map((x) => x.value).filter((v) => v !== 'none');
-  startGame(seats, $('speed').value, $('mode').value);
+  saveSettings(draft);
+  startFromSettings(draft);
 });
-// Without a game there is nothing to go back to: Escape must not leave an empty board.
 $('new-game').addEventListener('cancel', (e) => !game && e.preventDefault());
 
 function openGameOver() {
@@ -361,6 +433,10 @@ function openGameOver() {
   $('over-text').innerHTML = `${how}${others.length ? `<br><br><b>De andres missioner</b><br>${others.join('<br>')}` : ''}`;
   setTimeout(() => $('game-over').showModal(), 900);
 }
+$('game-over').addEventListener('close', () => {
+  if ($('game-over').returnValue === 'again') startFromSettings();
+  else if ($('game-over').returnValue === 'setup') openNewGame(true);
+});
 
 /* ---------- missions and cards ---------- */
 
@@ -430,12 +506,18 @@ function openCards() {
             <span class="sym">${SYMBOLS[G.cardSymbol(map, c)]}</span><span>${t >= 0 ? map.territories[t].name : 'Joker'}</span></div>`;
         })
         .join('')
-    : '<p class="empty">Ingen kort endnu.</p>';
+    : '<p class="empty">Du har ingen krigslykkekort endnu.</p>';
   const value = G.tradeValue(rules, s.trades);
   const canTrade = set.length && p === s.current && s.phase === 'reinforce';
   $('cards-text').innerHTML = `Næste sæt giver <b>${value} hære</b>.${
-    set.length ? (canTrade ? ' Du har et sæt (løftet op).' : ' Du har et sæt, som du kan bytte, når du forstærker.') : ''
+    set.length ? (canTrade ? ' Du har et sæt (løftet op).' : ' Du har et sæt, som du kan bytte, når du forstærker.') : hand.length ? ' Du har ikke et sæt endnu.' : ''
   }`;
+  const next = Math.min(s.trades, rules.tradeValues.length - 1);
+  $('ladder').innerHTML =
+    rules.tradeValues.map((v, i) => `<span class="${i === next ? 'next' : ''}">${i + 1}. sæt: ${v}</span>`).join('') +
+    `<span>derefter ${rules.tradeValues.at(-1)}</span>`;
+  // Until you have cards, the explanation is the interesting part.
+  $('cards-dialog').querySelector('.howto').open = !hand.length;
   $('trade-btn').hidden = !canTrade;
   $('cards-dialog').showModal();
 }
@@ -449,12 +531,15 @@ function renderHudButtons() {
   const p = viewer();
   $('mission-btn').hidden = p < 0 || s.mode !== 'mission' || !s.players[p]?.mission;
   $('cards-btn').hidden = p < 0;
-  if (p >= 0) $('cards-btn').textContent = `Kort (${s.players[p].cards.length})`;
+  if (p < 0) return;
+  // The button shows the symbols in hand, and lights up when there is a set to trade.
+  const hand = s.players[p].cards;
+  $('cards-btn').textContent = hand.length ? `Krigslykke ${hand.map((c) => SYMBOLS[G.cardSymbol(map, c)]).join('')}` : 'Krigslykke';
+  $('cards-btn').classList.toggle('ready', !!G.bestSet(map, s, p));
 }
 $('mission-btn').addEventListener('click', openMission);
 $('cards-btn').addEventListener('click', openCards);
-$('game-over').addEventListener('close', () => openNewGame());
-$('menu-btn').addEventListener('click', openNewGame);
+$('menu-btn').addEventListener('click', () => openNewGame());
 
 /* ---------- start ---------- */
 
@@ -483,7 +568,10 @@ window.__conquest = {
   board,
   act,
   tap,
-  start: startGame,
+  // start(['human', 'normal', …], speed, mode, seed): a game with these seats in this order.
+  start: (seats, speed = 'fast', mode = 'mission', seed) =>
+    startGame(seats.map((kind, i) => ({ kind, name: kind === 'human' ? 'Dig' : OPPONENTS[i], color: i })), speed, mode, seed),
+  startFromSettings,
   openCards,
   openMission,
 };

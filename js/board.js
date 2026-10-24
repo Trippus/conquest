@@ -84,10 +84,11 @@ export function createBoard(svg, grid, map, { onTap }) {
 
   /* ---------- state ---------- */
 
-  // marks: { selected: Set, targets: Set, chosen: Set }
-  function update(s, { selected = new Set(), targets = new Set(), chosen = new Set() } = {}) {
+  // marks: { selected: Set, targets: Set, chosen: Set }. colors: each player's colour (an index
+  // into PLAYER_COLORS), when it is not simply their seat number.
+  function update(s, { selected = new Set(), targets = new Set(), chosen = new Set() } = {}, colors = null) {
     T.forEach((t, i) => {
-      const color = PLAYER_COLORS[s.owner[i]] ?? 'transparent';
+      const color = PLAYER_COLORS[colors?.[s.owner[i]] ?? s.owner[i]] ?? 'transparent';
       washes[i].setAttribute('fill', color);
       seals[i].querySelector('.wax').setAttribute('fill', s.owner[i] >= 0 ? color : '#b9a98a');
       seals[i].querySelector('.count').textContent = s.owner[i] >= 0 ? s.armies[i] : '';

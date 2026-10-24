@@ -17,13 +17,14 @@
     <svg id="board" role="img" aria-label="Kortet"></svg>
     <div id="hand-buttons">
       <button id="mission-btn" hidden>Mission</button>
-      <button id="cards-btn" hidden>Kort</button>
+      <button id="cards-btn" hidden>Krigslykke</button>
     </div>
     <div id="zoom">
       <button id="zoom-in" class="icon" aria-label="Zoom ind">+</button>
       <button id="zoom-out" class="icon" aria-label="Zoom ud">−</button>
     </div>
     <div id="dice" aria-live="polite" hidden></div>
+    <div id="toast" aria-live="polite" hidden></div>
   </main>
 
   <footer id="bar">
@@ -40,21 +41,17 @@
   <dialog id="new-game">
     <form method="dialog">
       <h2>Nyt spil</h2>
-      <p class="sub">Verdenskortet, første udkast.</p>
-      <div id="seats"></div>
-      <p class="sub" id="seat-note"></p>
-      <label class="row">Sejr
-        <select id="mode">
-          <option value="mission">Hemmelig mission (kortere)</option>
-          <option value="world">Erobr hele verden</option>
-        </select>
-      </label>
-      <label class="row">Computerens tempo
-        <select id="speed">
-          <option value="normal">Roligt</option>
-          <option value="fast">Hurtigt</option>
-        </select>
-      </label>
+      <p id="setup-summary" class="summary"></p>
+      <details id="setup-details">
+        <summary>Skift opsætning</summary>
+        <div class="field"><span>Modstandere</span><div class="pills" data-name="opponents"></div></div>
+        <div class="field"><span>Sværhedsgrad</span><div class="pills" data-name="level"></div></div>
+        <div class="field"><span>Sejr</span><div class="pills" data-name="mode"></div></div>
+        <div class="field"><span>Spillere på denne telefon</span><div class="pills" data-name="humans"></div></div>
+        <div class="field"><span>Modstandernes tempo</span><div class="pills" data-name="speed"></div></div>
+        <p class="sub">Turrækkefølgen trækkes ved start. Den, der begynder, har en fordel, så de næste starter med
+          lidt flere hære.</p>
+      </details>
       <div class="buttons">
         <button value="cancel" id="cancel-new">Fortsæt spillet</button>
         <button value="start" class="primary" id="start">Start</button>
@@ -75,13 +72,20 @@
 
   <dialog id="cards-dialog">
     <form method="dialog">
-      <h2>Dine kort</h2>
+      <h2>Krigslykkekort</h2>
       <p class="sub" id="cards-who"></p>
       <div id="hand"></div>
       <p id="cards-text"></p>
-      <p class="sub">Du får et kort, når du erobrer mindst ét område i din tur. Tre ens symboler eller ét af
-        hver er et sæt (✱ tæller som alle). Et sæt byttes til hære, når du forstærker, og står et af dine egne
-        områder på kortene, får det 2 hære ekstra. Med 5 kort skal du bytte.</p>
+      <details class="howto">
+        <summary>Sådan virker krigslykkekort</summary>
+        <p><b>Sådan får du dem:</b> erobr mindst ét område i din tur, så får du ét kort, når turen slutter.</p>
+        <p><b>Tre kort er et sæt</b>, når de har tre ens symboler eller ét af hver:</p>
+        <div class="set-examples"><span>★ ★ ★</span><span>◆ ◆ ◆</span><span>● ● ●</span><span>★ ◆ ●</span></div>
+        <p>✱ er en joker og tæller som et hvilket som helst symbol.</p>
+        <p><b>Et sæt byttes til hære</b>, når du forstærker. Hvert sæt, nogen bytter, gør det næste mere værd:</p>
+        <div id="ladder"></div>
+        <p>Står et af dine egne områder på et af kortene, får det 2 hære ekstra. Har du 5 kort, skal du bytte.</p>
+      </details>
       <div class="buttons">
         <button value="close">Luk</button>
         <button value="trade" class="primary" id="trade-btn">Byt sæt</button>
@@ -93,7 +97,10 @@
     <form method="dialog">
       <h2 id="over-title"></h2>
       <p id="over-text"></p>
-      <div class="buttons"><button value="again" class="primary">Nyt spil</button></div>
+      <div class="buttons">
+        <button value="setup">Skift opsætning</button>
+        <button value="again" class="primary">Spil igen</button>
+      </div>
     </form>
   </dialog>
 

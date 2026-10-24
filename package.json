@@ -5,7 +5,8 @@
   "description": "Conquest (working title) by Trippus Games - turn-based world conquest strategy",
   "type": "module",
   "scripts": {
-    "test": "node --test \"tests/unit/*.test.mjs\"",
+    "start": "node tools/serve.mjs",
+    "test":"node --test \"tests/unit/*.test.mjs\"",
     "test:all": "npm test",
     "sim": "node tools/simulate.mjs"
   }

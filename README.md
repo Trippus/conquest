@@ -6,6 +6,7 @@ Hvad der skal designes og besluttes står i [`DESIGN.md`](DESIGN.md).
 
 ## Kør
 ```
+npm start          # http://localhost:5183 (også over Wi-Fi)
 npm test           # unit-tests af reglerne og bot-spil
 npm run sim        # 200 bot-spil: sejre pr. plads, længde (npm run sim -- 500 3 = 500 spil, 3 spillere)
 ```
@@ -17,6 +18,7 @@ npm run sim        # 200 bot-spil: sejre pr. plads, længde (npm run sim -- 500 
 | `js/ai.js` | Computerspillere ("let" bot) og `playBots()` |
 | `js/maps/*.js` | Kort som data: territorier, naboer, regioner og bonus. `test.js` er et lille testkort |
 | `js/rules/*.js` | Regelsæt som data: starthære, terninger, kort-bytte, rundegrænse |
+| `js/app.js` | Prototype-brugerfladen: tegner kortet ud fra data, tryk → handlinger, bots spiller, gem/indlæs. `window.__conquest` er debug-hooket |
 | `tools/simulate.mjs` | Mange bot-spil til balance |
 
 ## Et spil er en liste af handlinger
@@ -27,7 +29,8 @@ Det bruges til at gemme, til fejlrapporter og senere til online-spil, hvor en se
 og kun viser hver spiller `view(state, spiller)`.
 
 ## Status
-Milepæl 1 (regelmotor og tests) er færdig. Næste: en grim, spilbar prototype i browseren (port 5183).
+Milepæl 1 (regelmotor og tests) og 2 (spilbar prototype mod computeren og flere på samme telefon) er færdige.
+Næste: en "normal" bot (milepæl 3). Gemmes i `localStorage` under `conquest.v1` som opsætning + handlinger.
 
 Kendt til balancen: på testkortet vinder spiller 1 ca. 70 % af 2-mandsspillene (32 % ved 4 spillere).
 Det skal justeres, når det rigtige kort findes, fx færre forstærkninger i første runde.

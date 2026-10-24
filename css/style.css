@@ -1,0 +1,164 @@
+/* Prototype styling: plain on purpose. The real look is decided in DESIGN.md (milestone 4). */
+:root {
+  --bg: #fbf6ee;
+  --ink: #2b2522;
+  --muted: #7a6f66;
+  --panel: #ffffff;
+  --line: #b9ab98;
+  --primary: #ffd25a;
+  --primary-ink: #2b2522;
+  --shadow: 0 2px 10px rgb(0 0 0 / 0.12);
+  --ui: ui-rounded, 'SF Pro Rounded', system-ui, sans-serif;
+  --title: ui-serif, Georgia, serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --bg: #1d1b1a;
+    --ink: #f1ebe3;
+    --muted: #a99d92;
+    --panel: #2a2725;
+    --line: #6b6259;
+    --shadow: 0 2px 10px rgb(0 0 0 / 0.5);
+  }
+}
+:root[data-theme='dark'] {
+  --bg: #1d1b1a;
+  --ink: #f1ebe3;
+  --muted: #a99d92;
+  --panel: #2a2725;
+  --line: #6b6259;
+  --shadow: 0 2px 10px rgb(0 0 0 / 0.5);
+}
+
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html, body { margin: 0; height: 100%; }
+body {
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  height: 100dvh;
+  background: var(--bg);
+  color: var(--ink);
+  font: 17px/1.35 var(--ui);
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+
+button, select {
+  font: inherit;
+  color: var(--ink);
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  min-height: 48px;
+  padding: 0 16px;
+  cursor: pointer;
+}
+button:disabled { opacity: 0.4; cursor: default; }
+button.primary { background: var(--primary); color: var(--primary-ink); border-color: transparent; font-weight: 700; }
+button.icon { min-width: 48px; padding: 0; font-size: 22px; }
+
+/* ---------- top: players ---------- */
+#hud {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  padding: max(8px, env(safe-area-inset-top)) 12px 6px;
+}
+#players {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  flex: 1;
+}
+#players li {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: var(--panel);
+  border: 2px solid transparent;
+  font-size: 14px;
+}
+#players li.current { border-color: var(--ink); font-weight: 700; }
+#players li.out { opacity: 0.35; text-decoration: line-through; }
+#players .dot { width: 14px; height: 14px; border-radius: 50%; flex: none; }
+#players .stats { color: var(--muted); font-weight: 400; }
+
+/* ---------- board ---------- */
+#board-wrap { position: relative; min-height: 0; }
+#board { width: 100%; height: 100%; display: block; }
+.region-land { opacity: 0.22; stroke-linejoin: round; stroke-linecap: round; }
+.region-label { font: 700 3.2px var(--ui); fill: var(--muted); text-anchor: middle; }
+.link { stroke: var(--line); stroke-width: 0.6; }
+.link.sea { stroke-dasharray: 1.6 1.4; }
+.terr { cursor: pointer; }
+.terr circle.body { stroke: var(--bg); stroke-width: 0.8; }
+.terr .count { font: 700 4.4px var(--ui); fill: #fff; text-anchor: middle; dominant-baseline: central; pointer-events: none; }
+.terr .name { font: 2.7px var(--ui); fill: var(--ink); text-anchor: middle; pointer-events: none; }
+.terr .ring { fill: none; stroke-width: 1.1; pointer-events: none; }
+.terr.selected .ring { stroke: var(--ink); }
+.terr.target .ring { stroke: var(--ink); stroke-dasharray: 1.5 1.2; animation: spin 4s linear infinite; transform-box: fill-box; transform-origin: center; }
+.terr.chosen .ring { stroke: #d33; stroke-dasharray: none; stroke-width: 1.4; }
+.terr.flash circle.body { animation: flash 0.5s ease-out; }
+@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes flash { from { stroke: var(--ink); stroke-width: 3; } }
+
+#dice {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  background: var(--panel);
+  box-shadow: var(--shadow);
+  border-radius: 14px;
+  padding: 10px 14px;
+  text-align: center;
+  pointer-events: none;
+  font-size: 15px;
+  min-width: 220px;
+}
+#dice .dice-row { display: flex; gap: 6px; justify-content: center; align-items: center; margin: 4px 0; }
+#dice .die {
+  width: 30px; height: 30px; border-radius: 7px;
+  display: grid; place-items: center; font-weight: 700; color: #fff;
+}
+#dice .die.lost { opacity: 0.35; }
+
+/* ---------- bottom: phase, hint, actions ---------- */
+#bar {
+  padding: 8px 12px max(12px, env(safe-area-inset-bottom));
+  background: var(--panel);
+  box-shadow: var(--shadow);
+  border-radius: 18px 18px 0 0;
+}
+#phase { margin: 0; font-size: 13px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; }
+#hint { margin: 2px 0 8px; min-height: 2.7em; }
+#actions { display: flex; flex-wrap: wrap; gap: 8px; }
+#actions button { flex: 1 1 140px; }
+#stepper { display: flex; align-items: center; justify-content: center; gap: 12px; margin-bottom: 8px; }
+#stepper button { min-width: 56px; font-size: 24px; }
+#amount { min-width: 2.5em; text-align: center; font-size: 26px; font-weight: 700; }
+
+/* ---------- dialogs ---------- */
+dialog {
+  border: none;
+  border-radius: 18px;
+  background: var(--panel);
+  color: var(--ink);
+  box-shadow: var(--shadow);
+  width: min(420px, calc(100vw - 32px));
+  padding: 20px;
+}
+dialog::backdrop { background: rgb(0 0 0 / 0.4); }
+dialog h2 { font-family: var(--title); margin: 0 0 4px; }
+dialog .sub { color: var(--muted); margin: 0 0 12px; font-size: 15px; }
+.row { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 8px 0; }
+.row .dot { width: 18px; height: 18px; border-radius: 50%; flex: none; }
+.row span { flex: 1; }
+.buttons { display: flex; gap: 8px; margin-top: 16px; }
+.buttons button { flex: 1; }

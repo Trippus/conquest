@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="da">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="color-scheme" content="light dark">
+  <title>Conquest</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header id="hud">
+    <ol id="players" aria-label="Spillere"></ol>
+    <button id="menu-btn" class="icon" aria-label="Nyt spil">☰</button>
+  </header>
+
+  <main id="board-wrap">
+    <svg id="board" viewBox="-8 -6 116 112" role="img" aria-label="Kortet"></svg>
+    <div id="dice" aria-live="polite" hidden></div>
+  </main>
+
+  <footer id="bar">
+    <p id="phase"></p>
+    <p id="hint" aria-live="polite"></p>
+    <div id="stepper" hidden>
+      <button id="minus" aria-label="Færre">−</button>
+      <output id="amount"></output>
+      <button id="plus" aria-label="Flere">+</button>
+    </div>
+    <div id="actions"></div>
+  </footer>
+
+  <dialog id="new-game">
+    <form method="dialog">
+      <h2>Nyt spil</h2>
+      <p class="sub">Prototype på testkortet. Grafikken kommer senere.</p>
+      <div id="seats"></div>
+      <label class="row">Computerens tempo
+        <select id="speed">
+          <option value="normal">Roligt</option>
+          <option value="fast">Hurtigt</option>
+        </select>
+      </label>
+      <div class="buttons">
+        <button value="cancel" id="cancel-new">Fortsæt spillet</button>
+        <button value="start" class="primary" id="start">Start</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="game-over">
+    <form method="dialog">
+      <h2 id="over-title"></h2>
+      <p id="over-text"></p>
+      <div class="buttons"><button value="again" class="primary">Nyt spil</button></div>
+    </form>
+  </dialog>
+
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>

@@ -63,6 +63,12 @@ function act(a) {
   game.actions.push(a);
   save();
   if (r.events.some((e) => e.type === 'turn' || e.type === 'win')) clearSel();
+  // A new phase starts with nothing chosen. The one exception: the territory the armies were just
+  // placed on stays chosen for the attack, if it can attack.
+  if (r.events.some((e) => e.type === 'phase')) {
+    const keep = s.phase === 'attack' && sel.from >= 0 && s.armies[sel.from] > 1 && G.attackTargets(map, s, sel.from).length;
+    sel = { from: keep ? sel.from : -1, to: -1, n: 0 };
+  }
   if (s.phase === 'occupy') sel.n = s.armies[s.occupy.from] - 1; // all in, unless the player says less
   showEvents(r.events);
   render();
@@ -128,7 +134,9 @@ function tap(t) {
     render();
   } else if (s.phase === 'fortify') {
     if (!mine) return hint('Du kan kun flytte mellem dine egne områder.');
-    if (sel.from >= 0 && t !== sel.from && G.fortifyTargets(map, rules, s, sel.from).includes(t)) {
+    if (t === sel.from) {
+      clearSel(); // tapping the start territory again lets you pick another
+    } else if (sel.from >= 0 && G.fortifyTargets(map, rules, s, sel.from).includes(t)) {
       sel.to = t;
       sel.n = s.armies[sel.from] - 1;
     } else if (s.armies[t] > 1) {
@@ -230,6 +238,7 @@ function renderBar() {
       stepper = [1, s.armies[sel.from] - 1];
       button('Flyt', () => act({ type: 'fortify', from: sel.from, to: sel.to, n: sel.n }), { primary: true });
     }
+    if (sel.from >= 0) button('Vælg andet startområde', () => (clearSel(), render()));
     button('Afslut tur', () => act({ type: 'end' }));
   }
 

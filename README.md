@@ -23,7 +23,8 @@ npm run design-shots                          # stilprøverne som PNG (kræver n
 | `js/map-shapes.js` | Gør sekskantgitteret til tegnbare former: udjævnede omrids, grænser, kyst, havruter |
 | `design/` | Stilprøver til kortet (`stilproever.html`, `stil-*.png`) |
 | `js/rules/*.js` | Regelsæt som data: starthære, terninger, kort-bytte, rundegrænse |
-| `js/app.js` | Prototype-brugerfladen: tegner kortet ud fra data, tryk → handlinger, bots spiller, gem/indlæs. `window.__conquest` er debug-hooket |
+| `js/app.js` | Brugerfladen: tryk → handlinger, bots spiller, terninger, gem/indlæs. `window.__conquest` er debug-hooket |
+| `js/board.js` | Verdenskortet i papirkort-stil: farver, laksegl med hære, markeringer, træk og zoom (knib, hjul, +/−) |
 | `tools/simulate.mjs` | Mange bot-spil til balance |
 
 ## Et spil er en liste af handlinger
@@ -35,7 +36,7 @@ og kun viser hver spiller `view(state, spiller)`.
 
 ## Status
 Milepæl 1 (regelmotor og tests), 2 (spilbar prototype mod computeren og flere på samme telefon) og 3 (normal bot)
-er færdige. Næste: det rigtige kort og grafikken (milepæl 4), se `DESIGN.md`. Gemmes i `localStorage` under `conquest.v1` som opsætning + handlinger.
+er færdige. Næste: det rigtige kort og grafikken (milepæl 4), se `DESIGN.md`. Gemmes i `localStorage` under `conquest.v2` som opsætning + handlinger (v1 var spil på testkortet).
 
 Kendt til balancen: på testkortet vinder spiller 1 ca. 70 % af 2-mandsspillene (32 % ved 4 spillere).
 Det skal justeres, når det rigtige kort findes, fx færre forstærkninger i første runde.

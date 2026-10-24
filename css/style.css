@@ -77,36 +77,37 @@ button.icon { min-width: 48px; padding: 0; font-size: 22px; }
 #players li {
   display: flex;
   align-items: center;
-  gap: 6px;
-  padding: 4px 10px;
+  gap: 5px;
+  padding: 3px 9px;
   border-radius: 999px;
   background: var(--panel);
   border: 2px solid transparent;
-  font-size: 14px;
+  font-size: 13px;
 }
 #players li.current { border-color: var(--ink); font-weight: 700; }
 #players li.out { opacity: 0.35; text-decoration: line-through; }
 #players .dot { width: 14px; height: 14px; border-radius: 50%; flex: none; }
 #players .stats { color: var(--muted); font-weight: 400; }
 
-/* ---------- board ---------- */
-#board-wrap { position: relative; min-height: 0; }
-#board { width: 100%; height: 100%; display: block; }
-.region-land { opacity: 0.22; stroke-linejoin: round; stroke-linecap: round; }
-.region-label { font: 700 3.2px var(--ui); fill: var(--muted); text-anchor: middle; }
-.link { stroke: var(--line); stroke-width: 0.6; }
-.link.sea { stroke-dasharray: 1.6 1.4; }
-.terr { cursor: pointer; }
-.terr circle.body { stroke: var(--bg); stroke-width: 0.8; }
-.terr .count { font: 700 4.4px var(--ui); fill: #fff; text-anchor: middle; dominant-baseline: central; pointer-events: none; }
-.terr .name { font: 2.7px var(--ui); fill: var(--ink); text-anchor: middle; pointer-events: none; }
-.terr .ring { fill: none; stroke-width: 1.1; pointer-events: none; }
-.terr.selected .ring { stroke: var(--ink); }
-.terr.target .ring { stroke: var(--ink); stroke-dasharray: 1.5 1.2; animation: spin 4s linear infinite; transform-box: fill-box; transform-origin: center; }
-.terr.chosen .ring { stroke: #d33; stroke-dasharray: none; stroke-width: 1.4; }
-.terr.flash circle.body { animation: flash 0.5s ease-out; }
-@keyframes spin { to { transform: rotate(360deg); } }
-@keyframes flash { from { stroke: var(--ink); stroke-width: 3; } }
+/* ---------- board: the paper map (js/board.js) ---------- */
+#board-wrap { position: relative; min-height: 0; overflow: hidden; }
+#board { width: 100%; height: 100%; display: block; background: #ead9b5; touch-action: none; cursor: grab; }
+#board:active { cursor: grabbing; }
+#board .land, #board .seal { cursor: pointer; }
+#board .mark { fill: none; stroke: none; }
+#board .mark.selected { stroke: #2b1d12; stroke-width: .5; }
+#board .mark.chosen { stroke: #a3261b; stroke-width: .55; }
+#board .mark.target { stroke: #a3261b; stroke-width: .32; stroke-dasharray: .7 .45; animation: march 1.2s linear infinite; }
+@keyframes march { to { stroke-dashoffset: -2.3; } }
+#board .wax { stroke: #2b1d12; stroke-width: .12; }
+#board .rim { fill: none; stroke: #f4e8cc; stroke-width: .08; opacity: .7; }
+#board .count { font: 700 1.15px Georgia, serif; fill: #f4e8cc; text-anchor: middle; pointer-events: none; }
+#board .name { font: italic 1px Georgia, serif; fill: #3d2c1c; text-anchor: middle; paint-order: stroke; stroke: #f4e8cc; stroke-width: .25px; stroke-linejoin: round; pointer-events: none; }
+#board .seal.flash .wax { animation: pop .6s ease-out; }
+@keyframes pop { from { stroke: #fff6d8; stroke-width: .7; } }
+#board .region-names text { font: italic 1.6px Georgia, serif; letter-spacing: .35px; fill: #7a2e1d; opacity: .55; text-anchor: middle; }
+#zoom { position: absolute; right: 10px; bottom: 10px; display: flex; flex-direction: column; gap: 6px; }
+#zoom button { box-shadow: var(--shadow); }
 
 #dice {
   position: absolute;

@@ -14,7 +14,11 @@
   </header>
 
   <main id="board-wrap">
-    <svg id="board" viewBox="-8 -6 116 112" role="img" aria-label="Kortet"></svg>
+    <svg id="board" role="img" aria-label="Kortet"></svg>
+    <div id="zoom">
+      <button id="zoom-in" class="icon" aria-label="Zoom ind">+</button>
+      <button id="zoom-out" class="icon" aria-label="Zoom ud">−</button>
+    </div>
     <div id="dice" aria-live="polite" hidden></div>
   </main>
 
@@ -32,7 +36,7 @@
   <dialog id="new-game">
     <form method="dialog">
       <h2>Nyt spil</h2>
-      <p class="sub">Prototype på testkortet. Grafikken kommer senere.</p>
+      <p class="sub">Verdenskortet, første udkast.</p>
       <div id="seats"></div>
       <label class="row">Computerens tempo
         <select id="speed">

@@ -18,7 +18,7 @@ Intet. Prototypen er bevidst grim.
 ## Når reglerne er afprøvet (milepæl 4: rigtigt kort og grafik)
 | # | Hvad | Du beslutter / tegner | Claude leverer |
 |---|---|---|---|
-| 1 | **Kortstil** | Udtrykket: papirkort, flat/low-poly, neon, brætspil … Gerne 2–3 billeder til inspiration | ✅ Udkast: 3 stilprøver (A brætspil, B papirkort, C taktisk) i `design/stilproever.html` og `design/stil-*.png` |
+| 1 | **Kortstil** | Udtrykket: papirkort, flat/low-poly, neon, brætspil … Gerne 2–3 billeder til inspiration | ✅ **Valgt: B, gammelt papirkort** (24/10-2026). Bygget ind i spillet (`js/board.js`). Stilprøverne ligger stadig i `design/` |
 | 2 | **Territorie-inddeling** | Hvor grænserne går, og hvad de ca. 24–30 territorier og 5–6 regioner hedder | ✅ Udkast: 30 territorier i 6 regioner i `js/maps/world.js` (bogstaver i et sekskantgitter, så det er let at rette). Tegnet i hånden, ingen fremmede kortdata |
 | 3 | **Havruter og regionsbonus** | Hvilke forbindelser over vand, der skal findes | ✅ Udkast: 5 havruter, bonus ud fra antal indgange. Bot-spil: retfærdigt ved 3–4 spillere |
 | 4 | **Spillerfarver** | 6 farver, der kan skelnes af farveblinde, plus et symbol eller mønster pr. spiller | Farvetjek i lyst og mørkt tema |

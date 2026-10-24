@@ -1,24 +1,23 @@
-// The prototype board: draws the map from its data, turns taps into engine actions and lets the
-// bots play their turns. Deliberately plain; the real look comes later (see DESIGN.md).
+// The game screen: the world map (js/board.js draws it), turns taps into engine actions and lets
+// the bots play their turns.
 //
 // The saved game is the setup plus the list of actions, replayed on load, exactly like a
 // replay or (later) an online game. Debug hook: window.__conquest.
 
 import * as G from './engine.js';
 import { botAction } from './ai.js';
-import { TEST_MAP } from './maps/test.js';
+import * as WORLD from './maps/world.js';
 import { MODERN } from './rules/modern.js';
+import { createBoard, PLAYER_COLORS as COLORS } from './board.js';
 
-const KEY = 'conquest.v1';
-// Placeholder player colours; the real ones are design item 4.
-const COLORS = ['#d24c48', '#3a74c9', '#3f9a4a', '#d98b1c', '#8b4cb8', '#14918f'];
-const REGION_COLORS = ['#c9a96e', '#8fb37f', '#cf8f6d', '#929bc9', '#b98fb0', '#7fb3b1'];
+// v1 saves were games on the 12-territory test map; they cannot be replayed on the world map.
+const KEY = 'conquest.v2';
 const DELAY = { normal: 650, fast: 140 };
 
-const map = G.prepareMap(TEST_MAP);
+const map = G.prepareMap(WORLD.WORLD);
 const rules = MODERN;
 const $ = (id) => document.getElementById(id);
-const svgNS = 'http://www.w3.org/2000/svg';
+const board = createBoard($('board'), WORLD, map, { onTap: (t) => tap(t) });
 
 let game = null; // { setup, seats: ['human' | 'easy' | 'normal'], speed, actions }
 let s = null; // the current state
@@ -44,7 +43,14 @@ function startGame(seats, speed, seed = (Math.random() * 2 ** 31) | 0) {
   clearSel();
   save();
   render();
+  focusOnPlayer();
   schedule();
+}
+
+// Start zoomed in on the (first) human player's territories, or the whole map when only bots play.
+function focusOnPlayer() {
+  const you = game.seats.indexOf('human');
+  board.focus(you >= 0 ? G.owned(s, you) : null);
 }
 
 function act(a) {
@@ -134,47 +140,7 @@ function tap(t) {
   }
 }
 
-/* ---------- drawing the board ---------- */
-
-const el = (tag, attrs = {}, parent) => {
-  const e = document.createElementNS(svgNS, tag);
-  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
-  if (parent) parent.appendChild(e);
-  return e;
-};
-
-// The fixed parts (land, links, region names) once; the territories are updated on each render.
-function drawBoard() {
-  const svg = $('board');
-  svg.replaceChildren();
-  const T = map.territories;
-  map.regions.forEach((r, i) => {
-    const pts = r.members.map((t) => `${T[t].x},${T[t].y}`).join(' ');
-    el('polygon', { points: pts, class: 'region-land', fill: REGION_COLORS[i], stroke: REGION_COLORS[i], 'stroke-width': 17 }, svg);
-  });
-  T.forEach((a, i) => {
-    for (const j of a.adj) {
-      if (j < i) continue;
-      const b = T[j];
-      const sea = a.region !== b.region && Math.hypot(a.x - b.x, a.y - b.y) > 35;
-      el('line', { x1: a.x, y1: a.y, x2: b.x, y2: b.y, class: sea ? 'link sea' : 'link' }, svg);
-    }
-  });
-  map.regions.forEach((r) => {
-    const cx = r.members.reduce((n, t) => n + T[t].x, 0) / r.members.length;
-    const cy = r.members.reduce((n, t) => n + T[t].y, 0) / r.members.length;
-    const label = el('text', { x: cx + (50 - cx) * 0.42, y: cy + (50 - cy) * 0.42, class: 'region-label' }, svg);
-    label.textContent = `${r.name} +${r.bonus}`;
-  });
-  T.forEach((t, i) => {
-    const g = el('g', { class: 'terr', 'data-t': i, transform: `translate(${t.x} ${t.y})` }, svg);
-    el('circle', { r: 7.4, class: 'ring' }, g);
-    el('circle', { r: 6, class: 'body' }, g);
-    el('text', { class: 'count' }, g);
-    el('text', { y: 9.6, class: 'name' }, g).textContent = t.name;
-    g.addEventListener('click', () => tap(i));
-  });
-}
+/* ---------- drawing ---------- */
 
 function render() {
   const p = s.current;
@@ -184,13 +150,10 @@ function render() {
     if (s.phase === 'fortify') G.fortifyTargets(map, rules, s, sel.from).forEach((t) => targets.add(t));
   }
   const occ = s.occupy;
-  document.querySelectorAll('.terr').forEach((g) => {
-    const t = +g.dataset.t;
-    g.querySelector('.body').setAttribute('fill', COLORS[s.owner[t]]);
-    g.querySelector('.count').textContent = s.armies[t];
-    g.classList.toggle('selected', t === sel.from || (occ && t === occ.from));
-    g.classList.toggle('target', targets.has(t) && t !== sel.to);
-    g.classList.toggle('chosen', t === sel.to || (occ && t === occ.to));
+  board.update(s, {
+    selected: new Set([sel.from, occ?.from].filter((t) => t >= 0)),
+    chosen: new Set([sel.to, occ?.to].filter((t) => t >= 0)),
+    targets,
   });
 
   $('players').replaceChildren(
@@ -198,8 +161,9 @@ function render() {
       const li = document.createElement('li');
       li.className = (i === p && s.phase !== 'over' ? 'current ' : '') + (pl.alive ? '' : 'out');
       const land = G.owned(s, i).length;
+      li.title = `${pl.name}: ${land} områder, ${pl.cards.length} kort`;
       li.innerHTML = `<span class="dot" style="background:${COLORS[i]}"></span>${pl.name}
-        <span class="stats">${land} omr. · ${pl.cards.length} kort</span>`;
+        <span class="stats">${land} · ${pl.cards.length} kort</span>`;
       return li;
     }),
   );
@@ -288,12 +252,7 @@ const PHASE_NAMES = { reinforce: 'Forstærker', attack: 'Angriber', occupy: 'Ang
 
 const hint = (text) => ($('hint').textContent = text);
 
-function flash(t) {
-  const g = document.querySelector(`.terr[data-t="${t}"]`);
-  g?.classList.remove('flash');
-  void g?.getBBox();
-  g?.classList.add('flash');
-}
+const flash = (t) => board.flash(t);
 
 /* ---------- what happened: dice and messages ---------- */
 
@@ -376,16 +335,20 @@ $('menu-btn').addEventListener('click', openNewGame);
 
 /* ---------- start ---------- */
 
-drawBoard();
+$('zoom-in').addEventListener('click', board.zoomIn);
+$('zoom-out').addEventListener('click', board.zoomOut);
+
 if (load()) {
   if (s.phase === 'occupy') sel.n = s.armies[s.occupy.from] - 1;
   render();
+  focusOnPlayer();
   schedule();
 } else {
-  // An empty board under the dialog until the first game starts.
+  // An empty map under the dialog until the first game starts.
   s = G.newGame(map, rules, { players: ['', ''], seed: 1 });
   game = null;
-  document.querySelectorAll('.terr').forEach((g) => g.querySelector('.body').setAttribute('fill', 'var(--line)'));
+  board.update({ ...s, owner: s.owner.map(() => -1) });
+  board.focus(null);
   openNewGame();
 }
 
@@ -394,6 +357,7 @@ window.__conquest = {
   get game() { return game; },
   map,
   rules,
+  board,
   act,
   tap,
   start: startGame,

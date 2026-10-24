@@ -310,9 +310,22 @@ function openNewGame() {
       return row;
     }),
   );
+  seats.querySelectorAll('select').forEach((x) => x.addEventListener('change', seatNote));
+  seatNote();
   $('speed').value = game?.speed ?? 'normal';
   $('cancel-new').hidden = !game || s.phase === 'over';
   $('new-game').showModal();
+}
+
+// Tells why later seats start with more armies (the ruleset's laterSeatArmies).
+function seatNote() {
+  const n = [...document.querySelectorAll('[data-seat]')].filter((x) => x.value !== 'none').length;
+  const extra = G.seatArmies(rules, n);
+  $('seat-note').textContent = !extra
+    ? ''
+    : n === 2
+      ? `Plads 1 begynder. Til gengæld starter plads 2 med ${extra} ekstra hære.`
+      : `Plads 1 begynder. Til gengæld får hver plads efter den ${extra} ${extra === 1 ? 'hær' : 'hære'} mere fra start end pladsen før.`;
 }
 
 $('new-game').addEventListener('close', () => {

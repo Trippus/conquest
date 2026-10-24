@@ -38,8 +38,9 @@ og kun viser hver spiller `view(state, spiller)`.
 Milepæl 1 (regelmotor og tests), 2 (spilbar prototype mod computeren og flere på samme telefon) og 3 (normal bot)
 er færdige. Næste: det rigtige kort og grafikken (milepæl 4), se `DESIGN.md`. Gemmes i `localStorage` under `conquest.v2` som opsætning + handlinger (v1 var spil på testkortet).
 
-Kendt til balancen: på testkortet vinder spiller 1 ca. 70 % af 2-mandsspillene (32 % ved 4 spillere).
-Det skal justeres, når det rigtige kort findes, fx færre forstærkninger i første runde.
+Balance: den, der starter, har en fordel (uden udligning vinder spiller 1 ca. 73 % af 2-mandsspillene på
+verdenskortet). Derfor starter senere pladser med flere hære (`laterSeatArmies`: +6 ved 2 spillere, +1 pr. plads
+ved 3–6). Målt med bot-spil: 54/46 ved 2 spillere, ca. 25 % pr. plads ved 4.
 
 Den normale bot vinder 1,3–1,4 gange sin rimelige andel mod lette bots på det store testkort (2–6 spillere).
 På det lille testkort er forskellen mindre: spillene er så korte, at startopstillingen og terningerne bestemmer mest.

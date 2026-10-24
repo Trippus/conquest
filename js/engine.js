@@ -123,6 +123,11 @@ export const tradeValue = (rules, trades) => rules.tradeValues[Math.min(trades, 
 /* ---------- questions about a state ---------- */
 
 export const owned = (s, p) => s.owner.flatMap((o, t) => (o === p ? [t] : []));
+// Extra start armies for each later seat (rules.laterSeatArmies: a number, or one per player count).
+export const seatArmies = (rules, players) => {
+  const extra = rules.laterSeatArmies ?? 0;
+  return typeof extra === 'number' ? extra : extra[players] ?? 0;
+};
 export const startArmies = (rules, territories, players) => Math.ceil((territories * rules.startArmiesPerTerritory) / players);
 
 // New armies at the start of p's turn: one per territoriesPerArmy territories (at least
@@ -132,6 +137,9 @@ export function reinforcements(map, rules, s, p) {
   for (const r of map.regions) if (r.members.every((t) => s.owner[t] === p)) n += r.bonus;
   return n;
 }
+
+// In the ruleset's peace rounds nobody attacks: the turn goes straight from reinforce to fortify.
+export const peace = (rules, s) => s.round <= (rules.peaceRounds ?? 0);
 
 export const attackTargets = (map, s, from) => map.territories[from].adj.filter((t) => s.owner[t] !== s.owner[from]);
 
@@ -154,7 +162,8 @@ export function fortifyTargets(map, rules, s, from) {
 
 // players: names, in turn order. Territories are dealt at random (the last players get the spare
 // ones, since the first player moves first), each gets one army, and the rest of every player's
-// start armies are spread at random over their own territories.
+// start armies are spread at random over their own territories. Moving first is an advantage, so
+// each later player gets seatArmies() more armies than the one before.
 export function newGame(map, rules, { players, seed = 1 }) {
   const n = players.length;
   if (n < 2 || n > 6) throw new Error('A game needs 2–6 players');
@@ -182,7 +191,8 @@ export function newGame(map, rules, { players, seed = 1 }) {
   const start = startArmies(rules, T, n);
   for (let p = 0; p < n; p++) {
     const own = owned(s, p);
-    for (let k = own.length; k < start; k++) s.armies[own[Math.floor(random(s) * own.length)]]++;
+    const mine = start + p * seatArmies(rules, n);
+    for (let k = own.length; k < mine; k++) s.armies[own[Math.floor(random(s) * own.length)]]++;
   }
   s.deck = shuffle(s, [...Array(T + rules.wildCards).keys()]);
   s.reserve = reinforcements(map, rules, s, 0);
@@ -223,6 +233,7 @@ export function check(map, rules, s, a) {
     case 'attack':
     case 'blitz':
       if (s.phase !== 'attack') return 'not attacking now';
+      if (peace(rules, s)) return 'no attacks in the first rounds';
       if (!mine(a.from)) return 'attack from your own territory';
       if (!map.territories[a.from].adj.includes(a.to)) return 'not a neighbour';
       if (s.owner[a.to] === p) return 'that territory is yours';
@@ -317,7 +328,7 @@ const DO = {
     endTurn(map, rules, s, ev);
   },
   end(map, rules, s, a, ev) {
-    if (s.phase === 'reinforce') s.phase = 'attack';
+    if (s.phase === 'reinforce') s.phase = peace(rules, s) ? 'fortify' : 'attack';
     else if (s.phase === 'attack') s.phase = 'fortify';
     else return endTurn(map, rules, s, ev);
     ev.push({ type: 'phase', p: s.current, phase: s.phase });

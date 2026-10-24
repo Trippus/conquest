@@ -16,5 +16,10 @@ export const MODERN = {
   maxHand: 5, // with this many cards you must trade before placing
   wildCards: 2,
   fortify: 'connected', // 'connected' (through your own territories) or 'adjacent'
+  // Moving first is worth a lot (with 2 players the first wins about 73% of bot games on the
+  // world map). Each later player starts with this many more armies than the one before, by number
+  // of players; measured with bot games so every seat wins about as often.
+  laterSeatArmies: { 2: 6, 3: 1, 4: 1, 5: 1, 6: 1 },
+  peaceRounds: 0, // rounds at the start without attacks (measured: helps little)
   maxRounds: 0, // 0: play until one player holds the world; otherwise most territories wins after this round
 };

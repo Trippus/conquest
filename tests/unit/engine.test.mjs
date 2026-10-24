@@ -63,12 +63,34 @@ test('a new game deals every territory and the right number of armies', () => {
     assert.ok(s.armies.every((a) => a >= 1));
     const start = G.startArmies(MODERN, 12, n);
     for (let p = 0; p < n; p++) {
-      assert.equal(G.owned(s, p).reduce((sum, t) => sum + s.armies[t], 0), start);
+      assert.equal(G.owned(s, p).reduce((sum, t) => sum + s.armies[t], 0), start + p * G.seatArmies(MODERN, n));
     }
     assert.equal(s.deck.length, 12 + MODERN.wildCards);
     assert.equal(s.phase, 'reinforce');
   }
   assert.throws(() => G.newGame(map, MODERN, { players: ['A'] }));
+});
+
+test('later seats start with more armies, by number of players', () => {
+  const total = (s, p) => G.owned(s, p).reduce((sum, t) => sum + s.armies[t], 0);
+  const two = G.newGame(map, MODERN, { players: ['A', 'B'], seed: 4 });
+  assert.equal(total(two, 1) - total(two, 0), MODERN.laterSeatArmies[2]);
+  const flat = { ...MODERN, laterSeatArmies: 2 };
+  const three = G.newGame(map, flat, { players: ['A', 'B', 'C'], seed: 4 });
+  assert.deepEqual([1, 2].map((p) => total(three, p) - total(three, 0)), [2, 4]);
+  const none = { ...MODERN, laterSeatArmies: 0 };
+  const even = G.newGame(map, none, { players: ['A', 'B'], seed: 4 });
+  assert.equal(total(even, 0), total(even, 1));
+});
+
+test('in peace rounds the turn skips the attack phase', () => {
+  const rules = { ...MODERN, peaceRounds: 1 };
+  const s = board('000111000111', Array(12).fill(2), { reserve: 0 }, rules);
+  assert.equal(refuse({ ...s, phase: 'attack' }, { type: 'attack', from: 0, to: at('w3') }, rules), 'no attacks in the first rounds');
+  const { s: t } = play(s, [{ type: 'end' }], rules);
+  assert.equal(t.phase, 'fortify');
+  const later = play({ ...s, round: 2 }, [{ type: 'end' }], rules).s;
+  assert.equal(later.phase, 'attack');
 });
 
 test('the same seed gives the same game, another seed another', () => {

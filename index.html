@@ -10,7 +10,11 @@
 <body>
   <header id="hud">
     <ol id="players" aria-label="Spillere"></ol>
-    <button id="menu-btn" class="icon" aria-label="Nyt spil">☰</button>
+    <div id="hud-buttons">
+      <button id="mission-btn" hidden>Mission</button>
+      <button id="cards-btn" hidden>Kort</button>
+      <button id="menu-btn" class="icon" aria-label="Nyt spil">☰</button>
+    </div>
   </header>
 
   <main id="board-wrap">
@@ -39,6 +43,12 @@
       <p class="sub">Verdenskortet, første udkast.</p>
       <div id="seats"></div>
       <p class="sub" id="seat-note"></p>
+      <label class="row">Sejr
+        <select id="mode">
+          <option value="mission">Hemmelig mission (kortere)</option>
+          <option value="world">Erobr hele verden</option>
+        </select>
+      </label>
       <label class="row">Computerens tempo
         <select id="speed">
           <option value="normal">Roligt</option>
@@ -48,6 +58,33 @@
       <div class="buttons">
         <button value="cancel" id="cancel-new">Fortsæt spillet</button>
         <button value="start" class="primary" id="start">Start</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="mission-dialog">
+    <form method="dialog">
+      <h2>Din mission</h2>
+      <p class="sub" id="mission-who"></p>
+      <p id="mission-text" class="big"></p>
+      <p id="mission-progress"></p>
+      <p class="sub">Missionen er hemmelig. Klarer du den i din egen tur, vinder du med det samme.</p>
+      <div class="buttons"><button value="ok" class="primary">OK</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="cards-dialog">
+    <form method="dialog">
+      <h2>Dine kort</h2>
+      <p class="sub" id="cards-who"></p>
+      <div id="hand"></div>
+      <p id="cards-text"></p>
+      <p class="sub">Du får et kort, når du erobrer mindst ét område i din tur. Tre ens symboler eller ét af
+        hver er et sæt (✱ tæller som alle). Et sæt byttes til hære, når du forstærker, og står et af dine egne
+        områder på kortene, får det 2 hære ekstra. Med 5 kort skal du bytte.</p>
+      <div class="buttons">
+        <button value="close">Luk</button>
+        <button value="trade" class="primary" id="trade-btn">Byt sæt</button>
       </div>
     </form>
   </dialog>

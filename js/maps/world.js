@@ -85,6 +85,17 @@ export const TERRITORIES = {
   y: ['oestaustralien', 'Østaustralien', 'oc'],
 };
 
+// Region missions for mission games (the engine adds "hold territories" and "knock out a player").
+// Each asks for about 10–12 territories; the small pairs need one more region of your choice.
+export const MISSIONS = [
+  { type: 'regions', regions: ['as', 'sa'] },
+  { type: 'regions', regions: ['as', 'af'] },
+  { type: 'regions', regions: ['na', 'af'] },
+  { type: 'regions', regions: ['na', 'oc'], plusOne: true },
+  { type: 'regions', regions: ['eu', 'sa'], plusOne: true },
+  { type: 'regions', regions: ['eu', 'oc'], plusOne: true },
+];
+
 // Crossings over water, drawn as dashed lines: [from, to].
 export const SEA = [
   ['a', 'f'], // Beringstrædet
@@ -161,7 +172,7 @@ function build() {
     const entries = own.filter((t) => t.adj.some((n) => territories[n].region !== r)).length;
     regions[r] = { name, bonus: Math.max(2, entries + Math.floor(own.length / 3) - 1) };
   }
-  return { id: 'world', name: 'Verden', regions, territories };
+  return { id: 'world', name: 'Verden', regions, territories, missions: MISSIONS };
 }
 
 export const WORLD = build();

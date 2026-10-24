@@ -35,16 +35,17 @@ const DANISH = {
 
 /* ---------- game flow ---------- */
 
-function startGame(seats, speed, seed = (Math.random() * 2 ** 31) | 0) {
+function startGame(seats, speed, mode = 'mission', seed = (Math.random() * 2 ** 31) | 0) {
   const humans = seats.filter((x) => x === 'human').length;
   const players = seats.map((x, i) => (x !== 'human' ? `Computer ${i + 1}` : humans === 1 ? 'Dig' : `Spiller ${i + 1}`));
-  game = { setup: { players, seed }, seats, speed, actions: [] };
+  game = { setup: { players, seed, mode }, seats, speed, actions: [] };
   s = G.newGame(map, rules, game.setup);
   clearSel();
   save();
   render();
   focusOnPlayer();
-  schedule();
+  if (mode === 'mission' && humans === 1) openMission();
+  else schedule();
 }
 
 // Start zoomed in on the (first) human player's territories, or the whole map when only bots play.
@@ -176,6 +177,7 @@ function render() {
     }),
   );
   renderBar();
+  renderHudButtons();
 }
 
 function renderBar() {
@@ -204,7 +206,7 @@ function renderBar() {
   } else if (s.phase === 'reinforce') {
     phase = `Runde ${s.round} · Forstærk`;
     const hand = s.players[p].cards;
-    const set = G.findSet(map, hand);
+    const set = G.bestSet(map, s, p);
     if (hand.length >= rules.maxHand) text = `Du har ${hand.length} kort. Byt et sæt, før du placerer hære.`;
     else if (s.reserve) text = `Du har ${s.reserve} ${s.reserve === 1 ? 'ny hær' : 'nye hære'}. Tryk på dine områder for at placere dem.`;
     else text = 'Alle hære er placeret.';
@@ -322,6 +324,7 @@ function openNewGame() {
   seats.querySelectorAll('select').forEach((x) => x.addEventListener('change', seatNote));
   seatNote();
   $('speed').value = game?.speed ?? 'normal';
+  $('mode').value = game?.setup.mode ?? 'mission';
   $('cancel-new').hidden = !game || s.phase === 'over';
   $('new-game').showModal();
 }
@@ -340,7 +343,7 @@ function seatNote() {
 $('new-game').addEventListener('close', () => {
   if ($('new-game').returnValue !== 'start') return;
   const seats = [...document.querySelectorAll('[data-seat]')].map((x) => x.value).filter((v) => v !== 'none');
-  startGame(seats, $('speed').value);
+  startGame(seats, $('speed').value, $('mode').value);
 });
 // Without a game there is nothing to go back to: Escape must not leave an empty board.
 $('new-game').addEventListener('cancel', (e) => !game && e.preventDefault());
@@ -349,9 +352,107 @@ function openGameOver() {
   const w = s.players[s.winner];
   const you = game.seats[s.winner] === 'human';
   $('over-title').textContent = you ? 'Tillykke!' : 'Spillet er slut';
-  $('over-text').textContent = you ? `${w.name} har erobret hele kortet på ${s.round} runder.` : `${w.name} har erobret hele kortet.`;
+  const how = {
+    world: `${w.name} har erobret hele kortet i runde ${s.round}.`,
+    mission: `${w.name} klarede sin mission i runde ${s.round}:<br><i>${missionText(w.mission)}</i>`,
+    rounds: `${w.name} havde flest områder, da runderne slap op.`,
+  }[s.won];
+  const others = s.mode === 'mission' ? s.players.filter((pl, i) => i !== s.winner).map((pl) => `${pl.name}: ${missionText(pl.mission)}`) : [];
+  $('over-text').innerHTML = `${how}${others.length ? `<br><br><b>De andres missioner</b><br>${others.join('<br>')}` : ''}`;
   setTimeout(() => $('game-over').showModal(), 900);
 }
+
+/* ---------- missions and cards ---------- */
+
+// Whose mission and cards the buttons show: the player whose turn it is, or else the one human.
+function viewer() {
+  if (!game) return -1;
+  if (game.seats[s.current] === 'human') return s.current;
+  const humans = game.seats.flatMap((x, i) => (x === 'human' ? [i] : []));
+  return humans.length === 1 ? humans[0] : -1;
+}
+
+const regionNames = (list) => list.map((r) => map.regions[r].name).join(' og ');
+
+function missionText(m) {
+  if (!m) return '';
+  if (m.type === 'regions') return `Erobr ${regionNames(m.regions)}${m.plusOne ? ', og ét kontinent mere efter eget valg' : ''}.`;
+  if (m.type === 'territories') return m.armies > 1 ? `Hold ${m.count} områder med mindst ${m.armies} hære i hvert.` : `Hold ${m.count} områder på én gang.`;
+  return `Slå ${s.players[m.target].name} ud. Gør en anden det før dig, skal du i stedet holde ${G.fallback(map).count} områder.`;
+}
+
+function missionProgress(p) {
+  const m = s.players[p].mission;
+  if (m.type === 'regions') {
+    const parts = m.regions.map((r) => {
+      const have = map.regions[r].members.filter((t) => s.owner[t] === p).length;
+      return `${map.regions[r].name}: ${have} af ${map.regions[r].members.length}`;
+    });
+    if (m.plusOne) {
+      const extra = map.regions.filter((_, r) => !m.regions.includes(r) && G.holdsRegion(map, s, p, r)).map((r) => r.name);
+      parts.push(extra.length ? `Ét mere: ${extra.join(', ')} ✓` : 'Ét kontinent mere: ikke endnu');
+    }
+    return parts.join(' · ');
+  }
+  if (m.type === 'territories') {
+    const have = s.owner.filter((o, t) => o === p && s.armies[t] >= m.armies).length;
+    return `Du har ${have} af ${m.count}.`;
+  }
+  const left = G.owned(s, m.target).length;
+  return left ? `${s.players[m.target].name} har ${left} områder tilbage.` : `${s.players[m.target].name} er slået ud.`;
+}
+
+function openMission() {
+  const p = viewer();
+  if (p < 0 || !s.players[p].mission) return;
+  $('mission-who').textContent = s.players.filter((_, i) => game.seats[i] === 'human').length > 1 ? s.players[p].name : '';
+  $('mission-text').textContent = missionText(s.players[p].mission);
+  $('mission-progress').textContent = missionProgress(p);
+  $('mission-dialog').showModal();
+}
+// The game waits while the mission is shown at the start.
+$('mission-dialog').addEventListener('close', () => schedule());
+
+const SYMBOLS = ['★', '◆', '●', '✱']; // placeholders until design item 6
+
+function openCards() {
+  const p = viewer();
+  if (p < 0) return;
+  const hand = s.players[p].cards;
+  const set = G.bestSet(map, s, p) ?? [];
+  $('cards-who').textContent = s.players.filter((_, i) => game.seats[i] === 'human').length > 1 ? s.players[p].name : '';
+  $('hand').innerHTML = hand.length
+    ? hand
+        .map((c) => {
+          const t = G.cardTerritory(map, c);
+          const mine = t >= 0 && s.owner[t] === p;
+          return `<div class="card${mine ? ' mine' : ''}${set.includes(c) ? ' in-set' : ''}">
+            <span class="sym">${SYMBOLS[G.cardSymbol(map, c)]}</span><span>${t >= 0 ? map.territories[t].name : 'Joker'}</span></div>`;
+        })
+        .join('')
+    : '<p class="empty">Ingen kort endnu.</p>';
+  const value = G.tradeValue(rules, s.trades);
+  const canTrade = set.length && p === s.current && s.phase === 'reinforce';
+  $('cards-text').innerHTML = `Næste sæt giver <b>${value} hære</b>.${
+    set.length ? (canTrade ? ' Du har et sæt (løftet op).' : ' Du har et sæt, som du kan bytte, når du forstærker.') : ''
+  }`;
+  $('trade-btn').hidden = !canTrade;
+  $('cards-dialog').showModal();
+}
+$('cards-dialog').addEventListener('close', () => {
+  if ($('cards-dialog').returnValue !== 'trade') return;
+  const set = G.bestSet(map, s, s.current);
+  if (set) act({ type: 'trade', cards: set });
+});
+
+function renderHudButtons() {
+  const p = viewer();
+  $('mission-btn').hidden = p < 0 || s.mode !== 'mission' || !s.players[p]?.mission;
+  $('cards-btn').hidden = p < 0;
+  if (p >= 0) $('cards-btn').textContent = `Kort (${s.players[p].cards.length})`;
+}
+$('mission-btn').addEventListener('click', openMission);
+$('cards-btn').addEventListener('click', openCards);
 $('game-over').addEventListener('close', () => openNewGame());
 $('menu-btn').addEventListener('click', openNewGame);
 
@@ -383,4 +484,6 @@ window.__conquest = {
   act,
   tap,
   start: startGame,
+  openCards,
+  openMission,
 };

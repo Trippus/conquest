@@ -43,3 +43,13 @@ test('normal bots finish games on the world map', () => {
     assert.equal(state.phase, 'over');
   }
 });
+
+test('the world map\'s region missions name real regions, and mission games end', () => {
+  const map = G.prepareMap(W.WORLD);
+  assert.equal(map.missions.length, W.MISSIONS.length);
+  for (const m of map.missions) assert.ok(m.regions.every((r) => r >= 0 && r < map.regions.length));
+  for (let seed = 1; seed <= 3; seed++) {
+    const { state } = playBots(map, MODERN, { players: ['A', 'B', 'C'], seed, mode: 'mission' }, Array(3).fill('normal'));
+    assert.equal(state.phase, 'over');
+  }
+});

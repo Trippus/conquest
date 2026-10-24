@@ -2,7 +2,7 @@
 // endings. Used for balance (a seat or region that wins far too often shows up here) and to check
 // that a stronger bot really is stronger.
 //
-// Run: npm run sim -- [games=200] [bots=easy,easy,easy,easy] [map=test|large|world]
+// Run: npm run sim -- [games=200] [bots=easy,easy,easy,easy] [map=test|large|world] [mode=world|mission]
 //   npm run sim -- 400 normal,easy,easy,easy large   one normal bot against three easy ones, 30 territories
 // The bots move one seat on each game, so no bot always gets the first move.
 import * as G from '../js/engine.js';
@@ -28,17 +28,19 @@ const botWins = Array(n).fill(0); // by bot (its place in the list), whatever se
 let rounds = 0;
 let actions = 0;
 let limited = 0;
+const hows = {};
 const started = Date.now();
 for (let g = 0; g < games; g++) {
   const seatOf = (b) => (b + g) % n;
   const levels = Array(n);
   bots.forEach((level, b) => (levels[seatOf(b)] = level));
-  const r = playBots(map, rules, { players: [...'ABCDEF'].slice(0, n), seed: g + 1 }, levels);
+  const r = playBots(map, rules, { players: [...'ABCDEF'].slice(0, n), seed: g + 1, mode: process.argv[5] ?? 'world' }, levels);
   seatWins[r.state.winner]++;
   botWins[bots.findIndex((_, b) => seatOf(b) === r.state.winner)]++;
   rounds += r.state.round;
   actions += r.actions.length;
-  if (!r.state.owner.every((o) => o === r.state.winner)) limited++;
+  if (r.state.won === 'rounds') limited++;
+  hows[r.state.won] = (hows[r.state.won] ?? 0) + 1;
 }
 const pct = (x) => `${((100 * x) / games).toFixed(0)}%`;
 console.log(`${games} games, ${n} players on ${map.name} (${Date.now() - started} ms)`);
@@ -46,3 +48,4 @@ console.log(`wins per bot:  ${bots.map((b, i) => `${b}: ${pct(botWins[i])}`).joi
 console.log(`wins per seat: ${seatWins.map((w, p) => `${p + 1}: ${pct(w)}`).join('  ')}`);
 console.log(`average: ${(rounds / games).toFixed(1)} rounds, ${(actions / games).toFixed(0)} actions`);
 console.log(`ended by the round limit: ${pct(limited)}`);
+console.log(`won by: ${Object.entries(hows).map(([h, k]) => `${h} ${pct(k)}`).join('  ')}`);

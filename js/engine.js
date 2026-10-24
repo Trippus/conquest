@@ -9,7 +9,8 @@
 // A turn has three phases. Reinforce: trade card sets and place new armies. Attack: roll dice
 // against a neighbour; after a conquest, move armies in (the occupy step). Fortify: one move
 // between two of your territories that are connected through your own land. Taking at least one
-// territory in a turn earns a card at the end of it. Whoever holds every territory wins.
+// territory in a turn earns a card at the end of it. Whoever holds every territory wins, or, in a
+// mission game, whoever first completes their secret mission (see missions below).
 //
 // A game is a setup (map, ruleset, players, seed) plus a list of actions. apply() checks an
 // action and returns the next state and what happened (events for the UI to animate). The dice
@@ -87,7 +88,8 @@ export function prepareMap(def) {
     bonus: def.regions[id].bonus,
     members: territories.flatMap((t, i) => (t.region === r ? [i] : [])),
   }));
-  return { id: def.id, name: def.name, territories, regions, at };
+  const missions = (def.missions ?? []).map((m) => (m.regions ? { ...m, regions: m.regions.map((r) => rids.indexOf(r)) } : { ...m }));
+  return { id: def.id, name: def.name, territories, regions, at, missions };
 }
 
 /* ---------- cards ---------- */
@@ -119,6 +121,57 @@ export function findSet(map, hand) {
 }
 
 export const tradeValue = (rules, trades) => rules.tradeValues[Math.min(trades, rules.tradeValues.length - 1)];
+
+// The best set to trade: one with a territory p holds (worth extra armies there) if there is one.
+export function bestSet(map, s, p) {
+  const hand = s.players[p].cards;
+  let first = null;
+  for (let i = 0; i < hand.length; i++) {
+    for (let j = i + 1; j < hand.length; j++) {
+      for (let k = j + 1; k < hand.length; k++) {
+        const set = [hand[i], hand[j], hand[k]];
+        if (!isSet(map, set)) continue;
+        if (set.some((c) => s.owner[cardTerritory(map, c)] === p)) return set;
+        first ??= set;
+      }
+    }
+  }
+  return first;
+}
+
+/* ---------- missions ---------- */
+// A mission is plain data:
+//   { type: 'regions', regions: [r, r], plusOne }   hold these regions (and any one more, if plusOne)
+//   { type: 'territories', count, armies }          hold count territories with at least armies each
+//   { type: 'eliminate', target }                   knock out that player (seat index) yourself
+// A map lists its region missions (def.missions, with region ids); the territory missions follow
+// from the map's size and there is one eliminate mission per player in the game. If someone else
+// knocks out your target first, or you would have to knock out yourself, your mission becomes
+// holding territories instead (fallback).
+
+export const fallback = (map) => ({ type: 'territories', count: Math.round(map.territories.length * 0.63), armies: 1 });
+
+export function missionPool(map, players) {
+  const T = map.territories.length;
+  return [
+    ...map.missions.map((m) => ({ ...m })),
+    fallback(map),
+    { type: 'territories', count: Math.round(T * 0.36), armies: 2 },
+    ...Array.from({ length: players }, (_, target) => ({ type: 'eliminate', target })),
+  ];
+}
+
+export const holdsRegion = (map, s, p, r) => map.regions[r].members.every((t) => s.owner[t] === p);
+
+export function missionDone(map, s, p) {
+  const m = s.players[p].mission;
+  if (!m) return false;
+  if (m.type === 'regions') {
+    return m.regions.every((r) => holdsRegion(map, s, p, r)) && (!m.plusOne || map.regions.some((_, r) => !m.regions.includes(r) && holdsRegion(map, s, p, r)));
+  }
+  if (m.type === 'territories') return s.owner.filter((o, t) => o === p && s.armies[t] >= m.armies).length >= m.count;
+  return !s.players[m.target].alive && s.players[m.target].outBy === p;
+}
 
 /* ---------- questions about a state ---------- */
 
@@ -164,7 +217,8 @@ export function fortifyTargets(map, rules, s, from) {
 // ones, since the first player moves first), each gets one army, and the rest of every player's
 // start armies are spread at random over their own territories. Moving first is an advantage, so
 // each later player gets seatArmies() more armies than the one before.
-export function newGame(map, rules, { players, seed = 1 }) {
+// mode: 'world' (hold every territory) or 'mission' (each player gets a secret mission).
+export function newGame(map, rules, { players, seed = 1, mode = 'world' }) {
   const n = players.length;
   if (n < 2 || n > 6) throw new Error('A game needs 2–6 players');
   const T = map.territories.length;
@@ -182,7 +236,9 @@ export function newGame(map, rules, { players, seed = 1 }) {
     deck: [],
     discard: [],
     trades: 0, // card sets traded so far by anyone; sets the value of the next trade
+    mode,
     winner: -1,
+    won: '', // how: 'world', 'mission' or 'rounds'
   };
   shuffle(s, [...Array(T).keys()]).forEach((t, i) => {
     s.owner[t] = n - 1 - (i % n);
@@ -195,6 +251,13 @@ export function newGame(map, rules, { players, seed = 1 }) {
     for (let k = own.length; k < mine; k++) s.armies[own[Math.floor(random(s) * own.length)]]++;
   }
   s.deck = shuffle(s, [...Array(T + rules.wildCards).keys()]);
+  if (mode === 'mission') {
+    const pool = shuffle(s, missionPool(map, n));
+    s.players.forEach((pl, p) => {
+      const i = pool.findIndex((m) => !(m.type === 'eliminate' && m.target === p));
+      pl.mission = pool.splice(i, 1)[0];
+    });
+  }
   s.reserve = reinforcements(map, rules, s, 0);
   return s;
 }
@@ -267,6 +330,8 @@ export function apply(map, rules, state, action) {
   const s = structuredClone(state);
   const events = [];
   DO[action.type](map, rules, s, action, events);
+  // A mission is completed on your own turn, the moment it is true.
+  if (s.mode === 'mission' && s.phase !== 'over' && missionDone(map, s, s.current)) finish(s, s.current, events, 'mission');
   return { ok: true, state: s, events };
 }
 
@@ -281,10 +346,15 @@ export function replay(map, rules, setup, actions) {
   return s;
 }
 
-// What player p may see: other players' cards, the deck order and the dice generator are hidden.
+// What player p may see: other players' cards and missions, the deck order and the dice
+// generator are hidden.
 export function view(state, p) {
   const s = structuredClone(state);
-  s.players.forEach((pl, i) => i !== p && (pl.cards = pl.cards.map(() => null)));
+  s.players.forEach((pl, i) => {
+    if (i === p) return;
+    pl.cards = pl.cards.map(() => null);
+    if (pl.mission) pl.mission = null;
+  });
   s.deck = s.deck.map(() => null);
   s.rng = 0;
   return s;
@@ -359,11 +429,14 @@ function roll(map, rules, s, from, to, dice, ev) {
   ev.push({ type: 'conquer', p, from, to, loser: q });
   if (!s.owner.includes(q)) {
     s.players[q].alive = false;
+    s.players[q].outBy = p;
+    // Whoever else was out to knock q out now has to hold territories instead.
+    s.players.forEach((pl, i) => i !== p && pl.mission?.type === 'eliminate' && pl.mission.target === q && (pl.mission = fallback(map)));
     s.players[p].cards.push(...s.players[q].cards);
     s.players[q].cards = [];
     ev.push({ type: 'eliminate', p: q, by: p });
   }
-  if (s.owner.every((o) => o === p)) return finish(s, p, ev);
+  if (s.owner.every((o) => o === p)) return finish(s, p, ev, 'world');
   if (s.armies[from] > 1) {
     s.phase = 'occupy';
     s.occupy = { from, to };
@@ -387,7 +460,7 @@ function endTurn(map, rules, s, ev) {
   while (!s.players[q].alive);
   if (q <= p) {
     s.round++;
-    if (rules.maxRounds && s.round > rules.maxRounds) return finish(s, leader(s), ev);
+    if (rules.maxRounds && s.round > rules.maxRounds) return finish(s, leader(s), ev, 'rounds');
   }
   s.current = q;
   s.phase = 'reinforce';
@@ -401,9 +474,10 @@ function leader(s) {
   return s.players.reduce((best, pl, p) => (pl.alive && score(p) > score(best) ? p : best), s.current);
 }
 
-function finish(s, p, ev) {
+function finish(s, p, ev, how) {
   s.phase = 'over';
   s.winner = p;
+  s.won = how;
   s.occupy = null;
-  ev.push({ type: 'win', p });
+  ev.push({ type: 'win', p, how });
 }

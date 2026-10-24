@@ -94,7 +94,11 @@ const EASY = {
 /* ---------- normal ---------- */
 
 // The region worth going for: a good bonus for little fighting, and somewhere to attack it from.
+// A region the bot's mission asks for counts three times as much (with "one more of your choice",
+// every other region counts a bit more too).
 function targetRegion(map, s, p) {
+  const m = s.mode === 'mission' ? s.players[p].mission : null;
+  const wanted = (i) => (m?.type !== 'regions' ? 1 : m.regions.includes(i) ? 3 : m.plusOne ? 1.5 : 1);
   let best = -1;
   let bestScore = -Infinity;
   map.regions.forEach((r, i) => {
@@ -103,7 +107,7 @@ function targetRegion(map, s, p) {
     const reachable = theirs.some((t) => map.territories[t].adj.some((n) => s.owner[n] === p));
     if (!reachable) return;
     const cost = theirs.reduce((n, t) => n + s.armies[t], 0) + theirs.length;
-    const score = (r.bonus + 1) / cost + share(map, s, p, i) * 0.5;
+    const score = ((r.bonus + 1) / cost + share(map, s, p, i) * 0.5) * wanted(i);
     if (score > bestScore) (bestScore = score), (best = i);
   });
   return best;
@@ -121,23 +125,6 @@ function guardNeeds(map, s, p) {
     }
   }
   return needs.sort((a, b) => b.short - a.short);
-}
-
-// The card set to trade: one with a territory p holds (worth 2 extra armies) if there is one.
-function bestSet(map, s, p) {
-  const hand = s.players[p].cards;
-  let first = null;
-  for (let i = 0; i < hand.length; i++) {
-    for (let j = i + 1; j < hand.length; j++) {
-      for (let k = j + 1; k < hand.length; k++) {
-        const set = [hand[i], hand[j], hand[k]];
-        if (!G.isSet(map, set)) continue;
-        if (set.some((c) => s.owner[G.cardTerritory(map, c)] === p)) return set;
-        first ??= set;
-      }
-    }
-  }
-  return first;
 }
 
 // Weights for the normal bot, kept together so experiments can change them. Chosen by bot games
@@ -163,12 +150,16 @@ function prize(map, s, p, e, target) {
   if (members.every((m) => m === e || s.owner[m] === p)) value += 3 * map.regions[r].bonus;
   if (members.every((m) => s.owner[m] === q)) value += 2 * map.regions[r].bonus;
   if (G.owned(s, q).length === 1) value += 4 + 2 * s.players[q].cards.length;
+  // A mission to knock out q: every territory of q is worth more, the last one most.
+  const m = s.mode === 'mission' ? s.players[p].mission : null;
+  if (m?.type === 'eliminate' && m.target === q) value += G.owned(s, q).length === 1 ? 20 : 3;
+  if (m?.type === 'territories') value += 1;
   return value;
 }
 
 const NORMAL = {
   reinforce(map, rules, s, p) {
-    const set = bestSet(map, s, p);
+    const set = G.bestSet(map, s, p);
     if (set) return { type: 'trade', cards: set };
     if (!s.reserve) return { type: 'end' };
 

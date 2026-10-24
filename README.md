@@ -1,7 +1,8 @@
 # Conquest (arbejdstitel)
 
 Et turbaseret strategispil om at erobre verden, fra **Trippus Games**. Forstærk, angrib med terninger,
-flyt tropper, og saml kort til ekstra hære. Først en nutidig udgave, senere historiske æraer på samme motor.
+flyt tropper, og saml kort til ekstra hære. Man vinder ved at erobre hele verden eller, i den kortere udgave,
+ved først at klare sin hemmelige mission (to kontinenter, et antal områder eller at slå en bestemt spiller ud). Først en nutidig udgave, senere historiske æraer på samme motor.
 Hvad der skal designes og besluttes står i [`DESIGN.md`](DESIGN.md).
 
 ## Kør
@@ -10,6 +11,7 @@ npm start          # http://localhost:5183 (også over Wi-Fi)
 npm test           # unit-tests af reglerne og bot-spil
 npm run sim        # 200 bot-spil: sejre pr. bot og pr. plads, længde
 npm run sim -- 1000 normal,easy,easy large   # 1000 spil, én normal mod to lette, på det store testkort (eller world)
+npm run sim -- 800 normal,normal,normal world mission   # med hemmelige missioner
 npm run design-shots                          # stilprøverne som PNG (kræver npm start)
 ```
 
@@ -46,3 +48,7 @@ Den normale bot vinder 1,3–1,4 gange sin rimelige andel mod lette bots på det
 På det lille testkort er forskellen mindre: spillene er så korte, at startopstillingen og terningerne bestemmer mest.
 
 Ingen licens: alle rettigheder forbeholdes.
+
+Missioner (verdenskortet, 4 normale bots): spillene varer ca. 12 runder mod 18 ved "erobr verden", og hver
+missionstype vinder 19–30 % af gangene (rimelig andel 25 %). "Hold 11 områder med 2 hære i hvert" er sværest for
+botterne, fordi de samler hærene på én front.

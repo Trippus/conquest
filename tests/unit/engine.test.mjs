@@ -236,7 +236,7 @@ test('taking the whole world wins', () => {
   const { s: t, events } = play(s, [{ type: 'blitz', from: at('n1'), to: at('w3') }]);
   assert.equal(t.phase, 'over');
   assert.equal(t.winner, 0);
-  assert.deepEqual(events.at(-1), { type: 'win', p: 0 });
+  assert.deepEqual(events.at(-1), { type: 'win', p: 0, how: 'world' });
   assert.equal(refuse(t, { type: 'end' }), 'the game is over');
 });
 
@@ -279,4 +279,69 @@ test('apply never changes the state it is given', () => {
   const copy = structuredClone(s);
   G.apply(map, MODERN, s, { type: 'place', t: G.owned(s, 0)[0], n: 1 });
   assert.deepEqual(s, copy);
+});
+
+/* ---------- missions ---------- */
+
+test('a mission game deals every player a mission, never to knock out themselves', () => {
+  for (let seed = 1; seed <= 50; seed++) {
+    const s = G.newGame(map, MODERN, { players: ['A', 'B', 'C'], seed, mode: 'mission' });
+    s.players.forEach((pl, p) => {
+      assert.ok(pl.mission, 'has a mission');
+      assert.ok(!(pl.mission.type === 'eliminate' && pl.mission.target === p), 'not itself');
+    });
+  }
+  assert.equal(G.newGame(map, MODERN, { players: ['A', 'B'], seed: 1 }).players[0].mission, undefined, 'none in world games');
+});
+
+test('missions: holding regions, holding territories', () => {
+  const s = board('000000000111', Array(12).fill(1));
+  const north = map.regions.findIndex((r) => r.id === 'north');
+  const east = map.regions.findIndex((r) => r.id === 'east');
+  const west = map.regions.findIndex((r) => r.id === 'west');
+  s.players[0].mission = { type: 'regions', regions: [north, east] };
+  assert.ok(G.missionDone(map, s, 0));
+  s.players[0].mission = { type: 'regions', regions: [north, west] };
+  assert.ok(!G.missionDone(map, s, 0));
+  s.players[0].mission = { type: 'regions', regions: [north, east], plusOne: true };
+  assert.ok(G.missionDone(map, s, 0), 'South is the one more');
+  s.players[0].mission = { type: 'territories', count: 9, armies: 1 };
+  assert.ok(G.missionDone(map, s, 0));
+  s.players[0].mission = { type: 'territories', count: 9, armies: 2 };
+  assert.ok(!G.missionDone(map, s, 0), 'needs 2 armies in each');
+});
+
+test('completing a mission on your turn wins at once', () => {
+  const s = board('000000000001', [10, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], { phase: 'attack', reserve: 0, mode: 'mission' });
+  s.players[0].mission = { type: 'territories', count: 12, armies: 1 };
+  s.players[1].mission = { type: 'territories', count: 12, armies: 1 };
+  const { s: t, events } = play(s, [{ type: 'blitz', from: at('n1'), to: at('w3') }]);
+  assert.equal(t.phase, 'over');
+  assert.ok(events.some((e) => e.type === 'win' && e.p === 0));
+  // Placing armies can complete a "2 armies each" mission too.
+  const u = board('000000000111', Array(12).fill(1), { mode: 'mission', reserve: 3 });
+  u.armies = u.armies.map((a, i) => (i < 8 ? 2 : 1));
+  u.players[0].mission = { type: 'territories', count: 9, armies: 2 };
+  const { s: v, events: ev } = play(u, [{ type: 'place', t: 8, n: 1 }]);
+  assert.equal(v.phase, 'over');
+  assert.equal(ev.at(-1).how, 'mission');
+});
+
+test('knock-out missions: done when you do it, holding territories when someone else does', () => {
+  // C holds only w2. A (attacking) has to knock out C; B also had to: B gets the fallback.
+  const s = board('000111000020', [1, 1, 1, 1, 1, 1, 1, 1, 1, 30, 1, 1], { phase: 'attack', reserve: 0, mode: 'mission' });
+  s.players[0].mission = { type: 'eliminate', target: 2 };
+  s.players[1].mission = { type: 'eliminate', target: 2 };
+  s.players[2].mission = { type: 'territories', count: 12, armies: 1 };
+  const { s: t } = play(s, [{ type: 'blitz', from: at('w1'), to: at('w2') }]);
+  assert.equal(t.winner, 0);
+  assert.equal(t.won, 'mission');
+  assert.deepEqual(t.players[1].mission, G.fallback(map));
+});
+
+test('view hides the other players\' missions', () => {
+  const s = G.newGame(map, MODERN, { players: ['A', 'B'], seed: 3, mode: 'mission' });
+  const v = G.view(s, 0);
+  assert.ok(v.players[0].mission);
+  assert.equal(v.players[1].mission, null);
 });

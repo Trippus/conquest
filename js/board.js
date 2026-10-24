@@ -96,11 +96,14 @@ export function createBoard(svg, grid, map, { onTap }) {
     });
   }
 
-  function flash(i) {
+  // kind: 'stamp' when armies are placed or moved, 'conquer' when the territory changes hands.
+  function flash(i, kind = 'stamp') {
     const seal = seals[i];
-    seal.classList.remove('flash');
+    seal.classList.remove('stamp', 'conquer');
+    washes[i].classList.remove('conquer');
     void seal.getBBox();
-    seal.classList.add('flash');
+    seal.classList.add(kind);
+    if (kind === 'conquer') washes[i].classList.add('conquer');
   }
 
   /* ---------- pan and zoom ---------- */

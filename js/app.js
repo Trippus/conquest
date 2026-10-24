@@ -9,12 +9,13 @@ import { botAction } from './ai.js';
 import * as WORLD from './maps/world.js';
 import { MODERN } from './rules/modern.js';
 import { createBoard, PLAYER_COLORS as COLORS } from './board.js';
+import { Sound } from './audio.js';
 
 // Saves only replay on the map they were played on: v1 was the test map, v2 the 30-territory world.
 const KEY = 'conquest.v3';
 const DELAY = { normal: 650, fast: 140 };
 const SETTINGS = 'conquest.settings';
-const DEFAULTS = { opponents: 2, level: 'normal', mode: 'mission', humans: 1, speed: 'normal' };
+const DEFAULTS = { opponents: 2, level: 'normal', mode: 'mission', humans: 1, speed: 'normal', sound: true };
 // The computer opponents. Made-up commanders, so the table has someone to play against.
 const OPPONENTS = ['Grevinde Holm', 'Oberst Vind', 'Admiral Storm', 'Generalinde Ravn', 'Major Falk', 'Hertug Ulv'];
 
@@ -71,6 +72,7 @@ function startFromSettings(settings = loadSettings()) {
 // order: [{ kind: 'human' | 'easy' | 'normal', name, color }] in turn order.
 function startGame(order, speed, mode = 'mission', seed = (Math.random() * 2 ** 31) | 0) {
   const humans = order.filter((x) => x.kind === 'human').length;
+  $('intro').hidden = true;
   game = {
     setup: { players: order.map((x) => x.name), seed, mode },
     seats: order.map((x) => x.kind),
@@ -123,7 +125,7 @@ const level = (seat) => (seat === 'bot' ? 'easy' : seat);
 // Bots play one action at a time, with a pause so you can follow them.
 function schedule() {
   clearTimeout(botTimer);
-  if (s.phase === 'over' || !isBot()) return;
+  if (s.phase === 'over' || !isBot() || !$('intro').hidden) return;
   botTimer = setTimeout(() => act(botAction(map, rules, s, level(game.seats[s.current]))), DELAY[game.speed]);
 }
 
@@ -161,7 +163,6 @@ function tap(t) {
     if (!mine) return hint('Placér hærene på dine egne områder.');
     sel.from = t;
     act({ type: 'place', t, n: 1 });
-    flash(t);
   } else if (s.phase === 'attack') {
     if (mine) {
       if (s.armies[t] < 2) return hint('Der skal være mindst 2 hære for at angribe herfra.');
@@ -242,7 +243,7 @@ function renderBar() {
   if (s.phase === 'over') {
     phase = 'Spillet er slut';
     text = `${s.players[s.winner].name} har vundet.`;
-    button('Skift opsætning', () => openNewGame(true));
+    button('Til start', showIntro);
     button('Spil igen', () => startFromSettings(), { primary: true });
   } else if (isBot()) {
     phase = `Runde ${s.round} · ${PHASE_NAMES[s.phase]}`;
@@ -318,7 +319,7 @@ function toast(text) {
   toastTimer = setTimeout(() => ($('toast').hidden = true), 3200);
 }
 
-const flash = (t) => board.flash(t);
+const flash = (t, kind) => board.flash(t, kind);
 
 /* ---------- what happened: dice and messages ---------- */
 
@@ -327,15 +328,29 @@ function showEvents(events) {
   const rolls = events.filter((e) => e.type === 'roll');
   const out = events.find((e) => e.type === 'eliminate');
   if (rolls.length) showDice(rolls, events.find((e) => e.type === 'conquer'), out);
+  const human = (p) => game.seats[p] === 'human';
+  const quiet = (p) => (human(p) || game.speed !== 'fast' ? 1 : 0.4); // fast bots: softer
+  if (rolls.length) Sound.play('dice', { vol: quiet(rolls[0].p) });
   for (const e of events) {
-    if (e.type === 'win') openGameOver();
+    if (e.type === 'win') {
+      openGameOver();
+      Sound.play(human(e.p) ? 'victory' : 'defeat', { delay: 0.5 });
+    }
+    if (e.type === 'place') Sound.play('place', { vol: quiet(e.p) * 0.8 });
+    if (e.type === 'conquer') {
+      flash(e.to, 'conquer');
+      Sound.play(human(e.loser) && !human(e.p) ? 'lost' : 'conquer', { delay: 0.35, vol: quiet(e.p) });
+    }
+    if (e.type === 'card' && human(e.p)) Sound.play('card');
+    if (e.type === 'trade') Sound.play('trade', { vol: quiet(e.p) });
+    if (e.type === 'turn' && human(e.p)) Sound.play('turn', { delay: 0.2 });
     if (e.type === 'card' && game.seats[e.p] === 'human') {
       const t = G.cardTerritory(map, e.card);
       const who = game.seats.filter((x) => x === 'human').length > 1 ? `${s.players[e.p].name} fik` : 'Du fik';
       toast(`${who} et krigslykkekort for at erobre: ${SYMBOLS[G.cardSymbol(map, e.card)]} ${t >= 0 ? map.territories[t].name : 'joker'}`);
     }
     if (e.type === 'trade' && game.seats[e.p] !== 'human') toast(`${s.players[e.p].name} byttede krigslykkekort til ${e.armies} hære.`);
-    if (e.type === 'place' || e.type === 'move') flash(e.to ?? e.t);
+    if (e.type === 'place' || e.type === 'move') flash(e.to ?? e.t, 'stamp');
   }
 }
 
@@ -357,8 +372,17 @@ function showDice(rolls, conquest, out) {
     ${conquest ? `<div><b>${map.territories[conquest.to].name} er erobret!</b></div>` : ''}
     ${out ? `<div><b>${s.players[out.p].name} er slået ud.</b></div>` : ''}`;
   box.hidden = false;
+  const faces = [...box.querySelectorAll('.die')];
+  const real = faces.map((d) => d.textContent);
+  box.classList.add('rolling');
+  const spin = setInterval(() => faces.forEach((d) => (d.textContent = 1 + Math.floor(Math.random() * 6))), 60);
+  setTimeout(() => {
+    clearInterval(spin);
+    faces.forEach((d, i) => (d.textContent = real[i]));
+    box.classList.remove('rolling');
+  }, 380);
   clearTimeout(diceTimer);
-  diceTimer = setTimeout(() => (box.hidden = true), isBot() ? DELAY[game.speed] * 1.6 : 1800);
+  diceTimer = setTimeout(() => (box.hidden = true), isBot() ? Math.max(700, DELAY[game.speed] * 1.6) : 2000);
 }
 
 /* ---------- dialogs ---------- */
@@ -409,16 +433,16 @@ function openNewGame(change = false) {
   draft = loadSettings();
   renderSetup();
   $('setup-details').open = change;
-  $('cancel-new').hidden = !game || s.phase === 'over';
+  $('cancel-new').hidden = false;
   $('new-game').showModal();
 }
 
 $('new-game').addEventListener('close', () => {
   if ($('new-game').returnValue !== 'start') return;
-  saveSettings(draft);
+  saveSettings({ ...draft, sound: Sound.enabled });
   startFromSettings(draft);
 });
-$('new-game').addEventListener('cancel', (e) => !game && e.preventDefault());
+
 
 function openGameOver() {
   const w = s.players[s.winner];
@@ -435,7 +459,7 @@ function openGameOver() {
 }
 $('game-over').addEventListener('close', () => {
   if ($('game-over').returnValue === 'again') startFromSettings();
-  else if ($('game-over').returnValue === 'setup') openNewGame(true);
+  else if ($('game-over').returnValue === 'home') showIntro();
 });
 
 /* ---------- missions and cards ---------- */
@@ -539,7 +563,44 @@ function renderHudButtons() {
 }
 $('mission-btn').addEventListener('click', openMission);
 $('cards-btn').addEventListener('click', openCards);
-$('menu-btn').addEventListener('click', () => openNewGame());
+$('home-btn').addEventListener('click', showIntro);
+
+/* ---------- start screen ---------- */
+
+// The start screen is the menu: continue, a new game like the last one, change the setup, the
+// rules and the sound. The game behind it waits.
+function showIntro() {
+  clearTimeout(botTimer);
+  const going = game && s.phase !== 'over';
+  $('intro-continue').hidden = !going;
+  $('intro-new').classList.toggle('primary', !going);
+  $('intro-summary').textContent = summary(loadSettings());
+  soundLabel();
+  $('intro').hidden = false;
+}
+function hideIntro() {
+  $('intro').hidden = true;
+  schedule();
+}
+function soundLabel() {
+  $('sound-btn').textContent = Sound.enabled ? 'Lyd: til' : 'Lyd: fra';
+}
+$('intro-continue').addEventListener('click', hideIntro);
+$('intro-new').addEventListener('click', () => startFromSettings());
+$('intro-change').addEventListener('click', () => openNewGame(true));
+$('intro-rules-btn').addEventListener('click', () => ($('intro-rules').hidden = !$('intro-rules').hidden));
+$('sound-btn').addEventListener('click', () => {
+  Sound.enabled = !Sound.enabled;
+  saveSettings({ ...loadSettings(), sound: Sound.enabled });
+  soundLabel();
+  Sound.play('place');
+});
+// Audio may only start from a tap.
+document.addEventListener('pointerdown', () => Sound.unlock(), { capture: true });
+Sound.enabled = loadSettings().sound !== false;
+
+// The zoom buttons sit just above the turn panel, whatever its height.
+new ResizeObserver(() => document.documentElement.style.setProperty('--bar-h', `${$('bar').offsetHeight}px`)).observe($('bar'));
 
 /* ---------- start ---------- */
 
@@ -550,15 +611,14 @@ if (load()) {
   if (s.phase === 'occupy') sel.n = s.armies[s.occupy.from] - 1;
   render();
   focusOnPlayer();
-  schedule();
 } else {
-  // An empty map under the dialog until the first game starts.
+  // An empty map behind the start screen until the first game starts.
   s = G.newGame(map, rules, { players: ['', ''], seed: 1 });
   game = null;
   board.update({ ...s, owner: s.owner.map(() => -1) });
   board.focus(null);
-  openNewGame();
 }
+showIntro();
 
 window.__conquest = {
   get state() { return s; },
@@ -572,6 +632,7 @@ window.__conquest = {
   start: (seats, speed = 'fast', mode = 'mission', seed) =>
     startGame(seats.map((kind, i) => ({ kind, name: kind === 'human' ? 'Dig' : OPPONENTS[i], color: i })), speed, mode, seed),
   startFromSettings,
+  showIntro,
   openCards,
   openMission,
 };

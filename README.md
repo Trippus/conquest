@@ -25,7 +25,8 @@ npm run design-shots                          # stilprøverne som PNG (kræver n
 | `js/map-shapes.js` | Gør sekskantgitteret til tegnbare former: udjævnede omrids, grænser, kyst, havruter |
 | `design/` | Stilprøver til kortet (`stilproever.html`, `stil-*.png`) |
 | `js/rules/*.js` | Regelsæt som data: starthære, terninger, kort-bytte, rundegrænse |
-| `js/app.js` | Brugerfladen: tryk → handlinger, bots spiller, terninger, gem/indlæs. `window.__conquest` er debug-hooket |
+| `js/app.js` | Brugerfladen: startskærm, tryk → handlinger, bots spiller, terninger, lyd, gem/indlæs. `window.__conquest` er debug-hooket |
+| `js/audio.js` | Syntetiserede lyde (terninger, laksegl, horn, kort), ingen lydfiler |
 | `js/board.js` | Verdenskortet i papirkort-stil: farver, laksegl med hære, markeringer, træk og zoom (knib, hjul, +/−) |
 | `tools/simulate.mjs` | Mange bot-spil til balance |
 

@@ -232,3 +232,13 @@ dialog .big { font-family: var(--title); font-size: 20px; margin: 8px 0; }
 @media (prefers-reduced-motion: reduce) {
   .steam, #cards-btn.ready, #dice.rolling .die, #board .seal .wax, #board .washes path, #board .mark.target { animation: none !important; }
 }
+
+/* the standings at the end of a game */
+.your-place { font: 700 18px var(--title); margin: 10px 0 4px; }
+.standings { list-style: none; margin: 8px 0 0; padding: 0; }
+.standings li { display: flex; align-items: flex-start; gap: 8px; padding: 6px 0; border-top: 1px solid var(--line); }
+.standings li.you { font-weight: 700; }
+.standings .place { width: 1.6em; font: 700 17px var(--title); color: var(--accent); }
+.standings .dot { width: 16px; height: 16px; border-radius: 50%; flex: none; margin-top: 3px; box-shadow: 0 0 0 1px #2b1d12; }
+.standings .who { display: flex; flex-direction: column; }
+.standings small { font-weight: 400; color: var(--muted); font-size: 13px; }

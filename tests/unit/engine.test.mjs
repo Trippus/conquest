@@ -345,3 +345,15 @@ test('view hides the other players\' missions', () => {
   assert.ok(v.players[0].mission);
   assert.equal(v.players[1].mission, null);
 });
+
+test('standings: the winner, then those still in by territories, then the knocked out, last out first', () => {
+  // A knocks out C, then later B; A wins.
+  const s = board('000111000020', [1, 1, 1, 1, 1, 1, 1, 1, 1, 30, 1, 1], { phase: 'attack', reserve: 0 });
+  const { s: t } = play(s, [{ type: 'blitz', from: at('w1'), to: at('w2') }]);
+  assert.equal(t.players[2].alive, false);
+  assert.equal(t.players[2].outOrder, 1);
+  assert.equal(t.players[2].outRound, 1);
+  assert.deepEqual(G.standings(t), [0, 1, 2], 'no winner yet: A has more territories than B');
+  const done = { ...structuredClone(t), winner: 1, phase: 'over' };
+  assert.deepEqual(G.standings(done), [1, 0, 2]);
+});

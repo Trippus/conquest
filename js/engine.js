@@ -430,6 +430,8 @@ function roll(map, rules, s, from, to, dice, ev) {
   if (!s.owner.includes(q)) {
     s.players[q].alive = false;
     s.players[q].outBy = p;
+    s.players[q].outRound = s.round;
+    s.players[q].outOrder = s.players.filter((pl) => !pl.alive).length; // 1 for the first one out
     // Whoever else was out to knock q out now has to hold territories instead.
     s.players.forEach((pl, i) => i !== p && pl.mission?.type === 'eliminate' && pl.mission.target === q && (pl.mission = fallback(map)));
     s.players[p].cards.push(...s.players[q].cards);
@@ -469,9 +471,19 @@ function endTurn(map, rules, s, ev) {
   ev.push({ type: 'turn', p: q, round: s.round, reserve: s.reserve });
 }
 
+// How strong a player stands: territories first, then armies.
+const strength = (s, p) => owned(s, p).length * 10000 + owned(s, p).reduce((n, t) => n + s.armies[t], 0);
+
 function leader(s) {
-  const score = (p) => owned(s, p).length * 10000 + owned(s, p).reduce((n, t) => n + s.armies[t], 0);
-  return s.players.reduce((best, pl, p) => (pl.alive && score(p) > score(best) ? p : best), s.current);
+  return s.players.reduce((best, pl, p) => (pl.alive && strength(s, p) > strength(s, best) ? p : best), s.current);
+}
+
+// The players in order of placing: the winner, then those still in the game by strength, then
+// those knocked out, the last one out first.
+export function standings(s) {
+  const alive = s.players.flatMap((pl, p) => (pl.alive && p !== s.winner ? [p] : [])).sort((a, b) => strength(s, b) - strength(s, a));
+  const out = s.players.flatMap((pl, p) => (!pl.alive ? [p] : [])).sort((a, b) => s.players[b].outOrder - s.players[a].outOrder);
+  return [...(s.winner >= 0 ? [s.winner] : []), ...alive, ...out];
 }
 
 function finish(s, p, ev, how) {

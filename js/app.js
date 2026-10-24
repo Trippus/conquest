@@ -123,10 +123,34 @@ function act(a) {
     if (sel.to >= 0 && s.owner[sel.to] === s.current) sel = { from: canAttack(sel.to) ? sel.to : canAttack(sel.from) ? sel.from : -1, to: -1, n: 0 };
     if (sel.from >= 0 && !canAttack(sel.from)) sel = { from: -1, to: -1, n: 0 };
   }
+  // Once every human is out, there is nobody to watch: the rest is played at once.
+  if (s.phase !== 'over' && game.seats.includes('human') && game.seats.every((x, p) => x !== 'human' || !s.players[p].alive)) {
+    const out = r.events.find((e) => e.type === 'eliminate');
+    if (out) flash(r.events.find((e) => e.type === 'conquer')?.to ?? 0, 'conquer');
+    if (out) Sound.play('lost', { delay: 0.35 });
+    finishWithoutYou();
+    return true;
+  }
   showEvents(r.events);
   render();
   schedule();
   return true;
+}
+
+// Plays the bots' game to its end without pauses, sounds or animation, then shows the standings.
+function finishWithoutYou() {
+  clearTimeout(botTimer);
+  for (let i = 0; i < 20000 && s.phase !== 'over'; i++) {
+    const a = botAction(map, rules, s, level(game.seats[s.current]));
+    const r = G.apply(map, rules, s, a);
+    if (!r.ok) break;
+    s = r.state;
+    game.actions.push(a);
+  }
+  save();
+  clearSel();
+  render();
+  openGameOver();
 }
 
 const isBot = () => game.seats[s.current] !== 'human';
@@ -340,21 +364,25 @@ function showEvents(events) {
   const out = events.find((e) => e.type === 'eliminate');
   if (rolls.length) showDice(rolls, events.find((e) => e.type === 'conquer'), out);
   const human = (p) => game.seats[p] === 'human';
-  const quiet = (p) => (human(p) || game.speed !== 'fast' ? 1 : 0.4); // fast bots: softer
-  if (rolls.length) Sound.play('dice', { vol: quiet(rolls[0].p) });
+  // What concerns you is heard; battles between the opponents only as faint dice.
+  const yours = (...ps) => ps.some((p) => p >= 0 && human(p));
+  const quiet = (p) => (human(p) ? 1 : 0.3);
+  if (rolls.length) Sound.play('dice', { vol: yours(rolls[0].p, s.owner[rolls[0].to], events.find((e) => e.type === 'conquer')?.loser ?? -1) ? 1 : 0.25 });
   for (const e of events) {
     if (e.type === 'win') {
       openGameOver();
-      Sound.play(human(e.p) ? 'victory' : 'defeat', { delay: 0.5 });
+      if (human(e.p)) Sound.play('victory', { delay: 0.5 });
+      else if (game.seats.some((x, p) => x === 'human' && s.players[p].alive)) Sound.play('defeat', { delay: 0.5, vol: 0.6 });
     }
     if (e.type === 'place') Sound.play('place', { vol: quiet(e.p) * 0.8 });
     if ((e.type === 'conquer' || e.type === 'move') && human(e.p)) board.reveal(e.to);
     if (e.type === 'conquer') {
       flash(e.to, 'conquer');
-      Sound.play(human(e.loser) && !human(e.p) ? 'lost' : 'conquer', { delay: 0.35, vol: quiet(e.p) });
+      if (human(e.p)) Sound.play('conquer', { delay: 0.35 });
+      else if (human(e.loser)) Sound.play('lost', { delay: 0.35 });
     }
     if (e.type === 'card' && human(e.p)) Sound.play('card');
-    if (e.type === 'trade') Sound.play('trade', { vol: quiet(e.p) });
+    if (e.type === 'trade') Sound.play('trade', { vol: human(e.p) ? 1 : 0.4 });
     if (e.type === 'turn' && human(e.p)) Sound.play('turn', { delay: 0.2 });
     if (e.type === 'card' && game.seats[e.p] === 'human') {
       const t = G.cardTerritory(map, e.card);
@@ -465,9 +493,18 @@ function openGameOver() {
     mission: `${w.name} klarede sin mission i runde ${s.round}:<br><i>${missionText(w.mission)}</i>`,
     rounds: `${w.name} havde flest områder, da runderne slap op.`,
   }[s.won];
-  const others = s.mode === 'mission' ? s.players.filter((pl, i) => i !== s.winner).map((pl) => `${pl.name}: ${missionText(pl.mission)}`) : [];
-  $('over-text').innerHTML = `${how}${others.length ? `<br><br><b>De andres missioner</b><br>${others.join('<br>')}` : ''}`;
-  setTimeout(() => $('game-over').showModal(), 900);
+  const place = G.standings(s);
+  const rows = place.map((p, i) => {
+    const pl = s.players[p];
+    const fate = p === s.winner ? 'vandt' : pl.alive ? `${G.owned(s, p).length} ${G.owned(s, p).length === 1 ? 'område' : 'områder'}` : `slået ud i runde ${pl.outRound}`;
+    const mission = s.mode === 'mission' && p !== s.winner ? `<small>${missionText(pl.mission)}</small>` : '';
+    return `<li class="${game.seats[p] === 'human' ? 'you' : ''}"><span class="place">${i + 1}.</span>
+      <span class="dot" style="background:${colorOf(p)}"></span><span class="who">${pl.name}<small>${fate}</small>${mission}</span></li>`;
+  });
+  const me = place.findIndex((p) => game.seats[p] === 'human');
+  const mine = me >= 0 && game.seats.filter((x) => x === 'human').length === 1 ? `<p class="your-place">Du blev nr. ${me + 1} af ${place.length}.</p>` : '';
+  $('over-text').innerHTML = `${how}${mine}<ol class="standings">${rows.join('')}</ol>`;
+  setTimeout(() => $('game-over').open || $('game-over').showModal(), 900);
 }
 $('game-over').addEventListener('close', () => {
   if ($('game-over').returnValue === 'again') startFromSettings();
@@ -565,8 +602,8 @@ $('cards-dialog').addEventListener('close', () => {
 
 function renderHudButtons() {
   const p = viewer();
-  $('mission-btn').hidden = p < 0 || s.mode !== 'mission' || !s.players[p]?.mission;
-  $('cards-btn').hidden = p < 0;
+  $('mission-btn').hidden = p < 0 || s.phase === 'over' || s.mode !== 'mission' || !s.players[p]?.mission;
+  $('cards-btn').hidden = p < 0 || s.phase === 'over';
   if (p < 0) return;
   // The button shows the symbols in hand, and lights up when there is a set to trade.
   const hand = s.players[p].cards;

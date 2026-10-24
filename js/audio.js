@@ -43,8 +43,8 @@ export const Sound = {
         for (let i = 0; i < 3; i++) burst(t + 0.3 + i * 0.06, 1400 + Math.random() * 600, 2.5, 0.05, 0.18 * vol);
         break;
       case 'conquer':
-        // a short call on a brass horn
-        [0, 5, 7].forEach((s, i) => horn(t + i * 0.11, 293.66 * 2 ** (s / 12), i === 2 ? 0.45 : 0.14, 0.09 * vol));
+        // two soft notes on a brass horn
+        [0, 7].forEach((s, i) => horn(t + i * 0.1, 293.66 * 2 ** (s / 12), i ? 0.22 : 0.1, 0.055 * vol));
         break;
       case 'lost':
         // a dull drum: the territory is gone
@@ -66,7 +66,7 @@ export const Sound = {
         tone(t + 0.16, 150, 0.22, 0.2 * vol, 'sine', 80);
         break;
       case 'victory':
-        [0, 4, 7, 12, 7, 12, 16].forEach((s, i) => horn(t + i * 0.14, 293.66 * 2 ** (s / 12), i === 6 ? 0.9 : 0.16, 0.1 * vol));
+        [0, 4, 7, 12].forEach((s, i) => horn(t + i * 0.13, 293.66 * 2 ** (s / 12), i === 3 ? 0.6 : 0.14, 0.08 * vol));
         break;
       case 'defeat':
         [7, 5, 3, 0].forEach((s, i) => horn(t + i * 0.22, 220 * 2 ** (s / 12), 0.35, 0.08 * vol));

@@ -7,9 +7,9 @@ import { mapShapes } from '../../js/map-shapes.js';
 import { playBots } from '../../js/ai.js';
 import { MODERN } from '../../js/rules/modern.js';
 
-test('the world map is valid: 30 territories in 6 regions, every letter on the grid', () => {
+test('the world map is valid: 40 territories in 6 regions, every letter on the grid', () => {
   assert.deepEqual(G.validateMap(W.WORLD), []);
-  assert.equal(Object.keys(W.WORLD.territories).length, 30);
+  assert.equal(Object.keys(W.WORLD.territories).length, 40);
   assert.equal(Object.keys(W.WORLD.regions).length, 6);
   const used = new Set(W.GRID.join('').replace(/\./g, ''));
   assert.deepEqual([...used].sort(), Object.keys(W.TERRITORIES).sort());
@@ -18,9 +18,14 @@ test('the world map is valid: 30 territories in 6 regions, every letter on the g
 
 test('sea routes connect what the grid cannot', () => {
   const t = W.WORLD.territories;
-  assert.ok(t.alaska.adj.includes('fjernoesten'));
+  assert.ok(t.alaska.adj.includes('oestsibirien'));
+  assert.ok(t.japan.adj.includes('oestasien'));
   assert.ok(t.hoejlandet.adj.includes('vestafrika'));
   assert.ok(!t.alaska.adj.includes('groenland'));
+});
+
+test('hand-placed seals sit on their own territory', () => {
+  for (const [l, [row, col]] of Object.entries(W.PLACES)) assert.equal(W.cellAt(row, col), l, l);
 });
 
 test('every region bonus is at least 2', () => {

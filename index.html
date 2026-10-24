@@ -10,15 +10,15 @@
 <body>
   <header id="hud">
     <ol id="players" aria-label="Spillere"></ol>
-    <div id="hud-buttons">
-      <button id="mission-btn" hidden>Mission</button>
-      <button id="cards-btn" hidden>Kort</button>
-      <button id="menu-btn" class="icon" aria-label="Nyt spil">☰</button>
-    </div>
+    <button id="menu-btn" class="icon" aria-label="Nyt spil">☰</button>
   </header>
 
   <main id="board-wrap">
     <svg id="board" role="img" aria-label="Kortet"></svg>
+    <div id="hand-buttons">
+      <button id="mission-btn" hidden>Mission</button>
+      <button id="cards-btn" hidden>Kort</button>
+    </div>
     <div id="zoom">
       <button id="zoom-in" class="icon" aria-label="Zoom ind">+</button>
       <button id="zoom-out" class="icon" aria-label="Zoom ud">−</button>

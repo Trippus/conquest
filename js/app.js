@@ -10,8 +10,8 @@ import * as WORLD from './maps/world.js';
 import { MODERN } from './rules/modern.js';
 import { createBoard, PLAYER_COLORS as COLORS } from './board.js';
 
-// v1 saves were games on the 12-territory test map; they cannot be replayed on the world map.
-const KEY = 'conquest.v2';
+// Saves only replay on the map they were played on: v1 was the test map, v2 the 30-territory world.
+const KEY = 'conquest.v3';
 const DELAY = { normal: 650, fast: 140 };
 
 const map = G.prepareMap(WORLD.WORLD);

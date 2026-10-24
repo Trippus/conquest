@@ -1,4 +1,4 @@
-// The modern world map, first draft: 30 territories in 6 regions, drawn as a hex grid.
+// The modern world map, second draft: 40 territories in 6 regions, drawn as a hex grid.
 //
 // GRID is the map itself, one letter per hex, '.' is sea. Each column is 5° of longitude
 // (column 0 = 170° W, so the Pacific is at the edges) and each row 5° of latitude (row 0 = 80° N).
@@ -14,23 +14,23 @@
 
 export const GRID = [
   '................bbbbb.ggggggggg.........................................',
-  '..........bbbbbbbbbbbgggggggggg......................rrrrr..............',
-  '.aaaaaabbbbbbbbbbbbb...ggggggg.......sssseeeeerrrrrrrrrrrrrrrrfffffffff.',
-  '.aaaaabbbbbbbbbbb..bbb..ggg.........ssssseeeeerrrrrrrrrrrrrrrrfffffffff.',
-  '..aaaabbbbbbbbbb...bbb...g.........sssssseeeeerrrrrrrrrrrrrrrrff..f.....',
-  '......vvvvbbbbbb...ooo..........ii.ws..eeeeeeerrrrrrrrrrrrrrr.f...f.....',
-  '........vvvvvvoooooooo...........iwwwweeeeeeecccccccrrrrkkkkffff........',
-  '........vvvvvooooooooo...........wwwuuuu..ee.cccccccckkkkkkkk.ff........',
-  '........vvvvvooooooo............www.uuuuMMMM.ccccckkkkkkkkkk..f.........',
-  '..........vvvoooooo.............NNNNN...MMMMMMcccddkkkkkkkkk.ff.........',
-  '...........mmmooooo............NNNNNNNNNNMMMMMddddddkkkkkkk.............',
-  '............mmmm..o............NNNNNNNNNNMMMMM.ddddddkkkkkk.............',
-  '.............mmmmm.............NNNNNNNNNEEMMMM..dddd.tttt...............',
-  '...............mmm............WWWWWWWWEEEEEMM...ddd..tttt..zz...........',
-  '.................mmDDAAA......WWWWWWWWCCEEEE.....dd..tttt..zz...........',
-  '...................DDAAAAA......WWWWCCCCCEEE..........tt.zzz............',
+  '..........bbbbbbbbbbbgggggggggg......................rrrrn..............',
+  '.aaaaaabbbbbbbbbqqqq...ggggggg.......sssseeeeerrrrrrrrrrrnnnnnnnnnnnnnn.',
+  '.aaaaabbbbbbbbbbq..qqq..ggg.........ssssseeeeerrrrrrrrrrrnnnnnnnnnnnnnn.',
+  '..aaaabbbbbbbbbb...qqq...g.........sssssseeeeerrrrrrrrrrrnnnnnnn..n.....',
+  '......vvvvbbhhhh...qqq..........ii.ls..eeeeeeerrrrrrrrrrrnnnn.n...n.....',
+  '........vvvvhhhhoooooo...........iwwllleeeeeecccccccBBBBBBkknnnn........',
+  '........vvvvhhhhoooooo...........wwwuuuu..ee.ccccccccBBBBBkkk.JJ........',
+  '........vvvvhhhhoooo............jjj.uuuuMMMM.ccccckkkkkkkkkk..J.........',
+  '..........vvhhhhooo.............NNNNN...MMMMMMcccddkkkkkkkkk.JJ.........',
+  '...........mmmhhooo............NNNNNNLLLLMMMMMddddddkkkkkkk.............',
+  '............mmmm..o............NNNNNNLLLLRRRRR.ddddddkkkkkk.............',
+  '.............mmmmm.............NNNNNNLLLLLRRRR..dddd.tttt...............',
+  '...............mmm............WWWWWWWWEEEEERR...ddd..tttt..zz...........',
+  '.................mmKKKKK......WWWWWWWWCCEEEE.....dd..tttt..zz...........',
+  '...................KKKKKKK......WWWWCCCCCEEE..........tt.zzz............',
   '..................DDAAAAAAA.........CCCCCEEE.........zzz.zzzz...........',
-  '..................DDAAAAAAHH........CCCCCEE............zzzz..zzzz.......',
+  '..................DDAAAAAAHH........CCCCCEE............zzzz..GGGG.......',
   '..................DDDAAAAHHH........CCCCEEE...................y.........',
   '..................DDDAAAHHHH........SSSSSS..S............xxxyyyy........',
   '...................DDPPHHHH.........SSSSSS..S...........xxxxyyyyy.......',
@@ -54,55 +54,81 @@ export const REGIONS = {
 // letter: [id, name, region]
 export const TERRITORIES = {
   a: ['alaska', 'Alaska', 'na'],
-  b: ['arktis', 'Arktis', 'na'],
+  b: ['nordcanada', 'Nordcanada', 'na'],
+  q: ['oestcanada', 'Østcanada', 'na'],
   g: ['groenland', 'Grønland', 'na'],
   v: ['vestkysten', 'Vestkysten', 'na'],
+  h: ['praerien', 'Prærien', 'na'],
   o: ['oestkysten', 'Østkysten', 'na'],
   m: ['mellemamerika', 'Mellemamerika', 'na'],
+  K: ['caribien', 'Caribien-kysten', 'sa'],
   D: ['andes', 'Andes', 'sa'],
   A: ['amazonas', 'Amazonas', 'sa'],
   H: ['hoejlandet', 'Højlandet', 'sa'],
   P: ['pampas', 'Pampas', 'sa'],
   i: ['britiske-oeer', 'Britiske Øer', 'eu'],
   s: ['skandinavien', 'Skandinavien', 'eu'],
+  j: ['iberien', 'Iberien', 'eu'],
   w: ['vesteuropa', 'Vesteuropa', 'eu'],
+  l: ['centraleuropa', 'Centraleuropa', 'eu'],
   e: ['oesteuropa', 'Østeuropa', 'eu'],
   u: ['sydeuropa', 'Sydeuropa', 'eu'],
-  N: ['nordafrika', 'Nordafrika', 'af'],
+  N: ['maghreb', 'Maghreb', 'af'],
+  L: ['nilen', 'Nilen', 'af'],
   W: ['vestafrika', 'Vestafrika', 'af'],
   C: ['centralafrika', 'Centralafrika', 'af'],
-  E: ['oestafrika', 'Østafrika', 'af'],
+  E: ['afrikas-horn', 'Afrikas Horn', 'af'],
   S: ['sydlige-afrika', 'Det sydlige Afrika', 'af'],
   M: ['mellemoesten', 'Mellemøsten', 'as'],
+  R: ['arabien', 'Arabien', 'as'],
   c: ['centralasien', 'Centralasien', 'as'],
-  r: ['sibirien', 'Sibirien', 'as'],
-  f: ['fjernoesten', 'Fjernøsten', 'as'],
+  r: ['vestsibirien', 'Vestsibirien', 'as'],
+  n: ['oestsibirien', 'Østsibirien', 'as'],
+  B: ['steppen', 'Steppen', 'as'],
   d: ['sydasien', 'Sydasien', 'as'],
   k: ['oestasien', 'Østasien', 'as'],
   t: ['sydoestasien', 'Sydøstasien', 'as'],
+  J: ['japan', 'Japan', 'as'],
   z: ['sundaoeerne', 'Sundaøerne', 'oc'],
+  G: ['ny-guinea', 'Ny Guinea', 'oc'],
   x: ['vestaustralien', 'Vestaustralien', 'oc'],
   y: ['oestaustralien', 'Østaustralien', 'oc'],
 };
 
+// Where crowded territories put their seal and name: letter: [row, column, name side], side
+// 'below', 'above', 'left' or 'right'. The rest use the cell closest to the middle of the
+// territory, with the name below.
+export const PLACES = {
+  i: [5, 32, 'above'],
+  j: [8, 32, 'left'],
+  w: [7, 34, 'below'],
+  l: [6, 37, 'above'],
+  s: [2, 38, 'below'],
+  u: [8, 38, 'below'],
+  K: [14, 21, 'above'],
+};
+
 // Region missions for mission games (the engine adds "hold territories" and "knock out a player").
-// Each asks for about 10–12 territories; the small pairs need one more region of your choice.
+// Each asks for about 12–16 territories; the small pairs need one more region of your choice.
 export const MISSIONS = [
   { type: 'regions', regions: ['as', 'sa'] },
   { type: 'regions', regions: ['as', 'af'] },
   { type: 'regions', regions: ['na', 'af'] },
-  { type: 'regions', regions: ['na', 'oc'], plusOne: true },
+  { type: 'regions', regions: ['na', 'eu'] },
   { type: 'regions', regions: ['eu', 'sa'], plusOne: true },
   { type: 'regions', regions: ['eu', 'oc'], plusOne: true },
 ];
 
 // Crossings over water, drawn as dashed lines: [from, to].
 export const SEA = [
-  ['a', 'f'], // Beringstrædet
+  ['a', 'n'], // Beringstrædet
   ['g', 'i'], // over Island
   ['i', 's'], // Nordsøen
   ['H', 'W'], // Sydatlanten
   ['z', 'x'], // Timorhavet
+  ['z', 'G'], // Molukkerne
+  ['J', 'k'], // Koreastrædet
+  ['q', 'g'], // Davisstrædet
 ];
 
 /* ---------- geometry ---------- */
@@ -162,8 +188,11 @@ function build() {
     const pts = cells[l].map(([r, c]) => hexCenter(r, c));
     const mx = pts.reduce((n, p) => n + p[0], 0) / pts.length;
     const my = pts.reduce((n, p) => n + p[1], 0) / pts.length;
-    const [x, y] = pts.reduce((best, p) => (Math.hypot(p[0] - mx, p[1] - my) < Math.hypot(best[0] - mx, best[1] - my) ? p : best));
-    territories[id] = { name, region, adj: [...adj[l]].map((n) => TERRITORIES[n][0]), x, y, letter: l };
+    const [x, y] = PLACES[l]
+      ? hexCenter(PLACES[l][0], PLACES[l][1])
+      : pts.reduce((best, p) => (Math.hypot(p[0] - mx, p[1] - my) < Math.hypot(best[0] - mx, best[1] - my) ? p : best));
+    const label = PLACES[l]?.[2] ?? 'below';
+    territories[id] = { name, region, adj: [...adj[l]].map((n) => TERRITORIES[n][0]), x, y, label, letter: l };
   }
 
   const regions = {};

@@ -20,6 +20,13 @@ const REGION_PLACES = { na: [10, 19], sa: [22, 33], eu: [57.5, 5], af: [55, 30],
 const TAP_SLOP = 8; // px a finger may move and still count as a tap
 
 const n = (v) => +v.toFixed(2);
+// Where a territory's name goes relative to its seal.
+const NAME_AT = {
+  below: 'dy="2.45"',
+  above: 'dy="-1.75"',
+  left: 'x="-1.6" dy=".35" text-anchor="end"',
+  right: 'x="1.6" dy=".35" text-anchor="start"',
+};
 
 export function createBoard(svg, grid, map, { onTap }) {
   const shapes = mapShapes(grid);
@@ -68,7 +75,7 @@ export function createBoard(svg, grid, map, { onTap }) {
     <g class="seals">${T.map(
       (t, i) => `<g class="seal" data-t="${i}" transform="translate(${n(t.x)} ${n(t.y)})">
         <circle r="1.35" class="wax"/><circle r="1.08" class="rim"/>
-        <text class="count" dy=".4"></text><text class="name" dy="2.45">${t.name}</text></g>`,
+        <text class="count" dy=".4"></text><text class="name" ${NAME_AT[grid.WORLD.territories[t.id]?.label ?? 'below']}>${t.name}</text></g>`,
     ).join('')}</g>`;
 
   const washes = [...svg.querySelectorAll('.washes path')];

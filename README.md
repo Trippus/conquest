@@ -38,7 +38,7 @@ og kun viser hver spiller `view(state, spiller)`.
 
 ## Status
 Milepæl 1 (regelmotor og tests), 2 (spilbar prototype mod computeren og flere på samme telefon) og 3 (normal bot)
-er færdige. Næste: det rigtige kort og grafikken (milepæl 4), se `DESIGN.md`. Gemmes i `localStorage` under `conquest.v2` som opsætning + handlinger (v1 var spil på testkortet).
+er færdige. Næste: det rigtige kort og grafikken (milepæl 4), se `DESIGN.md`. Gemmes i `localStorage` under `conquest.v3` som opsætning + handlinger (v1: testkortet, v2: verden med 30 områder).
 
 Balance: den, der starter, har en fordel (uden udligning vinder spiller 1 ca. 73 % af 2-mandsspillene på
 verdenskortet). Derfor starter senere pladser med flere hære (`laterSeatArmies`: +6 ved 2 spillere, +1 pr. plads
@@ -49,6 +49,5 @@ På det lille testkort er forskellen mindre: spillene er så korte, at startopst
 
 Ingen licens: alle rettigheder forbeholdes.
 
-Missioner (verdenskortet, 4 normale bots): spillene varer ca. 12 runder mod 18 ved "erobr verden", og hver
-missionstype vinder 19–30 % af gangene (rimelig andel 25 %). "Hold 11 områder med 2 hære i hvert" er sværest for
-botterne, fordi de samler hærene på én front.
+Verdenskortet har 40 områder. Med 4 normale bots varer et missionsspil ca. 17 runder og "erobr verden" ca. 27.
+Hver missionstype vinder 18–30 % af gangene (rimelig andel 25 %).

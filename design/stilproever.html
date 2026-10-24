@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="da">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Stilprøver</title>
+  <style>
+    :root { --bg: #fbf6ee; --ink: #2b2522; --muted: #7a6f66; --card: #fff; --line: #e3d9cc; }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.5 ui-rounded, system-ui, sans-serif; }
+    main { max-width: 1200px; margin: 0 auto; padding: 24px 16px 64px; }
+    h1, h2 { font-family: ui-serif, Georgia, serif; margin: 0 0 4px; }
+    h1 { font-size: 30px; }
+    .lead { color: var(--muted); margin: 0 0 28px; max-width: 760px; }
+    section { margin: 0 0 36px; }
+    .why { margin: 4px 0 12px; color: var(--muted); max-width: 820px; }
+    .map { background: var(--card); border-radius: 14px; padding: 10px; box-shadow: 0 2px 12px rgb(0 0 0 / .08); overflow-x: auto; }
+    .map svg { display: block; width: 100%; min-width: 860px; height: auto; border-radius: 8px; }
+    table { border-collapse: collapse; background: var(--card); border-radius: 12px; overflow: hidden; width: 100%; }
+    th, td { text-align: left; padding: 8px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+    td:nth-child(2) { text-align: center; }
+    .note { color: var(--muted); }
+
+    .a-region { font: 700 1.35px ui-rounded, system-ui, sans-serif; letter-spacing: .25px; fill: #2c4a55; opacity: .35; text-anchor: middle; text-transform: uppercase; }
+    .a-count { font: 700 1.15px ui-rounded, system-ui, sans-serif; fill: #fff; text-anchor: middle; }
+    .a-name { font: 600 .72px ui-rounded, system-ui, sans-serif; fill: #3b302a; text-anchor: middle; paint-order: stroke; stroke: #fff; stroke-width: .22px; stroke-linejoin: round; }
+
+    .b-region { font: italic 1.6px Georgia, serif; letter-spacing: .35px; fill: #7a2e1d; opacity: .55; text-anchor: middle; }
+    .b-count { font: 700 1.05px Georgia, serif; fill: #f4e8cc; text-anchor: middle; }
+    .b-name { font: italic .78px Georgia, serif; fill: #3d2c1c; text-anchor: middle; paint-order: stroke; stroke: #f4e8cc; stroke-width: .2px; stroke-linejoin: round; }
+    .b-n { font: 700 1px Georgia, serif; fill: #4a3726; text-anchor: middle; }
+
+    .c-count { font: 700 1.05px ui-monospace, Consolas, monospace; text-anchor: middle; }
+    .c-name { font: .58px ui-monospace, Consolas, monospace; letter-spacing: .06px; fill: #cfe3f5; text-anchor: middle; opacity: .9; }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Stilprøver: verdenskortet</h1>
+    <p class="lead">Samme kort og samme spil (4 spillere i runde 4) tegnet på tre måder. Det er udkast til at vælge en
+      retning, ikke færdig grafik. Man kan godt blande: fx brætspillets farver med papirkortets kystlinjer.</p>
+
+    <section>
+      <h2>A · Brætspil</h2>
+      <p class="why">Lyst, venligt og tydeligt: ejeren ses straks på farven, og hærene er brikker med tal. Passer til
+        Trippus' hyggelige tone og en målgruppe, der vil kunne læse kortet uden at lede.</p>
+      <div class="map" id="a"></div>
+    </section>
+
+    <section>
+      <h2>B · Gammelt papirkort</h2>
+      <p class="why">Pergament, blæk og lakseglsbrikker. Mere stemning, og den samme stil kan bære de historiske
+        æraer (Rom, vikingetid) senere. Ejerfarven er en akvarel-vask, så den er lidt svagere end i A.</p>
+      <div class="map" id="b"></div>
+    </section>
+
+    <section>
+      <h2>C · Taktisk skærm</h2>
+      <p class="why">Mørk "kommandocentral" med lysende kyster og sekskantede felter. Tydeligt nutidigt og strategisk,
+        men mere krigerisk i tonen og mindre hyggeligt end A og B.</p>
+      <div class="map" id="c"></div>
+    </section>
+
+    <section>
+      <h2>Inddelingen (udkast)</h2>
+      <p class="why">30 territorier i 6 regioner. Grænser og navne rettes i <code>js/maps/world.js</code>, hvor kortet står
+        som bogstaver i et sekskantgitter.</p>
+      <div id="division"></div>
+    </section>
+  </main>
+  <script type="module" src="styles.js"></script>
+</body>
+</html>

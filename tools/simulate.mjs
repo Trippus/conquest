@@ -2,13 +2,14 @@
 // endings. Used for balance (a seat or region that wins far too often shows up here) and to check
 // that a stronger bot really is stronger.
 //
-// Run: npm run sim -- [games=200] [bots=easy,easy,easy,easy] [map=test|large]
+// Run: npm run sim -- [games=200] [bots=easy,easy,easy,easy] [map=test|large|world]
 //   npm run sim -- 400 normal,easy,easy,easy large   one normal bot against three easy ones, 30 territories
 // The bots move one seat on each game, so no bot always gets the first move.
 import * as G from '../js/engine.js';
 import { playBots, LEVELS } from '../js/ai.js';
 import { TEST_MAP } from '../js/maps/test.js';
 import { TEST_LARGE } from '../js/maps/test-large.js';
+import { WORLD } from '../js/maps/world.js';
 import { MODERN } from '../js/rules/modern.js';
 
 const games = +(process.argv[2] ?? 200);
@@ -18,7 +19,8 @@ if (bots.length < 2 || bots.some((b) => !LEVELS.includes(b))) {
   process.exit(1);
 }
 const n = bots.length;
-const map = G.prepareMap((process.argv[4] ?? 'test') === 'large' ? TEST_LARGE : TEST_MAP);
+const MAPS = { test: TEST_MAP, large: TEST_LARGE, world: WORLD };
+const map = G.prepareMap(MAPS[process.argv[4] ?? 'test']);
 const rules = { ...MODERN, maxRounds: 150 };
 
 const seatWins = Array(n).fill(0);

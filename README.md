@@ -9,7 +9,8 @@ Hvad der skal designes og besluttes står i [`DESIGN.md`](DESIGN.md).
 npm start          # http://localhost:5183 (også over Wi-Fi)
 npm test           # unit-tests af reglerne og bot-spil
 npm run sim        # 200 bot-spil: sejre pr. bot og pr. plads, længde
-npm run sim -- 1000 normal,easy,easy large   # 1000 spil, én normal mod to lette, på det store testkort
+npm run sim -- 1000 normal,easy,easy large   # 1000 spil, én normal mod to lette, på det store testkort (eller world)
+npm run design-shots                          # stilprøverne som PNG (kræver npm start)
 ```
 
 ## Opbygning
@@ -18,7 +19,9 @@ npm run sim -- 1000 normal,easy,easy large   # 1000 spil, én normal mod to lett
 | `js/engine.js` | Reglerne (ren logik, intet DOM): kort, turfaser, kamp, kort-sæt, gem/genspil, `view()` til online |
 | `js/ai.js` | Computerspillere: "let" og "normal" (vægtene står i `TUNING`) og `playBots()` |
 | `js/odds.js` | Præcise chancer for et terningslag og for "kæmp til enden" |
-| `js/maps/*.js` | Kort som data: territorier, naboer, regioner og bonus. `test.js` er et lille testkort (12), `test-large.js` et stort (30) til simulationer |
+| `js/maps/*.js` | Kort som data: territorier, naboer, regioner og bonus. `test.js` er et lille testkort (12), `test-large.js` et stort (30) til simulationer, `world.js` verdenskortet (udkast) |
+| `js/map-shapes.js` | Gør sekskantgitteret til tegnbare former: udjævnede omrids, grænser, kyst, havruter |
+| `design/` | Stilprøver til kortet (`stilproever.html`, `stil-*.png`) |
 | `js/rules/*.js` | Regelsæt som data: starthære, terninger, kort-bytte, rundegrænse |
 | `js/app.js` | Prototype-brugerfladen: tegner kortet ud fra data, tryk → handlinger, bots spiller, gem/indlæs. `window.__conquest` er debug-hooket |
 | `tools/simulate.mjs` | Mange bot-spil til balance |

@@ -6,8 +6,9 @@
   "type": "module",
   "scripts": {
     "start": "node tools/serve.mjs",
-    "test":"node --test \"tests/unit/*.test.mjs\"",
+    "test": "node --test \"tests/unit/*.test.mjs\"",
     "test:all": "npm test",
-    "sim": "node tools/simulate.mjs"
+    "sim": "node tools/simulate.mjs",
+    "design-shots": "node tools/design-shots.mjs"
   }
 }

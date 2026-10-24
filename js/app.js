@@ -22,7 +22,11 @@ const OPPONENTS = ['Grevinde Holm', 'Oberst Vind', 'Admiral Storm', 'Generalinde
 const map = G.prepareMap(WORLD.WORLD);
 const rules = MODERN;
 const $ = (id) => document.getElementById(id);
-const board = createBoard($('board'), WORLD, map, { onTap: (t) => tap(t) });
+const board = createBoard($('board'), WORLD, map, {
+  onTap: (t) => tap(t),
+  // The players at the top and the turn panel at the bottom cover the map.
+  insets: () => ({ top: $('hud').getBoundingClientRect().bottom, bottom: innerHeight - $('bar').getBoundingClientRect().top }),
+});
 
 let game = null; // { setup, seats: ['human' | 'easy' | 'normal'], colors, speed, actions }
 let s = null; // the current state
@@ -112,6 +116,13 @@ function act(a) {
     sel = { from: keep ? sel.from : -1, to: -1, n: 0 };
   }
   if (s.phase === 'occupy') sel.n = s.armies[s.occupy.from] - 1; // all in, unless the player says less
+  if (s.phase === 'attack') {
+    // After a conquest the old target is yours: carry on from the new land if it can attack, else
+    // from where you were. A start left with one army cannot attack any more.
+    const canAttack = (t) => t >= 0 && s.owner[t] === s.current && s.armies[t] > 1 && G.attackTargets(map, s, t).length > 0;
+    if (sel.to >= 0 && s.owner[sel.to] === s.current) sel = { from: canAttack(sel.to) ? sel.to : canAttack(sel.from) ? sel.from : -1, to: -1, n: 0 };
+    if (sel.from >= 0 && !canAttack(sel.from)) sel = { from: -1, to: -1, n: 0 };
+  }
   showEvents(r.events);
   render();
   schedule();
@@ -337,6 +348,7 @@ function showEvents(events) {
       Sound.play(human(e.p) ? 'victory' : 'defeat', { delay: 0.5 });
     }
     if (e.type === 'place') Sound.play('place', { vol: quiet(e.p) * 0.8 });
+    if ((e.type === 'conquer' || e.type === 'move') && human(e.p)) board.reveal(e.to);
     if (e.type === 'conquer') {
       flash(e.to, 'conquer');
       Sound.play(human(e.loser) && !human(e.p) ? 'lost' : 'conquer', { delay: 0.35, vol: quiet(e.p) });

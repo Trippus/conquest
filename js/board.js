@@ -28,7 +28,9 @@ const NAME_AT = {
   right: 'x="1.6" dy=".35" text-anchor="start"',
 };
 
-export function createBoard(svg, grid, map, { onTap }) {
+// insets(): how many pixels at the top and bottom of the screen are covered by panels, so the map
+// can be moved out from under them and is centred in what is left.
+export function createBoard(svg, grid, map, { onTap, insets = () => ({ top: 0, bottom: 0 }) }) {
   const shapes = mapShapes(grid);
   const letterOf = Object.fromEntries(Object.entries(grid.TERRITORIES).map(([l, [id]]) => [id, l]));
   const T = map.territories;
@@ -122,10 +124,13 @@ export function createBoard(svg, grid, map, { onTap }) {
     if (!b.width || !b.height) return;
     w = Math.min(maxW(), Math.max(minW, w));
     const h = (w * b.height) / b.width;
-    // Stay on the map: no paper beyond its edges, unless the view is larger than the map, then
-    // the map sits in the middle.
-    const clamp = (v, size, total) => (size >= total ? (total - size) / 2 : Math.min(total - size, Math.max(0, v)));
-    view = { x: clamp(x, w, W), y: clamp(y, h, H), w, h };
+    // Stay near the map: every edge can come a little way into view, and the top and bottom can
+    // be pulled clear of the panels that cover them. A map smaller than the view sits in the middle.
+    const k = w / b.width; // map units per pixel
+    const pad = 24 * k;
+    const { top, bottom } = insets();
+    const clamp = (v, lo, hi) => (lo > hi ? (lo + hi) / 2 : Math.min(hi, Math.max(lo, v)));
+    view = { x: clamp(x, -pad, W - w + pad), y: clamp(y, -top * k - pad, H - h + bottom * k + pad), w, h };
     svg.setAttribute('viewBox', `${n(view.x)} ${n(view.y)} ${n(view.w)} ${n(view.h)}`);
   }
   // Zoom by `factor` (> 1 zooms in) keeping the map point under (px, py) in place.
@@ -144,14 +149,50 @@ export function createBoard(svg, grid, map, { onTap }) {
     if (!list?.length || b.width > 1.6 * b.height) return setView(0, 0, maxW());
     const near = (i) => list.filter((j) => Math.hypot(T[i].x - T[j].x, T[i].y - T[j].y) < 16).length;
     const centre = list.reduce((best, i) => (near(i) > near(best) ? i : best));
-    const w = Math.min(36, (H * b.width) / b.height); // as close as 36 units, but the map fills the height
-    setView(T[centre].x - w / 2, T[centre].y - (w * b.height) / b.width / 2, w);
+    const { top, bottom } = insets();
+    const w = Math.min(36, (H * b.width) / (b.height - top - bottom)); // close, but the map fills the free height
+    centreOn(T[centre].x, T[centre].y, w);
+  }
+
+  // Puts map point (x, y) in the middle of the part of the screen the panels leave free.
+  function centreOn(x, y, w = view.w) {
+    const b = box();
+    const { top, bottom } = insets();
+    const k = w / b.width;
+    setView(x - w / 2, y - (top + (b.height - top - bottom) / 2) * k, w);
+  }
+
+  // Glides the map so territory i is in view (used to follow the troops); nothing if it already is.
+  let glide = 0;
+  function reveal(i) {
+    const b = box();
+    const { top, bottom } = insets();
+    const k = view.w / b.width;
+    const t = T[i];
+    const margin = 3;
+    const inside =
+      t.x > view.x + margin && t.x < view.x + view.w - margin && t.y > view.y + top * k + margin && t.y < view.y + view.h - bottom * k - margin;
+    if (inside) return;
+    const from = { ...view };
+    centreOn(t.x, t.y);
+    const to = { ...view };
+    setView(from.x, from.y, from.w);
+    cancelAnimationFrame(glide);
+    const start = performance.now();
+    const step = (now) => {
+      const p = Math.min(1, (now - start) / 380);
+      const e = 1 - (1 - p) ** 3;
+      setView(from.x + (to.x - from.x) * e, from.y + (to.y - from.y) * e, view.w);
+      if (p < 1) glide = requestAnimationFrame(step);
+    };
+    glide = requestAnimationFrame(step);
   }
 
   const pointers = new Map();
   let moved = 0;
   let pinch = null;
   svg.addEventListener('pointerdown', (e) => {
+    cancelAnimationFrame(glide); // a finger on the map stops it gliding
     svg.setPointerCapture(e.pointerId);
     pointers.set(e.pointerId, [e.clientX, e.clientY]);
     if (pointers.size === 1) moved = 0;
@@ -207,5 +248,5 @@ export function createBoard(svg, grid, map, { onTap }) {
     zoomAt(factor, b.left + b.width / 2, b.top + b.height / 2);
   };
 
-  return { update, flash, focus, zoomIn: () => zoom(1.4), zoomOut: () => zoom(1 / 1.4), get view() { return view; } };
+  return { update, flash, focus, reveal, zoomIn: () => zoom(1.4), zoomOut: () => zoom(1 / 1.4), get view() { return view; } };
 }

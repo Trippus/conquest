@@ -1,0 +1,4 @@
+node_modules/
+# Secrets (server keys, database logins) never go in git - this repo is public.
+.env
+.env.*

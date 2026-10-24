@@ -20,7 +20,7 @@ const rules = MODERN;
 const $ = (id) => document.getElementById(id);
 const svgNS = 'http://www.w3.org/2000/svg';
 
-let game = null; // { setup, seats: ['human' | 'bot'], speed, actions }
+let game = null; // { setup, seats: ['human' | 'easy' | 'normal'], speed, actions }
 let s = null; // the current state
 let sel = { from: -1, to: -1, n: 0 }; // what the player has tapped
 let botTimer = 0;
@@ -38,7 +38,7 @@ const DANISH = {
 
 function startGame(seats, speed, seed = (Math.random() * 2 ** 31) | 0) {
   const humans = seats.filter((x) => x === 'human').length;
-  const players = seats.map((x, i) => (x === 'bot' ? `Computer ${i + 1}` : humans === 1 ? 'Dig' : `Spiller ${i + 1}`));
+  const players = seats.map((x, i) => (x !== 'human' ? `Computer ${i + 1}` : humans === 1 ? 'Dig' : `Spiller ${i + 1}`));
   game = { setup: { players, seed }, seats, speed, actions: [] };
   s = G.newGame(map, rules, game.setup);
   clearSel();
@@ -64,13 +64,15 @@ function act(a) {
   return true;
 }
 
-const isBot = () => game.seats[s.current] === 'bot';
+const isBot = () => game.seats[s.current] !== 'human';
+// Games saved before there were levels say 'bot': those were easy bots.
+const level = (seat) => (seat === 'bot' ? 'easy' : seat);
 
 // Bots play one action at a time, with a pause so you can follow them.
 function schedule() {
   clearTimeout(botTimer);
   if (s.phase === 'over' || !isBot()) return;
-  botTimer = setTimeout(() => act(botAction(map, rules, s)), DELAY[game.speed]);
+  botTimer = setTimeout(() => act(botAction(map, rules, s, level(game.seats[s.current]))), DELAY[game.speed]);
 }
 
 function clearSel() {
@@ -332,7 +334,7 @@ function showDice(rolls, conquest, out) {
 
 function openNewGame() {
   const seats = $('seats');
-  const current = game?.seats ?? ['human', 'bot', 'bot'];
+  const current = (game?.seats ?? ['human', 'normal', 'normal']).map(level);
   seats.replaceChildren(
     ...COLORS.map((c, i) => {
       const row = document.createElement('label');
@@ -341,7 +343,8 @@ function openNewGame() {
       row.innerHTML = `<span class="dot" style="background:${c}"></span><span>Plads ${i + 1}</span>
         <select data-seat="${i}">
           <option value="human">Menneske</option>
-          <option value="bot">Computer</option>
+          <option value="easy">Computer, let</option>
+          <option value="normal">Computer, normal</option>
           ${i >= 2 ? '<option value="none">Ingen</option>' : ''}
         </select>`;
       row.querySelector('select').value = value;

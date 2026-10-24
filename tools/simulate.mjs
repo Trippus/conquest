@@ -1,30 +1,46 @@
-// Plays many bot games and prints how they went: wins per seat, length, round-limit endings.
-// Used for balance: a seat or region that wins far too often shows up here.
-// Run: npm run sim -- [games=200] [players=4]
+// Plays many bot games and prints how they went: wins per seat and per bot, length, round-limit
+// endings. Used for balance (a seat or region that wins far too often shows up here) and to check
+// that a stronger bot really is stronger.
+//
+// Run: npm run sim -- [games=200] [bots=easy,easy,easy,easy] [map=test|large]
+//   npm run sim -- 400 normal,easy,easy,easy large   one normal bot against three easy ones, 30 territories
+// The bots move one seat on each game, so no bot always gets the first move.
 import * as G from '../js/engine.js';
-import { playBots } from '../js/ai.js';
+import { playBots, LEVELS } from '../js/ai.js';
 import { TEST_MAP } from '../js/maps/test.js';
+import { TEST_LARGE } from '../js/maps/test-large.js';
 import { MODERN } from '../js/rules/modern.js';
 
 const games = +(process.argv[2] ?? 200);
-const players = +(process.argv[3] ?? 4);
-const map = G.prepareMap(TEST_MAP);
-const rules = { ...MODERN, maxRounds: 100 };
+const bots = (process.argv[3] ?? 'easy,easy,easy,easy').split(',');
+if (bots.length < 2 || bots.some((b) => !LEVELS.includes(b))) {
+  console.error(`bots: 2–6 of ${LEVELS.join(', ')}, separated by commas`);
+  process.exit(1);
+}
+const n = bots.length;
+const map = G.prepareMap((process.argv[4] ?? 'test') === 'large' ? TEST_LARGE : TEST_MAP);
+const rules = { ...MODERN, maxRounds: 150 };
 
-const wins = Array(players).fill(0);
+const seatWins = Array(n).fill(0);
+const botWins = Array(n).fill(0); // by bot (its place in the list), whatever seat it had
 let rounds = 0;
 let actions = 0;
 let limited = 0;
 const started = Date.now();
-for (let seed = 1; seed <= games; seed++) {
-  const r = playBots(map, rules, { players: [...'ABCDEF'].slice(0, players), seed });
-  wins[r.state.winner]++;
+for (let g = 0; g < games; g++) {
+  const seatOf = (b) => (b + g) % n;
+  const levels = Array(n);
+  bots.forEach((level, b) => (levels[seatOf(b)] = level));
+  const r = playBots(map, rules, { players: [...'ABCDEF'].slice(0, n), seed: g + 1 }, levels);
+  seatWins[r.state.winner]++;
+  botWins[bots.findIndex((_, b) => seatOf(b) === r.state.winner)]++;
   rounds += r.state.round;
   actions += r.actions.length;
   if (!r.state.owner.every((o) => o === r.state.winner)) limited++;
 }
-const pct = (n) => `${((100 * n) / games).toFixed(0)}%`;
-console.log(`${games} games, ${players} players on ${map.name} (${Date.now() - started} ms)`);
-console.log(`wins per seat: ${wins.map((w, p) => `${p + 1}: ${pct(w)}`).join('  ')}`);
+const pct = (x) => `${((100 * x) / games).toFixed(0)}%`;
+console.log(`${games} games, ${n} players on ${map.name} (${Date.now() - started} ms)`);
+console.log(`wins per bot:  ${bots.map((b, i) => `${b}: ${pct(botWins[i])}`).join('  ')}  (fair share ${pct(games / n)})`);
+console.log(`wins per seat: ${seatWins.map((w, p) => `${p + 1}: ${pct(w)}`).join('  ')}`);
 console.log(`average: ${(rounds / games).toFixed(1)} rounds, ${(actions / games).toFixed(0)} actions`);
 console.log(`ended by the round limit: ${pct(limited)}`);

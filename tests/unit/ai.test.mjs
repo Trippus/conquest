@@ -3,21 +3,52 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import * as G from '../../js/engine.js';
-import { playBots } from '../../js/ai.js';
+import { playBots, LEVELS } from '../../js/ai.js';
 import { TEST_MAP } from '../../js/maps/test.js';
+import { TEST_LARGE } from '../../js/maps/test-large.js';
 import { MODERN } from '../../js/rules/modern.js';
 
 const map = G.prepareMap(TEST_MAP);
+const large = G.prepareMap(TEST_LARGE);
 const names = ['A', 'B', 'C', 'D', 'E', 'F'];
 
-test('bots finish games with 2–6 players', () => {
-  for (let n = 2; n <= 6; n++) {
-    for (let seed = 1; seed <= 10; seed++) {
-      const { state } = playBots(map, MODERN, { players: names.slice(0, n), seed });
-      assert.equal(state.phase, 'over', `${n} players, seed ${seed}`);
-      assert.ok(state.owner.every((o) => o === state.winner));
+test('the large test map is valid', () => {
+  assert.deepEqual(G.validateMap(TEST_LARGE), []);
+  assert.equal(large.territories.length, 30);
+});
+
+test('bots of every level finish games with 2–6 players', () => {
+  for (const level of LEVELS) {
+    for (let n = 2; n <= 6; n++) {
+      for (let seed = 1; seed <= 10; seed++) {
+        const { state } = playBots(map, MODERN, { players: names.slice(0, n), seed }, Array(n).fill(level));
+        assert.equal(state.phase, 'over', `${level}, ${n} players, seed ${seed}`);
+        assert.ok(state.owner.every((o) => o === state.winner));
+      }
     }
   }
+});
+
+test('mixed bots finish games on the large map', () => {
+  for (let seed = 1; seed <= 5; seed++) {
+    const { state } = playBots(large, MODERN, { players: names.slice(0, 4), seed }, ['normal', 'easy', 'normal', 'easy']);
+    assert.equal(state.phase, 'over');
+  }
+});
+
+// The games are seeded, so this is the same 300 games every time. The normal bot wins about 1.3
+// times its fair share; the test only asks for clearly more than fair.
+test('the normal bot beats easy bots more often than its fair share', () => {
+  let wins = 0;
+  const games = 300;
+  for (let g = 0; g < games; g++) {
+    const seat = g % 3;
+    const levels = ['easy', 'easy', 'easy'];
+    levels[seat] = 'normal';
+    const { state } = playBots(large, { ...MODERN, maxRounds: 150 }, { players: names.slice(0, 3), seed: 900 + g }, levels);
+    if (state.winner === seat) wins++;
+  }
+  assert.ok(wins / games > 0.4, `normal won ${wins} of ${games} (fair share is a third)`);
 });
 
 test('a game replays exactly from its setup and actions', () => {

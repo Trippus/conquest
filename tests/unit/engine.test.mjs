@@ -6,6 +6,7 @@ import { TEST_MAP } from '../../js/maps/test.js';
 import { MODERN } from '../../js/rules/modern.js';
 
 const map = G.prepareMap(TEST_MAP);
+const CARDS = { ...MODERN, luck: 'cards' }; // the classic cards instead of war-luck stars
 const at = (id) => map.at[id];
 
 // A game whose board is set by hand: owners written as a string in map order
@@ -126,16 +127,17 @@ test('trade values rise and then stay at the cap', () => {
 });
 
 test('trading a set gives armies, and 2 more on a traded territory you hold', () => {
-  const s = board('000111000111', Array(12).fill(1));
+  const s = board('000111000111', Array(12).fill(1), {}, CARDS);
   s.players[0].cards = [0, 3, 6, 1]; // n1, e1 (not A's), s1 (A's), all symbol 0
   const reserve = s.reserve;
-  const { s: t, events } = play(s, [{ type: 'trade', cards: [0, 3, 6] }]);
+  const { s: t, events } = play(s, [{ type: 'trade', cards: [0, 3, 6] }], CARDS);
   assert.equal(t.reserve, reserve + 4);
   assert.equal(t.armies[at('n1')], 3);
   assert.deepEqual(t.players[0].cards, [1]);
   assert.equal(t.trades, 1);
   assert.equal(events[0].bonus, at('n1'));
-  assert.equal(refuse(t, { type: 'trade', cards: [0, 3, 6] }), 'not your cards');
+  assert.equal(refuse(t, { type: 'trade', cards: [0, 3, 6] }, CARDS), 'not your cards');
+  assert.equal(refuse(s, { type: 'trade', cards: [0, 3, 6] }), 'this game has no cards');
 });
 
 test('with 5 cards you must trade before placing or ending', () => {
@@ -182,7 +184,7 @@ test('a roll compares the highest dice pair by pair, ties to the defender', () =
   }
 });
 
-test('a conquest moves the dice in, then lets you move more; the card comes at the end of the turn', () => {
+test('a conquest moves the dice in, then lets you move more; the card comes at the end of the turn (cards)', () => {
   // A attacks a lone army on w3 until it falls.
   const s = board('000111000111', [10, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], { phase: 'attack', reserve: 0 });
   const { s: t, events } = play(s, [{ type: 'blitz', from: at('n1'), to: at('w3') }]);
@@ -194,7 +196,7 @@ test('a conquest moves the dice in, then lets you move more; the card comes at t
   assert.equal(refuse(t, { type: 'end' }), 'move armies in first');
   assert.equal(refuse(t, { type: 'occupy', n: t.armies[at('n1')] }), 'cannot move that many');
   const before = t.armies[at('w3')];
-  const { s: u } = play(t, [{ type: 'occupy', n: 1 }, { type: 'end' }, { type: 'end' }]);
+  const { s: u } = play(t, [{ type: 'occupy', n: 1 }, { type: 'end' }, { type: 'end' }], CARDS);
   assert.equal(u.armies[at('w3')], before + 1);
   assert.equal(u.players[0].cards.length, 1);
   assert.equal(u.current, 1);
@@ -356,4 +358,44 @@ test('standings: the winner, then those still in by territories, then the knocke
   assert.deepEqual(G.standings(t), [0, 1, 2], 'no winner yet: A has more territories than B');
   const done = { ...structuredClone(t), winner: 1, phase: 'over' };
   assert.deepEqual(G.standings(done), [1, 0, 2]);
+});
+
+/* ---------- war-luck stars ---------- */
+
+test('a conquest earns a star at the end of the turn, none without', () => {
+  const s = board('000111000111', [10, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], { phase: 'attack', reserve: 0 });
+  let { s: t, events } = play(s, [{ type: 'blitz', from: at('n1'), to: at('w3') }]);
+  if (t.phase === 'occupy') t = play(t, [{ type: 'occupy', n: 0 }]).s;
+  ({ s: t, events } = play(t, [{ type: 'end' }, { type: 'end' }]));
+  assert.equal(t.players[0].stars, 1);
+  assert.deepEqual(events.find((e) => e.type === 'star'), { type: 'star', p: 0, stars: 1 });
+  assert.equal(t.players[0].cards.length, 0, 'no cards in a stars game');
+  const quiet = board('000111000111', Array(12).fill(1), { phase: 'attack', reserve: 0 });
+  assert.equal(play(quiet, [{ type: 'end' }, { type: 'end' }]).s.players[0].stars, 0);
+});
+
+test('three stars become extra armies at the start of the turn, each time worth more', () => {
+  const s = board('000111000111', Array(12).fill(1), { phase: 'fortify', reserve: 0 });
+  s.players[1].stars = 3;
+  const { s: t, events } = play(s, [{ type: 'end' }]);
+  assert.equal(t.current, 1);
+  assert.equal(t.players[1].stars, 0);
+  assert.equal(t.reserve, G.reinforcements(map, MODERN, t, 1) + 4);
+  assert.deepEqual(events.at(-1), { type: 'luck', p: 1, armies: 4 });
+  assert.equal(t.trades, 1);
+  // Two stars wait for the third.
+  const u = board('000111000111', Array(12).fill(1), { phase: 'fortify', reserve: 0, trades: 1 });
+  u.players[1].stars = 2;
+  const v = play(u, [{ type: 'end' }]).s;
+  assert.equal(v.players[1].stars, 2);
+  assert.equal(v.reserve, G.reinforcements(map, MODERN, v, 1));
+});
+
+test('knocking a player out takes their stars', () => {
+  const s = board('000111000020', [1, 1, 1, 1, 1, 1, 1, 1, 1, 30, 1, 1], { phase: 'attack', reserve: 0 });
+  s.players[2].stars = 2;
+  const { s: t, events } = play(s, [{ type: 'blitz', from: at('w1'), to: at('w2') }]);
+  assert.equal(t.players[0].stars, 2);
+  assert.equal(t.players[2].stars, 0);
+  assert.equal(events.find((e) => e.type === 'eliminate').stars, 2);
 });

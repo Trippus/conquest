@@ -35,7 +35,6 @@ let botTimer = 0;
 
 // The engine answers in English; the player reads Danish.
 const DANISH = {
-  'trade a card set first': 'Du har for mange kort. Byt et sæt først.',
   'not your territory': 'Det område er ikke dit.',
   'place all armies first': 'Placér alle nye hære først.',
   'an attack needs at least 2 armies': 'Der skal være mindst 2 hære for at angribe.',
@@ -249,9 +248,9 @@ function render() {
       const li = document.createElement('li');
       li.className = (i === p && s.phase !== 'over' ? 'current ' : '') + (pl.alive ? '' : 'out');
       const land = G.owned(s, i).length;
-      li.title = `${pl.name}: ${land} områder, ${pl.cards.length} krigslykkekort`;
+      li.title = `${pl.name}: ${land} områder, ${pl.stars} ★ krigslykke`;
       li.innerHTML = `<span class="dot" style="background:${colorOf(i)}"></span>${pl.name}
-        <span class="stats">${land} · ${pl.cards.length} kort</span>`;
+        <span class="stats">${land} · ${starsText(pl.stars)}</span>`;
       return li;
     }),
   );
@@ -285,22 +284,18 @@ function renderBar() {
     text = `${name} tænker …`;
   } else if (s.phase === 'reinforce') {
     phase = `Runde ${s.round} · Forstærk`;
-    const hand = s.players[p].cards;
-    const set = G.bestSet(map, s, p);
-    if (hand.length >= rules.maxHand) text = `Du har ${hand.length} kort. Byt et sæt, før du placerer hære.`;
-    else if (s.reserve) text = `Du har ${s.reserve} ${s.reserve === 1 ? 'ny hær' : 'nye hære'}. Tryk på dine områder for at placere dem.`;
+    const lucky = lastLuck?.p === p && lastLuck.round === s.round ? ` Heraf +${lastLuck.armies} for krigslykke.` : '';
+    if (s.reserve) text = `Du har ${s.reserve} ${s.reserve === 1 ? 'ny hær' : 'nye hære'}.${lucky} Tryk på dine områder for at placere dem.`;
     else text = 'Alle hære er placeret.';
-    if (set && hand.length < rules.maxHand) text += ` Du har et sæt krigslykkekort, der kan byttes til ${G.tradeValue(rules, s.trades)} hære.`;
-    if (set) button(`Byt krigslykkekort (+${G.tradeValue(rules, s.trades)})`, () => act({ type: 'trade', cards: set }));
-    if (s.reserve && sel.from >= 0 && s.owner[sel.from] === p && hand.length < rules.maxHand) {
+    if (s.reserve && sel.from >= 0 && s.owner[sel.from] === p) {
       button(`Resten på ${map.territories[sel.from].name}`, () => act({ type: 'place', t: sel.from, n: s.reserve }));
     }
-    button('Til angreb', () => act({ type: 'end' }), { primary: true, disabled: s.reserve > 0 || hand.length >= rules.maxHand });
+    button('Til angreb', () => act({ type: 'end' }), { primary: true, disabled: s.reserve > 0 });
   } else if (s.phase === 'attack') {
     phase = `Runde ${s.round} · Angrib`;
     if (sel.from < 0) {
       text = 'Vælg et af dine områder at angribe fra, eller gå videre.';
-      if (!s.conquered) text += ' Erobrer du mindst ét område i denne tur, får du et krigslykkekort.';
+      if (!s.conquered) text += ' Erobrer du mindst ét område i denne tur, får du en ★ krigslykke.';
     } else if (sel.to < 0) text = `Angrib fra ${map.territories[sel.from].name}: vælg en nabo.`;
     else text = `${map.territories[sel.from].name} (${s.armies[sel.from]}) mod ${map.territories[sel.to].name} (${s.armies[sel.to]}).`;
     if (sel.to >= 0) {
@@ -346,12 +341,28 @@ const PHASE_NAMES = { reinforce: 'Forstærker', attack: 'Angriber', occupy: 'Ang
 
 const hint = (text) => ($('hint').textContent = text);
 
+// Messages are shown one after another, each for a few seconds.
+const toasts = [];
 let toastTimer = 0;
 function toast(text) {
-  $('toast').textContent = text;
+  toasts.push(text);
+  if (toasts.length === 1) showToast();
+  // Something new is waiting: the message showing now gives way soon, so news never lags behind.
+  else if (toasts.length === 2) {
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(nextToast, 1200);
+  }
+}
+function nextToast() {
+  toasts.shift();
+  if (toasts.length) showToast();
+  else $('toast').hidden = true;
+}
+function showToast() {
+  $('toast').textContent = toasts[0];
   $('toast').hidden = false;
   clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => ($('toast').hidden = true), 3200);
+  toastTimer = setTimeout(nextToast, toasts.length > 1 ? 1600 : 3400);
 }
 
 const flash = (t, kind) => board.flash(t, kind);
@@ -381,15 +392,10 @@ function showEvents(events) {
       if (human(e.p)) Sound.play('conquer', { delay: 0.35 });
       else if (human(e.loser)) Sound.play('lost', { delay: 0.35 });
     }
-    if (e.type === 'card' && human(e.p)) Sound.play('card');
-    if (e.type === 'trade') Sound.play('trade', { vol: human(e.p) ? 1 : 0.4 });
+    if (e.type === 'star' && human(e.p)) Sound.play('card');
+    if (e.type === 'luck') Sound.play('trade', { vol: human(e.p) ? 1 : 0.4 });
     if (e.type === 'turn' && human(e.p)) Sound.play('turn', { delay: 0.2 });
-    if (e.type === 'card' && game.seats[e.p] === 'human') {
-      const t = G.cardTerritory(map, e.card);
-      const who = game.seats.filter((x) => x === 'human').length > 1 ? `${s.players[e.p].name} fik` : 'Du fik';
-      toast(`${who} et krigslykkekort for at erobre: ${SYMBOLS[G.cardSymbol(map, e.card)]} ${t >= 0 ? map.territories[t].name : 'joker'}`);
-    }
-    if (e.type === 'trade' && game.seats[e.p] !== 'human') toast(`${s.players[e.p].name} byttede krigslykkekort til ${e.armies} hære.`);
+    luckNews(e);
     if (e.type === 'place' || e.type === 'move') flash(e.to ?? e.t, 'stamp');
   }
 }
@@ -562,56 +568,60 @@ function openMission() {
 // The game waits while the mission is shown at the start.
 $('mission-dialog').addEventListener('close', () => schedule());
 
-const SYMBOLS = ['★', '◆', '●', '✱']; // placeholders until design item 6
+/* ---------- war luck ---------- */
 
-function openCards() {
+// Stars as ★★☆: filled for the ones you have, empty up to three.
+const starsText = (n) => '★'.repeat(n) + '☆'.repeat(Math.max(0, G.STARS - n));
+let lastLuck = null; // { p, round, armies }: war luck at the start of this turn, for the hint
+
+// A message for everything that happens with war luck, so it is never a mystery.
+function luckNews(e) {
+  const you = (p) => game.seats[p] === 'human';
+  const solo = game.seats.filter((x) => x === 'human').length === 1;
+  const name = (p) => (solo && you(p) ? 'Du' : s.players[p].name);
+  const next = G.tradeValue(rules, s.trades);
+  if (e.type === 'star' && you(e.p)) {
+    const left = G.STARS - e.stars;
+    toast(`★ for at erobre! ${name(e.p)} har nu ${starsText(e.stars)}. ${left > 0 ? `${left} mere, så bliver de til +${next} hære.` : `Næste tur bliver de til +${next} hære.`}`);
+  }
+  if (e.type === 'luck') {
+    lastLuck = { p: e.p, round: s.round, armies: e.armies };
+    toast(you(e.p) ? `Krigslykke! ★★★ blev til +${e.armies} hære.` : `${s.players[e.p].name} fik krigslykke: +${e.armies} hære.`);
+  }
+  if (e.type === 'eliminate' && e.stars > 0) {
+    toast(`${name(e.by)} slog ${s.players[e.p].name} ud og ${solo && you(e.by) ? 'fik' : 'overtog'} ${e.stars === 1 ? 'deres ★' : `deres ${e.stars} ★`}.`);
+  }
+}
+
+function openLuck() {
   const p = viewer();
   if (p < 0) return;
-  const hand = s.players[p].cards;
-  const set = G.bestSet(map, s, p) ?? [];
-  $('cards-who').textContent = s.players.filter((_, i) => game.seats[i] === 'human').length > 1 ? s.players[p].name : '';
-  $('hand').innerHTML = hand.length
-    ? hand
-        .map((c) => {
-          const t = G.cardTerritory(map, c);
-          const mine = t >= 0 && s.owner[t] === p;
-          return `<div class="card${mine ? ' mine' : ''}${set.includes(c) ? ' in-set' : ''}">
-            <span class="sym">${SYMBOLS[G.cardSymbol(map, c)]}</span><span>${t >= 0 ? map.territories[t].name : 'Joker'}</span></div>`;
-        })
-        .join('')
-    : '<p class="empty">Du har ingen krigslykkekort endnu.</p>';
-  const value = G.tradeValue(rules, s.trades);
-  const canTrade = set.length && p === s.current && s.phase === 'reinforce';
-  $('cards-text').innerHTML = `Næste sæt giver <b>${value} hære</b>.${
-    set.length ? (canTrade ? ' Du har et sæt (løftet op).' : ' Du har et sæt, som du kan bytte, når du forstærker.') : hand.length ? ' Du har ikke et sæt endnu.' : ''
-  }`;
-  const next = Math.min(s.trades, rules.tradeValues.length - 1);
+  const stars = s.players[p].stars;
+  const next = G.tradeValue(rules, s.trades);
+  $('luck-who').textContent = s.players.filter((_, i) => game.seats[i] === 'human').length > 1 ? s.players[p].name : '';
+  $('luck-stars').textContent = starsText(stars);
+  $('luck-text').textContent = !stars
+    ? `Du har ingen ★ endnu. Næste krigslykke giver +${next} hære.`
+    : stars < G.STARS
+      ? `${G.STARS - stars} ★ mere, så får du +${next} hære.`
+      : `Når din næste tur begynder, bliver de til +${next} hære.`;
+  const at = Math.min(s.trades, rules.tradeValues.length - 1);
   $('ladder').innerHTML =
-    rules.tradeValues.map((v, i) => `<span class="${i === next ? 'next' : ''}">${i + 1}. sæt: ${v}</span>`).join('') +
-    `<span>derefter ${rules.tradeValues.at(-1)}</span>`;
-  // Until you have cards, the explanation is the interesting part.
-  $('cards-dialog').querySelector('.howto').open = !hand.length;
-  $('trade-btn').hidden = !canTrade;
-  $('cards-dialog').showModal();
+    rules.tradeValues.map((v, i) => `<span class="${i === at ? 'next' : ''}">+${v}</span>`).join('') + `<span>derefter +${rules.tradeValues.at(-1)}</span>`;
+  $('luck-dialog').showModal();
 }
-$('cards-dialog').addEventListener('close', () => {
-  if ($('cards-dialog').returnValue !== 'trade') return;
-  const set = G.bestSet(map, s, s.current);
-  if (set) act({ type: 'trade', cards: set });
-});
 
 function renderHudButtons() {
   const p = viewer();
   $('mission-btn').hidden = p < 0 || s.phase === 'over' || s.mode !== 'mission' || !s.players[p]?.mission;
-  $('cards-btn').hidden = p < 0 || s.phase === 'over';
+  $('luck-btn').hidden = p < 0 || s.phase === 'over';
   if (p < 0) return;
-  // The button shows the symbols in hand, and lights up when there is a set to trade.
-  const hand = s.players[p].cards;
-  $('cards-btn').textContent = hand.length ? `Krigslykke ${hand.map((c) => SYMBOLS[G.cardSymbol(map, c)]).join('')}` : 'Krigslykke';
-  $('cards-btn').classList.toggle('ready', !!G.bestSet(map, s, p));
+  // The button shows your stars, and glows when three are ready to become armies.
+  $('luck-btn').textContent = `Krigslykke ${starsText(s.players[p].stars)}`;
+  $('luck-btn').classList.toggle('ready', s.players[p].stars >= G.STARS);
 }
 $('mission-btn').addEventListener('click', openMission);
-$('cards-btn').addEventListener('click', openCards);
+$('luck-btn').addEventListener('click', openLuck);
 $('home-btn').addEventListener('click', showIntro);
 
 /* ---------- start screen ---------- */
@@ -682,6 +692,6 @@ window.__conquest = {
     startGame(seats.map((kind, i) => ({ kind, name: kind === 'human' ? 'Dig' : OPPONENTS[i], color: i })), speed, mode, seed),
   startFromSettings,
   showIntro,
-  openCards,
+  openLuck,
   openMission,
 };

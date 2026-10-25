@@ -9,7 +9,9 @@
 // A turn has three phases. Reinforce: trade card sets and place new armies. Attack: roll dice
 // against a neighbour; after a conquest, move armies in (the occupy step). Fortify: one move
 // between two of your territories that are connected through your own land. Taking at least one
-// territory in a turn earns a card at the end of it. Whoever holds every territory wins, or, in a
+// territory in a turn earns war luck at the end of it: a star, and three stars become extra armies
+// at the start of your next turn (or, with rules.luck 'cards', a card for trading sets). Whoever
+// holds every territory wins, or, in a
 // mission game, whoever first completes their secret mission (see missions below).
 //
 // A game is a setup (map, ruleset, players, seed) plus a list of actions. apply() checks an
@@ -224,7 +226,7 @@ export function newGame(map, rules, { players, seed = 1, mode = 'world' }) {
   const T = map.territories.length;
   const s = {
     rng: seed | 0,
-    players: players.map((name) => ({ name, alive: true, cards: [] })),
+    players: players.map((name) => ({ name, alive: true, cards: [], stars: 0 })),
     owner: Array(T).fill(-1),
     armies: Array(T).fill(0),
     current: 0,
@@ -283,6 +285,7 @@ export function check(map, rules, s, a) {
   if (s.phase === 'over') return 'the game is over';
   switch (a?.type) {
     case 'trade':
+      if (rules.luck !== 'cards') return 'this game has no cards';
       if (s.phase !== 'reinforce') return 'cards are traded while reinforcing';
       if (!Array.isArray(a.cards) || !a.cards.every((c) => hand.includes(c))) return 'not your cards';
       if (!isSet(map, a.cards)) return 'not a set';
@@ -435,8 +438,11 @@ function roll(map, rules, s, from, to, dice, ev) {
     // Whoever else was out to knock q out now has to hold territories instead.
     s.players.forEach((pl, i) => i !== p && pl.mission?.type === 'eliminate' && pl.mission.target === q && (pl.mission = fallback(map)));
     s.players[p].cards.push(...s.players[q].cards);
+    const stars = s.players[q].stars;
+    s.players[p].stars += stars;
+    s.players[q].stars = 0;
     s.players[q].cards = [];
-    ev.push({ type: 'eliminate', p: q, by: p });
+    ev.push({ type: 'eliminate', p: q, by: p, stars });
   }
   if (s.owner.every((o) => o === p)) return finish(s, p, ev, 'world');
   if (s.armies[from] > 1) {
@@ -449,7 +455,10 @@ function roll(map, rules, s, from, to, dice, ev) {
 // With a round limit, the game ends after the last round: most territories wins, then most armies.
 function endTurn(map, rules, s, ev) {
   const p = s.current;
-  if (s.conquered) {
+  if (s.conquered && rules.luck !== 'cards') {
+    s.players[p].stars++;
+    ev.push({ type: 'star', p, stars: s.players[p].stars });
+  } else if (s.conquered) {
     if (!s.deck.length) s.deck = shuffle(s, s.discard.splice(0));
     if (s.deck.length) {
       const card = s.deck.pop();
@@ -469,6 +478,20 @@ function endTurn(map, rules, s, ev) {
   s.conquered = false;
   s.reserve = reinforcements(map, rules, s, q);
   ev.push({ type: 'turn', p: q, round: s.round, reserve: s.reserve });
+  luck(rules, s, q, ev);
+}
+
+// War luck: with STARS stars at the start of the turn, they are spent on extra armies. Each time
+// anyone gets war luck, the next is worth more (rules.tradeValues, like card sets).
+export const STARS = 3;
+function luck(rules, s, p, ev) {
+  if (rules.luck === 'cards') return;
+  while (s.players[p].stars >= STARS) {
+    s.players[p].stars -= STARS;
+    const armies = tradeValue(rules, s.trades++);
+    s.reserve += armies;
+    ev.push({ type: 'luck', p, armies });
+  }
 }
 
 // How strong a player stands: territories first, then armies.

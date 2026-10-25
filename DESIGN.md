@@ -23,7 +23,7 @@ Intet. Prototypen er bevidst grim.
 | 3 | **Havruter og regionsbonus** | Hvilke forbindelser over vand, der skal findes | ✅ Udkast: 8 havruter, bonus ud fra antal indgange. Bot-spil: retfærdigt ved 2–4 spillere |
 | 4 | **Spillerfarver** | 6 farver, der kan skelnes af farveblinde, plus et symbol eller mønster pr. spiller | Farvetjek i lyst og mørkt tema |
 | 5 | **Hærvisning** | Tal i en cirkel, små figurer eller faner? Hvordan ser 1, 12 og 87 ud? | Prototype af 2 varianter |
-| 6 | **Kortsymboler** | 3 symboler + joker til kort-sættene (eget motiv, fx stjerne/skjold/krone) | – |
+| 6 | ~~Kortsymboler~~ | Bortfaldet: krigslykke er nu stjerner (★★★ bliver til hære). Kortene findes stadig i motoren (`luck: 'cards'`) | – |
 
 ## Når det skal føles rigtigt (milepæl 5: feel og polish)
 | # | Hvad | Du beslutter |

@@ -31,7 +31,7 @@
       <p id="phase"></p>
       <div id="hand-buttons">
         <button id="mission-btn" hidden>Mission</button>
-        <button id="cards-btn" hidden>Krigslykke</button>
+        <button id="luck-btn" hidden>Krigslykke</button>
       </div>
     </div>
     <p id="hint" aria-live="polite"></p>
@@ -60,7 +60,7 @@
           <li><b>Forstærk:</b> du får nye hære hver tur, flere jo flere områder og hele kontinenter du har. Tryk på dine områder for at sætte dem ud.</li>
           <li><b>Angrib:</b> vælg et af dine områder og en nabo. Terningerne afgør det, og den største hær har oftest held med sig.</li>
           <li><b>Flyt:</b> til sidst må du flytte hære én gang mellem dine egne områder.</li>
-          <li><b>Krigslykkekort:</b> erobr mindst ét område i din tur, så får du et kort. Tre kort giver ekstra hære.</li>
+          <li><b>Krigslykke:</b> erobr mindst ét område i din tur, så får du en ★. Tre ★ bliver til ekstra hære.</li>
           <li><b>Sejr:</b> klar din hemmelige mission, eller erobr hele verden.</li>
         </ul>
       </div>
@@ -102,8 +102,8 @@
         <div class="field"><span>Sejr</span><div class="pills" data-name="mode"></div></div>
         <div class="field"><span>Spillere på denne telefon</span><div class="pills" data-name="humans"></div></div>
         <div class="field"><span>Modstandernes tempo</span><div class="pills" data-name="speed"></div></div>
-        <p class="sub">Turrækkefølgen trækkes ved start. Den, der begynder, har en fordel, så de næste starter med
-          lidt flere hære.</p>
+        <p class="sub">Turrækkefølgen trækkes ved start, og starthærene er justeret, så alle pladser har lige
+          gode chancer.</p>
       </details>
       <div class="buttons">
         <button value="cancel" id="cancel-new">Tilbage</button>
@@ -123,26 +123,22 @@
     </form>
   </dialog>
 
-  <dialog id="cards-dialog">
+  <dialog id="luck-dialog">
     <form method="dialog">
-      <h2>Krigslykkekort</h2>
-      <p class="sub" id="cards-who"></p>
-      <div id="hand"></div>
-      <p id="cards-text"></p>
-      <details class="howto">
-        <summary>Sådan virker krigslykkekort</summary>
-        <p><b>Sådan får du dem:</b> erobr mindst ét område i din tur, så får du ét kort, når turen slutter.</p>
-        <p><b>Tre kort er et sæt</b>, når de har tre ens symboler eller ét af hver:</p>
-        <div class="set-examples"><span>★ ★ ★</span><span>◆ ◆ ◆</span><span>● ● ●</span><span>★ ◆ ●</span></div>
-        <p>✱ er en joker og tæller som et hvilket som helst symbol.</p>
-        <p><b>Et sæt byttes til hære</b>, når du forstærker. Hvert sæt, nogen bytter, gør det næste mere værd:</p>
-        <div id="ladder"></div>
-        <p>Står et af dine egne områder på et af kortene, får det 2 hære ekstra. Har du 5 kort, skal du bytte.</p>
-      </details>
-      <div class="buttons">
-        <button value="close">Luk</button>
-        <button value="trade" class="primary" id="trade-btn">Byt sæt</button>
-      </div>
+      <h2>Krigslykke</h2>
+      <p class="sub" id="luck-who"></p>
+      <p class="stars-big" id="luck-stars"></p>
+      <p id="luck-text"></p>
+      <ul class="luck-rules">
+        <li>Erobr mindst ét område i din tur, så får du en ★.</li>
+        <li>Har du ★★★, når din tur begynder, bliver de af sig selv til ekstra hære.</li>
+        <li>Hver gang nogen får krigslykke, bliver den næste større:</li>
+      </ul>
+      <div id="ladder"></div>
+      <ul class="luck-rules">
+        <li>Slår du en spiller ud, får du deres stjerner.</li>
+      </ul>
+      <div class="buttons"><button value="ok" class="primary">OK</button></div>
     </form>
   </dialog>
 

@@ -665,6 +665,19 @@ function showIntro() {
   soundLabel();
   $('intro').hidden = false;
 }
+// The title is two lines that never wrap: shrink it when a line is wider than the card, which
+// happens on narrow phones and with large text.
+let titleWidth = 0;
+function fitTitle(force) {
+  const h = $('intro-title');
+  if (h.clientWidth === titleWidth && force !== true) return; // shrinking changes the height, not the width
+  titleWidth = h.clientWidth;
+  h.style.fontSize = '';
+  const widest = Math.max(...[...h.children].map((line) => line.scrollWidth));
+  if (widest > h.clientWidth) h.style.fontSize = `${Math.floor(parseFloat(getComputedStyle(h).fontSize) * h.clientWidth / widest)}px`;
+}
+new ResizeObserver(fitTitle).observe($('intro-title'));
+document.fonts.ready.then(() => fitTitle(true));
 function hideIntro() {
   $('intro').hidden = true;
   schedule();

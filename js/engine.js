@@ -9,10 +9,10 @@
 // A turn has three phases. Reinforce: trade card sets and place new armies. Attack: roll dice
 // against a neighbour; after a conquest, move armies in (the occupy step). Fortify: one move
 // between two of your territories that are connected through your own land. Taking at least one
-// territory in a turn earns war luck at the end of it: a star, and three stars become extra armies
-// at the start of your next turn (or, with rules.luck 'cards', a card for trading sets). Whoever
-// holds every territory wins, or, in a
-// mission game, whoever first completes their secret mission (see missions below).
+// territory in a turn earns war luck at the end of it: a star, which you cash in for extra armies
+// when you reinforce, now or saved up for more (or, with rules.luck 'cards', a card for trading
+// sets). Whoever holds every territory wins, or, in a mission game, whoever first completes their
+// secret mission (see missions below).
 //
 // A game is a setup (map, ruleset, players, seed) plus a list of actions. apply() checks an
 // action and returns the next state and what happened (events for the UI to animate). The dice
@@ -265,7 +265,8 @@ export function newGame(map, rules, { players, seed = 1, mode = 'world' }) {
 }
 
 /* ---------- actions ---------- */
-// { type: 'trade', cards: [c, c, c] }       reinforce: swap a set for armies
+// { type: 'luck' }                         reinforce: cash in all saved war-luck stars for armies
+// { type: 'trade', cards: [c, c, c] }       reinforce: swap a set for armies (rules.luck 'cards')
 // { type: 'place', t, n }                   reinforce: put n (default 1) new armies on t
 // { type: 'attack', from, to, dice }        attack: one roll (dice defaults to as many as allowed)
 // { type: 'blitz', from, to }               attack: roll until t is taken or from has 1 army left
@@ -284,6 +285,11 @@ export function check(map, rules, s, a) {
   const hand = s.players[p].cards;
   if (s.phase === 'over') return 'the game is over';
   switch (a?.type) {
+    case 'luck':
+      if (rules.luck === 'cards') return 'this game has cards, not stars';
+      if (s.phase !== 'reinforce') return 'war luck is cashed in while reinforcing';
+      if (!s.players[p].stars) return 'no stars to cash in';
+      return null;
     case 'trade':
       if (rules.luck !== 'cards') return 'this game has no cards';
       if (s.phase !== 'reinforce') return 'cards are traded while reinforcing';
@@ -364,6 +370,14 @@ export function view(state, p) {
 }
 
 const DO = {
+  luck(map, rules, s, a, ev) {
+    const p = s.current;
+    const stars = s.players[p].stars;
+    const armies = starValue(rules, stars);
+    s.players[p].stars = 0;
+    s.reserve += armies;
+    ev.push({ type: 'luck', p, stars, armies });
+  },
   trade(map, rules, s, a, ev) {
     const p = s.current;
     const armies = tradeValue(rules, s.trades++);
@@ -480,20 +494,14 @@ function endTurn(map, rules, s, ev) {
   s.conquered = false;
   s.reserve = reinforcements(map, rules, s, q);
   ev.push({ type: 'turn', p: q, round: s.round, reserve: s.reserve });
-  luck(rules, s, q, ev);
 }
 
-// War luck: with STARS stars at the start of the turn, they are spent on extra armies. Each time
-// anyone gets war luck, the next is worth more (rules.tradeValues, like card sets).
-export const STARS = 3;
-function luck(rules, s, p, ev) {
-  if (rules.luck === 'cards') return;
-  while (s.players[p].stars >= STARS) {
-    s.players[p].stars -= STARS;
-    const armies = tradeValue(rules, s.trades++);
-    s.reserve += armies;
-    ev.push({ type: 'luck', p, armies });
-  }
+// War luck: saved stars are worth more together. rules.starValues gives the armies for 1, 2, 3 …
+// stars; every star beyond the list adds rules.extraStar more.
+export const STARS = 3; // how many stars the screen shows as a full row
+export function starValue(rules, stars) {
+  const list = rules.starValues;
+  return stars < list.length ? list[stars] : list.at(-1) + (stars - list.length + 1) * rules.extraStar;
 }
 
 // How strong a player stands: territories first, then armies.

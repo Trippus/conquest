@@ -1,7 +1,7 @@
 # Conquest (arbejdstitel)
 
 Et turbaseret strategispil om at erobre verden, fra **Trippus Games**. Forstærk, angrib med terninger,
-flyt tropper, og få krigslykke: en ★ for hver tur med en erobring, og ★★★ bliver til ekstra hære. Man vinder ved at erobre hele verden eller, i den kortere udgave,
+flyt tropper, og få krigslykke: en ★ for hver tur med en erobring, som du indløser til ekstra hære, når du vil (★ +2, ★★ +5, ★★★ +9). Man vinder ved at erobre hele verden eller, i den kortere udgave,
 ved først at klare sin hemmelige mission (to kontinenter, et antal områder eller at slå en bestemt spiller ud). Først en nutidig udgave, senere historiske æraer på samme motor.
 Hvad der skal designes og besluttes står i [`DESIGN.md`](DESIGN.md).
 

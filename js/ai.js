@@ -35,6 +35,7 @@ export function botAction(map, rules, s, level = 'easy') {
 
 const EASY = {
   reinforce(map, rules, s, p) {
+    if (s.players[p].stars && rules.luck !== 'cards') return { type: 'luck' };
     const set = G.findSet(map, s.players[p].cards);
     if (set) return { type: 'trade', cards: set };
     if (!s.reserve) return { type: 'end' };
@@ -159,6 +160,8 @@ function prize(map, s, p, e, target) {
 
 const NORMAL = {
   reinforce(map, rules, s, p) {
+    const stars = s.players[p].stars;
+    if (stars && rules.luck !== 'cards' && (stars >= G.STARS || G.owned(s, p).length <= 6)) return { type: 'luck' };
     const set = G.bestSet(map, s, p);
     if (set) return { type: 'trade', cards: set };
     if (!s.reserve) return { type: 'end' };

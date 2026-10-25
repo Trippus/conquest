@@ -374,21 +374,22 @@ test('a conquest earns a star at the end of the turn, none without', () => {
   assert.equal(play(quiet, [{ type: 'end' }, { type: 'end' }]).s.players[0].stars, 0);
 });
 
-test('three stars become extra armies at the start of the turn, each time worth more', () => {
-  const s = board('000111000111', Array(12).fill(1), { phase: 'fortify', reserve: 0 });
-  s.players[1].stars = 3;
-  const { s: t, events } = play(s, [{ type: 'end' }]);
-  assert.equal(t.current, 1);
-  assert.equal(t.players[1].stars, 0);
-  assert.equal(t.reserve, G.reinforcements(map, MODERN, t, 1) + 4);
-  assert.deepEqual(events.at(-1), { type: 'luck', p: 1, armies: 4 });
-  assert.equal(t.trades, 1);
-  // Two stars wait for the third.
-  const u = board('000111000111', Array(12).fill(1), { phase: 'fortify', reserve: 0, trades: 1 });
-  u.players[1].stars = 2;
-  const v = play(u, [{ type: 'end' }]).s;
-  assert.equal(v.players[1].stars, 2);
-  assert.equal(v.reserve, G.reinforcements(map, MODERN, v, 1));
+test('saved stars are cashed in when you choose, worth more together', () => {
+  assert.deepEqual([0, 1, 2, 3, 4, 5].map((n) => G.starValue(MODERN, n)), [0, 2, 5, 9, 13, 17]);
+  const s = board('000111000111', Array(12).fill(1));
+  assert.equal(refuse(s, { type: 'luck' }), 'no stars to cash in');
+  s.players[0].stars = 2;
+  const reserve = s.reserve;
+  const { s: t, events } = play(s, [{ type: 'luck' }]);
+  assert.equal(t.reserve, reserve + 5);
+  assert.equal(t.players[0].stars, 0);
+  assert.deepEqual(events[0], { type: 'luck', p: 0, stars: 2, armies: 5 });
+  // Not while attacking, and saved stars wait for you: nothing happens by itself.
+  const u = board('000111000111', Array(12).fill(1), { phase: 'attack', reserve: 0 });
+  u.players[0].stars = 3;
+  assert.equal(refuse(u, { type: 'luck' }), 'war luck is cashed in while reinforcing');
+  const v = play({ ...u, phase: 'fortify' }, [{ type: 'end' }]).s;
+  assert.equal(v.players[0].stars, 3);
 });
 
 test('knocking a player out takes their stars', () => {

@@ -290,6 +290,11 @@ function renderBar() {
     const lucky = lastLuck?.p === p && lastLuck.round === s.round ? ` Heraf +${lastLuck.armies} for krigslykke.` : '';
     if (s.reserve) text = `Du har ${s.reserve} ${s.reserve === 1 ? 'ny hær' : 'nye hære'}.${lucky} Tryk på dine områder for at placere dem.`;
     else text = 'Alle hære er placeret.';
+    const stars = s.players[p].stars;
+    if (stars) {
+      text += ` Krigslykke ${starsText(stars)}: indløs for +${worth(stars)}, eller spar op til +${worth(stars + 1)}.`;
+      button(`Indløs ${starsText(stars).replace(/☆/g, '')} (+${worth(stars)})`, () => act({ type: 'luck' }));
+    }
     if (s.reserve && sel.from >= 0 && s.owner[sel.from] === p) {
       button(`Resten på ${map.territories[sel.from].name}`, () => act({ type: 'place', t: sel.from, n: s.reserve }));
     }
@@ -575,8 +580,11 @@ $('mission-dialog').addEventListener('close', () => schedule());
 
 /* ---------- war luck ---------- */
 
-// Stars as ★★☆: filled for the ones you have, empty up to three.
-const starsText = (n) => '★'.repeat(n) + '☆'.repeat(Math.max(0, G.STARS - n));
+// Stars as ★★☆: filled for the ones you have, empty up to three; beyond three as ★★★+2.
+const starsText = (n) => (n > G.STARS ? `${'★'.repeat(G.STARS)}+${n - G.STARS}` : '★'.repeat(n) + '☆'.repeat(G.STARS - n));
+const worth = (n) => G.starValue(rules, n);
+// Your stars can be cashed in now: your turn, reinforcing.
+const canCash = (p) => p === s.current && s.phase === 'reinforce' && s.players[p].stars > 0 && !isBot();
 let lastLuck = null; // { p, round, armies }: war luck at the start of this turn, for the hint
 
 // A message for everything that happens with war luck, so it is never a mystery.
@@ -584,14 +592,12 @@ function luckNews(e) {
   const you = (p) => game.seats[p] === 'human';
   const solo = game.seats.filter((x) => x === 'human').length === 1;
   const name = (p) => (solo && you(p) ? 'Du' : s.players[p].name);
-  const next = G.tradeValue(rules, s.trades);
   if (e.type === 'star' && you(e.p)) {
-    const left = G.STARS - e.stars;
-    toast(`★ for at erobre! ${name(e.p)} har nu ${starsText(e.stars)}. ${left > 0 ? `${left} mere, så bliver de til +${next} hære.` : `Næste tur bliver de til +${next} hære.`}`);
+    toast(`★ for at erobre! ${name(e.p)} har nu ${starsText(e.stars)}, værd +${worth(e.stars)} hære. Indløs dem, når du forstærker, eller spar op.`);
   }
   if (e.type === 'luck') {
     lastLuck = { p: e.p, round: s.round, armies: e.armies };
-    toast(you(e.p) ? `Krigslykke! ★★★ blev til +${e.armies} hære.` : `${s.players[e.p].name} fik krigslykke: +${e.armies} hære.`);
+    toast(you(e.p) ? `Krigslykke! ${starsText(e.stars).replace(/☆/g, '')} blev til +${e.armies} hære.` : `${s.players[e.p].name} indløste krigslykke: +${e.armies} hære.`);
   }
   if (e.type === 'eliminate' && e.stars > 0) {
     toast(`${name(e.by)} slog ${s.players[e.p].name} ud og ${solo && you(e.by) ? 'fik' : 'overtog'} ${e.stars === 1 ? 'deres ★' : `deres ${e.stars} ★`}.`);
@@ -602,19 +608,19 @@ function openLuck() {
   const p = viewer();
   if (p < 0) return;
   const stars = s.players[p].stars;
-  const next = G.tradeValue(rules, s.trades);
   $('luck-who').textContent = s.players.filter((_, i) => game.seats[i] === 'human').length > 1 ? s.players[p].name : '';
   $('luck-stars').textContent = starsText(stars);
   $('luck-text').textContent = !stars
-    ? `Du har ingen ★ endnu. Næste krigslykke giver +${next} hære.`
-    : stars < G.STARS
-      ? `${G.STARS - stars} ★ mere, så får du +${next} hære.`
-      : `Når din næste tur begynder, bliver de til +${next} hære.`;
-  const at = Math.min(s.trades, rules.tradeValues.length - 1);
+    ? 'Du har ingen ★ endnu.'
+    : `Dine stjerner er værd +${worth(stars)} hære. Spar én mere op, så er de værd +${worth(stars + 1)}.`;
   $('ladder').innerHTML =
-    rules.tradeValues.map((v, i) => `<span class="${i === at ? 'next' : ''}">+${v}</span>`).join('') + `<span>derefter +${rules.tradeValues.at(-1)}</span>`;
+    [1, 2, 3].map((n) => `<span class="${Math.min(stars, G.STARS) === n ? 'next' : ''}">${'★'.repeat(n)} +${worth(n)}</span>`).join('') +
+    `<span>hver ★ mere +${rules.extraStar}</span>`;
+  $('cash-btn').hidden = !canCash(p);
+  $('cash-btn').textContent = `Indløs (+${worth(stars)})`;
   $('luck-dialog').showModal();
 }
+$('luck-dialog').addEventListener('close', () => $('luck-dialog').returnValue === 'luck' && act({ type: 'luck' }));
 
 function renderHudButtons() {
   const p = viewer();
@@ -623,7 +629,7 @@ function renderHudButtons() {
   if (p < 0) return;
   // The button shows your stars, and glows when three are ready to become armies.
   $('luck-btn').textContent = `Krigslykke ${starsText(s.players[p].stars)}`;
-  $('luck-btn').classList.toggle('ready', s.players[p].stars >= G.STARS);
+  $('luck-btn').classList.toggle('ready', canCash(p));
 }
 $('mission-btn').addEventListener('click', openMission);
 $('luck-btn').addEventListener('click', openLuck);

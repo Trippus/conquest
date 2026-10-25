@@ -169,7 +169,7 @@ button.wide { width: 100%; }
   border: 1px solid var(--line); border-radius: 20px; padding: 28px 24px 20px;
   outline: 1px solid var(--line); outline-offset: -8px;
 }
-#intro h1 { margin: 2px 0 6px; font: 700 52px/1 var(--title); letter-spacing: 0.04em; color: var(--accent); }
+#intro h1 { margin: 2px 0 6px; font: 700 min(52px, 12vw)/1 var(--title); letter-spacing: 0.04em; color: var(--accent); }
 .intro-sub { margin: 0 0 20px; color: var(--muted); }
 .intro-buttons { display: flex; flex-direction: column; gap: 10px; align-items: center; }
 .intro-setup { margin: 0; font-size: 15px; color: var(--muted); }

@@ -246,3 +246,10 @@ dialog .big { font-family: var(--title); font-size: 20px; margin: 8px 0; }
 #reserve.bump b { animation: bump .35s ease-out; }
 @keyframes bump { from { transform: scale(1.4); } }
 #actions button.wide { flex-basis: 100%; }
+
+/* Emblems: pressed into the wax as a darker relief, the number on top. */
+#board .emblem { fill: rgb(0 0 0 / 0.3); pointer-events: none; }
+#board .count { paint-order: stroke; stroke: rgb(43 29 18 / 0.55); stroke-width: .18px; stroke-linejoin: round; }
+.seal-icon { width: 20px; height: 20px; flex: none; display: block; }
+.credits { margin: 12px 0 0; font-size: 12px; color: var(--muted); }
+.credits a { color: inherit; }

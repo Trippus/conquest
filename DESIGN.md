@@ -21,7 +21,7 @@ Intet. Prototypen er bevidst grim.
 | 1 | **Kortstil** | Udtrykket: papirkort, flat/low-poly, neon, brætspil … Gerne 2–3 billeder til inspiration | ✅ **Valgt: B, gammelt papirkort** (24/10-2026). Bygget ind i spillet (`js/board.js`). Stilprøverne ligger stadig i `design/` |
 | 2 | **Territorie-inddeling** | Hvor grænserne går, og hvad de ca. 24–30 territorier og 5–6 regioner hedder | ✅ Udkast 2: 40 territorier i 6 regioner (8/5/7/6/10/4) i `js/maps/world.js` (bogstaver i et sekskantgitter, så det er let at rette). Egen inddeling, tegnet i hånden, ingen fremmede kortdata |
 | 3 | **Havruter og regionsbonus** | Hvilke forbindelser over vand, der skal findes | ✅ Udkast: 8 havruter, bonus ud fra antal indgange. Bot-spil: retfærdigt ved 2–4 spillere |
-| 4 | **Spillerfarver** | 6 farver, der kan skelnes af farveblinde, plus et symbol eller mønster pr. spiller | Farvetjek i lyst og mørkt tema |
+| 4 | **Spillerfarver** | 6 farver, der kan skelnes af farveblinde, plus et symbol eller mønster pr. spiller | ✅ Delvist: hver spiller har et emblem i seglet (løve, ørn, galeon, tårn, ulv, krone, fra game-icons.net). Farverne er ikke farveblind-tjekket endnu |
 | 5 | **Hærvisning** | Tal i en cirkel, små figurer eller faner? Hvordan ser 1, 12 og 87 ud? | Prototype af 2 varianter |
 | 6 | ~~Kortsymboler~~ | Bortfaldet: krigslykke er nu stjerner, der indløses til hære. Kortene findes stadig i motoren (`luck: 'cards'`) | – |
 

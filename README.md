@@ -27,6 +27,8 @@ npm run design-shots                          # stilprøverne som PNG (kræver n
 | `js/rules/*.js` | Regelsæt som data: starthære, terninger, kort-bytte, rundegrænse |
 | `js/app.js` | Brugerfladen: startskærm, tryk → handlinger, bots spiller, terninger, lyd, gem/indlæs. `window.__conquest` er debug-hooket |
 | `js/audio.js` | Syntetiserede lyde (terninger, laksegl, horn, kort), ingen lydfiler |
+| `js/map-art.js` | Kortsymboler i blæk: bjerge, skove, klitter, bølger, skibe, kompasrose, placeret ud fra gitteret |
+| `js/emblems.js` | Spillernes emblemer, lavet af `tools/make-emblems.mjs` fra `assets/emblems` (se `LICENSES.md`) |
 | `js/board.js` | Verdenskortet i papirkort-stil: farver, laksegl med hære, markeringer, træk og zoom (knib, hjul, +/−) |
 | `tools/simulate.mjs` | Mange bot-spil til balance |
 

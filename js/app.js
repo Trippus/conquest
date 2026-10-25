@@ -8,7 +8,7 @@ import * as G from './engine.js';
 import { botAction } from './ai.js';
 import * as WORLD from './maps/world.js';
 import { MODERN } from './rules/modern.js';
-import { createBoard, PLAYER_COLORS as COLORS } from './board.js';
+import { createBoard, PLAYER_COLORS as COLORS, sealIcon } from './board.js';
 import { Sound } from './audio.js';
 
 // Saves only replay on the map they were played on: v1 was the test map, v2 the 30-territory world.
@@ -45,7 +45,8 @@ const DANISH = {
 
 // A player's colour: the humans have the first colours (you are always red), the opponents the
 // next, whatever order the turns come in.
-const colorOf = (p) => COLORS[game?.colors?.[p] ?? p];
+const lookOf = (p) => game?.colors?.[p] ?? p; // colour and emblem number
+const colorOf = (p) => COLORS[lookOf(p)];
 
 function loadSettings() {
   try {
@@ -251,7 +252,7 @@ function render() {
       li.className = (i === p && s.phase !== 'over' ? 'current ' : '') + (pl.alive ? '' : 'out');
       const land = G.owned(s, i).length;
       li.title = `${pl.name}: ${land} områder, ${pl.stars} ★ krigslykke`;
-      li.innerHTML = `<span class="dot" style="background:${colorOf(i)}"></span>${pl.name}
+      li.innerHTML = `${sealIcon(lookOf(i))}${pl.name}
         <span class="stats">${land} · ${starsText(pl.stars)}</span>`;
       return li;
     }),
@@ -528,7 +529,7 @@ function openGameOver() {
     const fate = p === s.winner ? 'vandt' : pl.alive ? `${G.owned(s, p).length} ${G.owned(s, p).length === 1 ? 'område' : 'områder'}` : `slået ud i runde ${pl.outRound}`;
     const mission = s.mode === 'mission' && p !== s.winner ? `<small>${missionText(pl.mission)}</small>` : '';
     return `<li class="${game.seats[p] === 'human' ? 'you' : ''}"><span class="place">${i + 1}.</span>
-      <span class="dot" style="background:${colorOf(p)}"></span><span class="who">${pl.name}<small>${fate}</small>${mission}</span></li>`;
+      ${sealIcon(lookOf(p))}<span class="who">${pl.name}<small>${fate}</small>${mission}</span></li>`;
   });
   const me = place.findIndex((p) => game.seats[p] === 'human');
   const mine = me >= 0 && game.seats.filter((x) => x === 'human').length === 1 ? `<p class="your-place">Du blev nr. ${me + 1} af ${place.length}.</p>` : '';

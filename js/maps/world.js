@@ -95,6 +95,27 @@ export const TERRITORIES = {
   y: ['oestaustralien', 'Østaustralien', 'oc'],
 };
 
+// What the map draws in each territory (js/map-art.js): ink mountains, forests or dunes.
+export const TERRAIN = {
+  v: 'mountains', // the Rockies
+  D: 'mountains', // the Andes
+  l: 'mountains', // the Alps
+  c: 'mountains', // the Pamirs and Tian Shan
+  J: 'mountains',
+  b: 'forest', // the northern forests
+  q: 'forest',
+  s: 'forest',
+  r: 'forest', // the taiga
+  n: 'forest',
+  A: 'forest', // the rainforests
+  C: 'forest',
+  z: 'forest',
+  N: 'desert', // the Sahara
+  L: 'desert',
+  R: 'desert',
+  x: 'desert', // the outback
+};
+
 // Where crowded territories put their seal and name: letter: [row, column, name side], side
 // 'below', 'above', 'left' or 'right'. The rest use the cell closest to the middle of the
 // territory, with the name below.

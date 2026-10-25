@@ -7,13 +7,21 @@
 // on a territory and goes to onTap(territory index).
 
 import { mapShapes } from './map-shapes.js';
+import { mapArt, ART_DEFS } from './map-art.js';
+import { EMBLEMS } from './emblems.js';
 
 // Ink-friendly player colours: red, blue, green, ochre, purple, teal. Design item 4 will settle
 // them (colour-blind check, symbols).
 export const PLAYER_COLORS = ['#a3261b', '#1f5fa8', '#3f7a26', '#c98a12', '#6b3f8f', '#1d7f7a'];
+// Each colour has an emblem too (js/emblems.js: lion, eagle, galleon, tower, wolf, crown), so the
+// players can be told apart without seeing colour. A small SVG of colour i for lists and dialogs:
+export const sealIcon = (i) =>
+  `<svg class="seal-icon" viewBox="-1.35 -1.35 2.7 2.7" aria-hidden="true"><circle r="1.3" fill="${PLAYER_COLORS[i]}" stroke="#2b1d12" stroke-width=".1"/>` +
+  `<svg x="-1" y="-1" width="2" height="2" viewBox="0 0 512 512"><path d="${EMBLEMS[i]}" fill="#f4e8cc" opacity=".9"/></svg></svg>`;
 
 const NS = 'http://www.w3.org/2000/svg';
 const INK = '#4a3726';
+const COMPASS = [91, 35.5]; // in the open sea between Africa and Australia
 const LAND = '#f4e8cc';
 // Region names sit in the sea next to their land (map units, see design/styles.js).
 const REGION_PLACES = { na: [10, 19], sa: [22, 33], eu: [57.5, 5], af: [55, 30], as: [84, 27], oc: [119, 30] };
@@ -47,6 +55,25 @@ export function createBoard(svg, grid, map, { onTap, insets = () => ({ top: 0, b
     )
     .join('');
   const outline = (i) => shapes.outlines[letterOf[T[i].id]];
+  // Map art keeps out of every seal, name and region name.
+  const clear = (x, y, w, h) => ({ x0: x - w, y0: y - h, x1: x + w, y1: y + h });
+  const nameBox = (t) => {
+    const half = t.name.length * 0.27 + 0.3;
+    const side = grid.WORLD.territories[t.id]?.label ?? 'below';
+    if (side === 'above') return clear(t.x, t.y - 2, half, 0.8);
+    if (side === 'left') return clear(t.x - 1.6 - half, t.y, half, 0.8);
+    if (side === 'right') return clear(t.x + 1.6 + half, t.y, half, 0.8);
+    return clear(t.x, t.y + 2.2, half, 0.8);
+  };
+  const art = mapArt(grid, {
+    keepClear: [
+      ...T.map((t) => clear(t.x, t.y, 1.6, 1.6)),
+      ...T.map(nameBox),
+      ...map.regions.map((r) => clear(REGION_PLACES[r.id][0], REGION_PLACES[r.id][1] - 0.5, (r.name.length + 3) * 0.55, 1.1)),
+    ],
+    seaLines: shapes.sea.map(({ p, q }) => [p[0], p[1], q[0], q[1]]),
+    compass: COMPASS,
+  });
   // Sea routes over the edge of the map (Alaska–Østsibirien) end in a mirror seal: the territory on
   // the far side, shown at this edge with its colour and armies, and tappable like the real one.
   const indexOf = (letter) => map.at[grid.TERRITORIES[letter][0]];
@@ -63,22 +90,27 @@ export function createBoard(svg, grid, map, { onTap, insets = () => ({ top: 0, b
   svg.setAttribute('viewBox', `0 0 ${n(W)} ${n(H)}`);
   svg.innerHTML = `
     <defs>
-      <filter id="paper" x="0" y="0" width="100%" height="100%">
-        <feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="3" seed="3"/>
-        <feColorMatrix values="0 0 0 0 .45  0 0 0 0 .33  0 0 0 0 .18  0 0 0 .22 0"/>
-      </filter>
+      <pattern id="paper" patternUnits="userSpaceOnUse" width="22" height="22">
+        <image href="assets/paper.jpg" width="22" height="22" preserveAspectRatio="none"/>
+      </pattern>
+      ${EMBLEMS.map((d, i) => `<symbol id="emblem-${i}" viewBox="0 0 512 512"><path d="${d}"/></symbol>`).join('')}
+      ${ART_DEFS}
       <filter id="ink"><feTurbulence type="fractalNoise" baseFrequency="1.4" numOctaves="2" seed="8" result="t"/>
         <feDisplacementMap in="SourceGraphic" in2="t" scale=".35"/></filter>
     </defs>
     <rect x="${n(-W)}" y="${n(-H)}" width="${n(3 * W)}" height="${n(3 * H)}" fill="#ead9b5"/>
-    <rect x="${n(-W)}" y="${n(-H)}" width="${n(3 * W)}" height="${n(3 * H)}" filter="url(#paper)"/>
+
     <g fill="none" stroke="#6b8a8a" stroke-linejoin="round">
       <path d="${shapes.coast}" stroke-width="2.4" opacity=".08"/>
       <path d="${shapes.coast}" stroke-width="1.5" opacity=".12"/>
       <path d="${shapes.coast}" stroke-width=".8" opacity=".18"/></g>
+    <g class="art" pointer-events="none" opacity=".5">${art.sea}</g>
     <path d="${sea}" fill="none" stroke="${INK}" stroke-width=".16" stroke-dasharray=".1 .45" stroke-linecap="round"/>
     <g class="lands">${T.map((t, i) => `<path class="land" data-t="${i}" d="${outline(i)}" fill="${LAND}"/>`).join('')}</g>
     <g class="washes">${T.map((t, i) => `<path data-t="${i}" d="${outline(i)}" opacity=".4"/>`).join('')}</g>
+    <g class="art" pointer-events="none" opacity=".7">${art.land}</g>
+    <!-- Crumpled paper over land and sea alike (CC0 texture, see LICENSES.md). -->
+    <rect x="${n(-W)}" y="${n(-H)}" width="${n(3 * W)}" height="${n(3 * H)}" fill="url(#paper)" pointer-events="none" style="mix-blend-mode: multiply" opacity=".75"/>
     <g fill="none" stroke="${INK}" stroke-linejoin="round" filter="url(#ink)" pointer-events="none">
       <path d="${shapes.borders}" stroke-width=".13" stroke-dasharray=".45 .3"/>
       <path d="${shapes.regions}" stroke-width=".24"/>
@@ -89,13 +121,13 @@ export function createBoard(svg, grid, map, { onTap, insets = () => ({ top: 0, b
       .join('')}</g>
     <g class="seals">${T.map(
       (t, i) => `<g class="seal" data-t="${i}" transform="translate(${n(t.x)} ${n(t.y)})">
-        <circle r="1.35" class="wax"/><circle r="1.08" class="rim"/>
+        <circle r="1.35" class="wax"/><use class="emblem" x="-1.08" y="-1.08" width="2.16" height="2.16"/><circle r="1.08" class="rim"/>
         <text class="count" dy=".4"></text><text class="name" ${NAME_AT[grid.WORLD.territories[t.id]?.label ?? 'below']}>${t.name}</text></g>`,
     ).join('')}</g>
     <g class="mirrors">${mirrors
       .map(
         ({ t, xy }) => `<g class="mirror" data-t="${t}" transform="translate(${n(xy[0])} ${n(xy[1])})">
-        <circle r="1.6" class="ring"/><circle r="1.15" class="wax"/><circle r=".92" class="rim"/>
+        <circle r="1.6" class="ring"/><circle r="1.15" class="wax"/><use class="emblem" x="-.92" y="-.92" width="1.84" height="1.84"/><circle r=".92" class="rim"/>
         <text class="count" dy=".38"></text><text class="name" dy="2.2">${T[t].name}</text></g>`,
       )
       .join('')}</g>`;
@@ -111,7 +143,10 @@ export function createBoard(svg, grid, map, { onTap, insets = () => ({ top: 0, b
   // into PLAYER_COLORS), when it is not simply their seat number.
   function update(s, { selected = new Set(), targets = new Set(), chosen = new Set() } = {}, colors = null) {
     T.forEach((t, i) => {
-      const color = PLAYER_COLORS[colors?.[s.owner[i]] ?? s.owner[i]] ?? 'transparent';
+      const look = colors?.[s.owner[i]] ?? s.owner[i]; // colour and emblem number
+      const color = PLAYER_COLORS[look] ?? 'transparent';
+      if (look >= 0) seals[i].querySelector('.emblem').setAttribute('href', `#emblem-${look}`);
+      else seals[i].querySelector('.emblem').removeAttribute('href');
       washes[i].setAttribute('fill', color);
       seals[i].querySelector('.wax').setAttribute('fill', s.owner[i] >= 0 ? color : '#b9a98a');
       seals[i].querySelector('.count').textContent = s.owner[i] >= 0 ? s.armies[i] : '';
@@ -121,6 +156,9 @@ export function createBoard(svg, grid, map, { onTap, insets = () => ({ top: 0, b
       const i = +g.dataset.t;
       g.querySelector('.wax').setAttribute('fill', seals[i].querySelector('.wax').getAttribute('fill'));
       g.querySelector('.count').textContent = seals[i].querySelector('.count').textContent;
+      const emblem = seals[i].querySelector('.emblem').getAttribute('href');
+      if (emblem) g.querySelector('.emblem').setAttribute('href', emblem);
+      else g.querySelector('.emblem').removeAttribute('href');
       g.setAttribute('class', `mirror${selected.has(i) ? ' selected' : chosen.has(i) ? ' chosen' : targets.has(i) ? ' target' : ''}`);
     });
   }

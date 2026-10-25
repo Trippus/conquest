@@ -37,7 +37,7 @@ Intet. Prototypen er bevidst grim.
 ## Før butikken (trin 04)
 | # | Hvad | Du beslutter |
 |---|---|---|
-| 12 | **Navn** | Endeligt navn. Tjek Play Butik, App Store, EUIPO og dkpto.dk (klasse 9 og 41) |
+| 12 | **Navn** | ✅ **Valgt: Rulers of the Map – World Conquest** (25/10-2026). Websøgning: intet spil eller app med navnet. Mangler: varemærketjek på EUIPO og dkpto.dk (klasse 9 og 41) |
 | 13 | **Logo og app-ikon** | Ikonets motiv, der skal kunne ses i 48 px |
 | 14 | **Feature graphic og skærmbilleder** | Hvilke situationer i spillet, der viser det bedst |
 

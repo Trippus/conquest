@@ -399,3 +399,14 @@ test('knocking a player out takes their stars', () => {
   assert.equal(t.players[2].stars, 0);
   assert.equal(events.find((e) => e.type === 'eliminate').stars, 2);
 });
+
+test('a conquest moves one army in by itself; with occupyMin dice, as many as attacked', () => {
+  const s = board('000111000111', [10, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], { phase: 'attack', reserve: 0 });
+  for (let seed = 1; seed < 20; seed++) {
+    const one = play({ ...s, rng: seed }, [{ type: 'attack', from: at('n1'), to: at('w3') }]).s;
+    if (one.owner[at('w3')] === 0) assert.equal(one.armies[at('w3')], 1);
+    const dice = { ...MODERN, occupyMin: 'dice' };
+    const three = play({ ...s, rng: seed }, [{ type: 'attack', from: at('n1'), to: at('w3') }], dice).s;
+    if (three.owner[at('w3')] === 0) assert.equal(three.armies[at('w3')], 3);
+  }
+});

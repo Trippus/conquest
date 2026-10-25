@@ -408,8 +408,9 @@ const DO = {
   },
 };
 
-// One roll. Highest dice are compared pair by pair; the defender wins ties. A conquest moves the
-// attacking dice's armies in at once (they cannot have been lost: the defender lost every pair).
+// One roll. Highest dice are compared pair by pair; the defender wins ties. A conquest moves
+// rules.occupyMin armies in at once, or with 'dice' as many as attacked (those cannot have been
+// lost: the defender lost every pair); the occupy step then moves more if the player wants.
 function roll(map, rules, s, from, to, dice, ev) {
   const p = s.current;
   const q = s.owner[to];
@@ -426,8 +427,9 @@ function roll(map, rules, s, from, to, dice, ev) {
   if (s.armies[to] > 0) return;
 
   s.owner[to] = p;
-  s.armies[to] = na;
-  s.armies[from] -= na;
+  const moveIn = rules.occupyMin === 'dice' ? na : Math.min(na, rules.occupyMin ?? 1);
+  s.armies[to] = moveIn;
+  s.armies[from] -= moveIn;
   s.conquered = true;
   ev.push({ type: 'conquer', p, from, to, loser: q });
   if (!s.owner.includes(q)) {

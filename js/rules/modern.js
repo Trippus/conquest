@@ -18,6 +18,7 @@ export const MODERN = {
   tradeTerritoryBonus: 2, // extra armies on a traded card's territory when you hold it
   maxHand: 5, // with this many cards you must trade before placing
   wildCards: 2,
+  occupyMin: 1, // armies that must move into a conquest: a number, or 'dice' (as many as attacked)
   fortify: 'connected', // 'connected' (through your own territories) or 'adjacent'
   // Seat balance: each later player starts with this many more armies than the one before (by
   // number of players). With two, moving first is worth a lot; with three or four the later seats

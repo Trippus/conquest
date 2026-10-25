@@ -233,8 +233,10 @@ function render() {
     if (s.phase === 'fortify') G.fortifyTargets(map, rules, s, sel.from).forEach((t) => targets.add(t));
   }
   const occ = s.occupy;
+  // While choosing how many move in, the seals already show the split being chosen.
+  const shownState = occ && !isBot() ? { ...s, armies: s.armies.map((n, t) => (t === occ.to ? n + sel.n : t === occ.from ? n - sel.n : n)) } : s;
   board.update(
-    s,
+    shownState,
     {
       selected: new Set([sel.from, occ?.from].filter((t) => t >= 0)),
       chosen: new Set([sel.to, occ?.to].filter((t) => t >= 0)),
@@ -273,6 +275,7 @@ function renderBar() {
   let phase = '';
   let text = '';
   let stepper = null; // [min, max] when the amount stepper is shown
+  let shown = 0; // added to the number the stepper shows (moving in: the armies already there)
 
   if (s.phase === 'over') {
     phase = 'Spillet er slut';
@@ -306,8 +309,10 @@ function renderBar() {
   } else if (s.phase === 'occupy') {
     phase = `Runde ${s.round} · Erobret`;
     const { from, to } = s.occupy;
-    text = `${map.territories[to].name} er din. Hvor mange ekstra hære skal med ind fra ${map.territories[from].name}?`;
+    // The stepper shows how many stand in the new land; the old one keeps the rest.
+    text = `${map.territories[to].name} er din. Hvor mange hære skal stå der? ${map.territories[from].name} beholder ${s.armies[from] - sel.n}.`;
     stepper = [0, s.armies[from] - 1];
+    shown = s.armies[to];
     button('Flyt ind', () => act({ type: 'occupy', n: sel.n }), { primary: true });
   } else if (s.phase === 'fortify') {
     phase = `Runde ${s.round} · Flyt`;
@@ -329,11 +334,11 @@ function renderBar() {
   if (stepper) {
     const [lo, hi] = stepper;
     if (sel.n < lo || sel.n > hi) sel.n = hi;
-    $('amount').value = sel.n;
+    $('amount').value = sel.n + shown;
     $('minus').disabled = sel.n <= lo;
     $('plus').disabled = sel.n >= hi;
-    $('minus').onclick = () => ((sel.n = Math.max(lo, sel.n - 1)), renderBar());
-    $('plus').onclick = () => ((sel.n = Math.min(hi, sel.n + 1)), renderBar());
+    $('minus').onclick = () => ((sel.n = Math.max(lo, sel.n - 1)), render());
+    $('plus').onclick = () => ((sel.n = Math.min(hi, sel.n + 1)), render());
   }
 }
 

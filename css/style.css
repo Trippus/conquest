@@ -127,7 +127,7 @@ button.wide { width: 100%; }
   border: 1px solid var(--line); border-radius: 18px;
 }
 .bar-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 32px; }
-#phase { margin: 0; font: italic 15px var(--title); color: var(--accent); letter-spacing: 0.02em; }
+#phase { margin: 0; font: italic 15px var(--title); color: var(--accent); letter-spacing: 0.02em; white-space: nowrap; }
 #hint { margin: 4px 0 10px; }
 #actions { display: flex; flex-wrap: wrap; gap: 8px; }
 #actions button { flex: 1 1 140px; }
@@ -135,7 +135,7 @@ button.wide { width: 100%; }
 #stepper button { min-width: 56px; font-size: 24px; }
 #amount { min-width: 2.5em; text-align: center; font: 700 26px var(--title); }
 #hand-buttons { display: flex; gap: 6px; }
-#hand-buttons button { min-height: 34px; padding: 0 12px; font-size: 14px; border-radius: 999px; }
+#hand-buttons button { white-space: nowrap; min-height: 34px; padding: 0 12px; font-size: 14px; border-radius: 999px; }
 #luck-btn.ready { background: var(--primary); color: var(--primary-ink); border-color: transparent; font-weight: 700; animation: glow 1.6s ease-in-out infinite alternate; }
 @keyframes glow { to { box-shadow: 0 0 0 4px rgb(255 210 90 / 0.45); } }
 
@@ -238,3 +238,11 @@ dialog .big { font-family: var(--title); font-size: 20px; margin: 8px 0; }
 .standings .dot { width: 16px; height: 16px; border-radius: 50%; flex: none; margin-top: 3px; box-shadow: 0 0 0 1px #2b1d12; }
 .standings .who { display: flex; flex-direction: column; }
 .standings small { font-weight: 400; color: var(--muted); font-size: 13px; }
+
+/* How many armies are left to place, big and plain while reinforcing. */
+#reserve { margin: 6px 0 0; display: flex; align-items: baseline; gap: 6px; }
+#reserve b { font: 700 28px/1 var(--title); color: var(--accent); }
+#reserve span { font-size: 16px; }
+#reserve.bump b { animation: bump .35s ease-out; }
+@keyframes bump { from { transform: scale(1.4); } }
+#actions button.wide { flex-basis: 100%; }

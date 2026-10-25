@@ -267,7 +267,7 @@ function renderBar() {
   const button = (label, fn, opts = {}) => {
     const b = document.createElement('button');
     b.textContent = label;
-    if (opts.primary) b.className = 'primary';
+    b.className = [opts.primary && 'primary', opts.wide && 'wide'].filter(Boolean).join(' ');
     b.disabled = !!opts.disabled;
     b.addEventListener('click', fn);
     buttons.push(b);
@@ -276,6 +276,7 @@ function renderBar() {
   let text = '';
   let stepper = null; // [min, max] when the amount stepper is shown
   let shown = 0; // added to the number the stepper shows (moving in: the armies already there)
+  let reserve = -1; // armies left to place, shown big while reinforcing
 
   if (s.phase === 'over') {
     phase = 'Spillet er slut';
@@ -287,13 +288,14 @@ function renderBar() {
     text = `${name} tænker …`;
   } else if (s.phase === 'reinforce') {
     phase = `Runde ${s.round} · Forstærk`;
-    const lucky = lastLuck?.p === p && lastLuck.round === s.round ? ` Heraf +${lastLuck.armies} for krigslykke.` : '';
-    if (s.reserve) text = `Du har ${s.reserve} ${s.reserve === 1 ? 'ny hær' : 'nye hære'}.${lucky} Tryk på dine områder for at placere dem.`;
+    reserve = s.reserve;
+    const lucky = lastLuck?.p === p && lastLuck.round === s.round ? ` (heraf ${lastLuck.armies} fra krigslykke)` : '';
+    if (s.reserve) text = `Tryk på dine områder for at placere hærene${lucky}.`;
     else text = 'Alle hære er placeret.';
     const stars = s.players[p].stars;
     if (stars) {
-      text += ` Krigslykke ${starsText(stars)}: indløs for +${worth(stars)}, eller spar op til +${worth(stars + 1)}.`;
-      button(`Indløs ${starsText(stars).replace(/☆/g, '')} (+${worth(stars)})`, () => act({ type: 'luck' }));
+      text += ` Du har ${starCount(stars)}: indløs dem nu for ${armies(worth(stars))}, eller spar op (${starCount(stars + 1)} giver ${armies(worth(stars + 1))}).`;
+      button(`Indløs ${starCount(stars)} (+${armies(worth(stars))})`, () => act({ type: 'luck' }), { wide: true });
     }
     if (s.reserve && sel.from >= 0 && s.owner[sel.from] === p) {
       button(`Resten på ${map.territories[sel.from].name}`, () => act({ type: 'place', t: sel.from, n: s.reserve }));
@@ -333,6 +335,17 @@ function renderBar() {
   }
 
   $('phase').textContent = phase;
+  $('reserve').hidden = reserve < 0;
+  if (reserve >= 0) {
+    const was = $('reserve').querySelector('b').textContent;
+    $('reserve').querySelector('b').textContent = reserve;
+    $('reserve').querySelector('span').textContent = reserve === 1 ? 'hær at placere' : 'hære at placere';
+    if (was !== String(reserve)) {
+      $('reserve').classList.remove('bump');
+      void $('reserve').offsetWidth;
+      $('reserve').classList.add('bump');
+    }
+  }
   $('hint').textContent = text;
   $('actions').replaceChildren(...buttons);
   $('stepper').hidden = !stepper;
@@ -581,7 +594,11 @@ $('mission-dialog').addEventListener('close', () => schedule());
 /* ---------- war luck ---------- */
 
 // Stars as ★★☆: filled for the ones you have, empty up to three; beyond three as ★★★+2.
-const starsText = (n) => (n > G.STARS ? `${'★'.repeat(G.STARS)}+${n - G.STARS}` : '★'.repeat(n) + '☆'.repeat(G.STARS - n));
+// Beyond three, the number: ★ 5. ("+" is only ever used for armies.)
+const starsText = (n) => (n > G.STARS ? `★ ${n}` : '★'.repeat(n) + '☆'.repeat(G.STARS - n));
+// In sentences: "1 ★", "4 ★"; and armies with their word: "5 hære".
+const starCount = (n) => `${n} ★`;
+const armies = (n) => `${n} ${n === 1 ? 'hær' : 'hære'}`;
 const worth = (n) => G.starValue(rules, n);
 // Your stars can be cashed in now: your turn, reinforcing.
 const canCash = (p) => p === s.current && s.phase === 'reinforce' && s.players[p].stars > 0 && !isBot();
@@ -593,11 +610,11 @@ function luckNews(e) {
   const solo = game.seats.filter((x) => x === 'human').length === 1;
   const name = (p) => (solo && you(p) ? 'Du' : s.players[p].name);
   if (e.type === 'star' && you(e.p)) {
-    toast(`★ for at erobre! ${name(e.p)} har nu ${starsText(e.stars)}, værd +${worth(e.stars)} hære. Indløs dem, når du forstærker, eller spar op.`);
+    toast(`★ for at erobre! ${name(e.p)} har nu ${starCount(e.stars)}, som er ${armies(worth(e.stars))} værd. Indløs dem, når du forstærker, eller spar op.`);
   }
   if (e.type === 'luck') {
     lastLuck = { p: e.p, round: s.round, armies: e.armies };
-    toast(you(e.p) ? `Krigslykke! ${starsText(e.stars).replace(/☆/g, '')} blev til +${e.armies} hære.` : `${s.players[e.p].name} indløste krigslykke: +${e.armies} hære.`);
+    toast(you(e.p) ? `Krigslykke! ${starCount(e.stars)} blev til ${armies(e.armies)} mere at placere.` : `${s.players[e.p].name} indløste ${starCount(e.stars)} til ${armies(e.armies)}.`);
   }
   if (e.type === 'eliminate' && e.stars > 0) {
     toast(`${name(e.by)} slog ${s.players[e.p].name} ud og ${solo && you(e.by) ? 'fik' : 'overtog'} ${e.stars === 1 ? 'deres ★' : `deres ${e.stars} ★`}.`);
@@ -612,12 +629,12 @@ function openLuck() {
   $('luck-stars').textContent = starsText(stars);
   $('luck-text').textContent = !stars
     ? 'Du har ingen ★ endnu.'
-    : `Dine stjerner er værd +${worth(stars)} hære. Spar én mere op, så er de værd +${worth(stars + 1)}.`;
+    : `Du har ${starCount(stars)}. De er ${armies(worth(stars))} værd nu, og ${armies(worth(stars + 1))}, hvis du sparer én mere op.`;
   $('ladder').innerHTML =
-    [1, 2, 3].map((n) => `<span class="${Math.min(stars, G.STARS) === n ? 'next' : ''}">${'★'.repeat(n)} +${worth(n)}</span>`).join('') +
-    `<span>hver ★ mere +${rules.extraStar}</span>`;
+    [1, 2, 3].map((n) => `<span class="${Math.min(stars, G.STARS) === n ? 'next' : ''}">${starCount(n)} = ${armies(worth(n))}</span>`).join('') +
+    `<span class="${stars > G.STARS ? 'next' : ''}">hver ★ mere = ${armies(rules.extraStar)} mere</span>`;
   $('cash-btn').hidden = !canCash(p);
-  $('cash-btn').textContent = `Indløs (+${worth(stars)})`;
+  $('cash-btn').textContent = `Indløs (+${armies(worth(stars))})`;
   $('luck-dialog').showModal();
 }
 $('luck-dialog').addEventListener('close', () => $('luck-dialog').returnValue === 'luck' && act({ type: 'luck' }));

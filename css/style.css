@@ -68,7 +68,13 @@ button.wide { width: 100%; }
 #board-wrap { position: fixed; inset: 0; overflow: hidden; }
 #board { width: 100%; height: 100%; display: block; background: var(--paper); touch-action: none; cursor: grab; }
 #board:active { cursor: grabbing; }
-#board .land, #board .seal { cursor: pointer; }
+#board .land, #board .seal, #board .mirror { cursor: pointer; }
+/* A mirror seal: the territory across the edge of the map, in a dashed ring. */
+#board .mirror .ring { fill: #f4e8cc; stroke: #4a3726; stroke-width: .12; stroke-dasharray: .35 .25; opacity: .9; }
+#board .mirror .name { font-size: .85px; }
+#board .mirror.selected .ring { stroke: #2b1d12; stroke-width: .35; stroke-dasharray: none; }
+#board .mirror.chosen .ring { stroke: #a3261b; stroke-width: .4; stroke-dasharray: none; }
+#board .mirror.target .ring { stroke: #a3261b; stroke-width: .25; animation: march 1.2s linear infinite; }
 #board .mark { fill: none; stroke: none; }
 #board .mark.selected { stroke: #2b1d12; stroke-width: .5; }
 #board .mark.chosen { stroke: #a3261b; stroke-width: .55; }

@@ -47,6 +47,19 @@ export function createBoard(svg, grid, map, { onTap, insets = () => ({ top: 0, b
     )
     .join('');
   const outline = (i) => shapes.outlines[letterOf[T[i].id]];
+  // Sea routes over the edge of the map (Alaska–Østsibirien) end in a mirror seal: the territory on
+  // the far side, shown at this edge with its colour and armies, and tappable like the real one.
+  const indexOf = (letter) => map.at[grid.TERRITORIES[letter][0]];
+  const mirrors = shapes.sea
+    .filter((r) => r.wraps)
+    .flatMap(({ from, to, p, q }) => {
+      const shift = (a, b) => (a[0] < b[0] ? -W : W); // where b's mirror lies, seen from a
+      const at = (a, b) => [(a[0] + b[0] + shift(a, b)) / 2, (a[1] + b[1]) / 2];
+      return [
+        { t: indexOf(to), xy: at(p, q) },
+        { t: indexOf(from), xy: at(q, p) },
+      ];
+    });
   svg.setAttribute('viewBox', `0 0 ${n(W)} ${n(H)}`);
   svg.innerHTML = `
     <defs>
@@ -78,11 +91,19 @@ export function createBoard(svg, grid, map, { onTap, insets = () => ({ top: 0, b
       (t, i) => `<g class="seal" data-t="${i}" transform="translate(${n(t.x)} ${n(t.y)})">
         <circle r="1.35" class="wax"/><circle r="1.08" class="rim"/>
         <text class="count" dy=".4"></text><text class="name" ${NAME_AT[grid.WORLD.territories[t.id]?.label ?? 'below']}>${t.name}</text></g>`,
-    ).join('')}</g>`;
+    ).join('')}</g>
+    <g class="mirrors">${mirrors
+      .map(
+        ({ t, xy }) => `<g class="mirror" data-t="${t}" transform="translate(${n(xy[0])} ${n(xy[1])})">
+        <circle r="1.6" class="ring"/><circle r="1.15" class="wax"/><circle r=".92" class="rim"/>
+        <text class="count" dy=".38"></text><text class="name" dy="2.2">${T[t].name}</text></g>`,
+      )
+      .join('')}</g>`;
 
   const washes = [...svg.querySelectorAll('.washes path')];
   const marks = [...svg.querySelectorAll('.mark')];
   const seals = [...svg.querySelectorAll('.seal')];
+  const mirrorSeals = [...svg.querySelectorAll('.mirror')];
 
   /* ---------- state ---------- */
 
@@ -95,6 +116,12 @@ export function createBoard(svg, grid, map, { onTap, insets = () => ({ top: 0, b
       seals[i].querySelector('.wax').setAttribute('fill', s.owner[i] >= 0 ? color : '#b9a98a');
       seals[i].querySelector('.count').textContent = s.owner[i] >= 0 ? s.armies[i] : '';
       marks[i].setAttribute('class', `mark${selected.has(i) ? ' selected' : chosen.has(i) ? ' chosen' : targets.has(i) ? ' target' : ''}`);
+    });
+    mirrorSeals.forEach((g) => {
+      const i = +g.dataset.t;
+      g.querySelector('.wax').setAttribute('fill', seals[i].querySelector('.wax').getAttribute('fill'));
+      g.querySelector('.count').textContent = seals[i].querySelector('.count').textContent;
+      g.setAttribute('class', `mirror${selected.has(i) ? ' selected' : chosen.has(i) ? ' chosen' : targets.has(i) ? ' target' : ''}`);
     });
   }
 
@@ -130,7 +157,8 @@ export function createBoard(svg, grid, map, { onTap, insets = () => ({ top: 0, b
     const pad = 24 * k;
     const { top, bottom } = insets();
     const clamp = (v, lo, hi) => (lo > hi ? (lo + hi) / 2 : Math.min(hi, Math.max(lo, v)));
-    view = { x: clamp(x, -pad, W - w + pad), y: clamp(y, -top * k - pad, H - h + bottom * k + pad), w, h };
+    const side = 3; // room beyond the left and right edge for the mirror seals
+    view = { x: clamp(x, -pad - side, W - w + pad + side), y: clamp(y, -top * k - pad, H - h + bottom * k + pad), w, h };
     svg.setAttribute('viewBox', `${n(view.x)} ${n(view.y)} ${n(view.w)} ${n(view.h)}`);
   }
   // Zoom by `factor` (> 1 zooms in) keeping the map point under (px, py) in place.

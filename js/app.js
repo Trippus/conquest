@@ -577,9 +577,15 @@ function openGameOver() {
   const me = place.findIndex((p) => game.seats[p] === 'human');
   const mine = me >= 0 && game.seats.filter((x) => x === 'human').length === 1 ? `<p class="your-place">Du blev nr. ${me + 1} af ${place.length}.</p>` : '';
   $('over-text').innerHTML = `${how}${mine}<ol class="standings">${rows.join('')}</ol>`;
-  setTimeout(() => $('game-over').open || $('game-over').showModal(), 900);
+  setTimeout(() => {
+    if ($('game-over').open) return;
+    // The bar says the same with the same buttons; it waits until the winner screen is closed.
+    $('bar').hidden = true;
+    $('game-over').showModal();
+  }, 900);
 }
 $('game-over').addEventListener('close', () => {
+  $('bar').hidden = false;
   if ($('game-over').returnValue === 'again') startFromSettings();
   else if ($('game-over').returnValue === 'home') showIntro();
 });

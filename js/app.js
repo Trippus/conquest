@@ -47,6 +47,10 @@ const DANISH = {
 // next, whatever order the turns come in.
 const lookOf = (p) => game?.colors?.[p] ?? p; // colour and emblem number
 const colorOf = (p) => COLORS[lookOf(p)];
+// With one person at the phone the texts speak to them: "Du" as subject, "dig" as object.
+const soloYou = (p) => game.seats[p] === 'human' && game.seats.filter((x) => x === 'human').length === 1;
+const subject = (p) => (soloYou(p) ? 'Du' : s.players[p].name);
+const object = (p) => (soloYou(p) ? 'dig' : s.players[p].name);
 
 function loadSettings() {
   try {
@@ -281,7 +285,7 @@ function renderBar() {
 
   if (s.phase === 'over') {
     phase = 'Spillet er slut';
-    text = `${s.players[s.winner].name} har vundet.`;
+    text = `${subject(s.winner)} har vundet.`;
     button('Til start', showIntro);
     button('Spil igen', () => startFromSettings(), { primary: true });
   } else if (isBot()) {
@@ -440,7 +444,7 @@ function showDice(rolls, conquest, out) {
     <div class="dice-row">${dice(last.d, colorOf(pd), (i) => i < pairs && last.a[i] > last.d[i])}</div>
     <div>${rolls.length > 1 ? `${rolls.length} slag · ` : ''}angriber −${lostA}, forsvarer −${lostD}</div>
     ${conquest ? `<div><b>${map.territories[conquest.to].name} er erobret!</b></div>` : ''}
-    ${out ? `<div><b>${s.players[out.p].name} er slået ud.</b></div>` : ''}`;
+    ${out ? `<div><b>${subject(out.p)} er slået ud.</b></div>` : ''}`;
   box.hidden = false;
   const faces = [...box.querySelectorAll('.die')];
   const real = faces.map((d) => d.textContent);
@@ -519,9 +523,9 @@ function openGameOver() {
   const you = game.seats[s.winner] === 'human';
   $('over-title').textContent = you ? 'Tillykke!' : 'Spillet er slut';
   const how = {
-    world: `${w.name} har erobret hele kortet i runde ${s.round}.`,
-    mission: `${w.name} klarede sin mission i runde ${s.round}:<br><i>${missionText(w.mission)}</i>`,
-    rounds: `${w.name} havde flest områder, da runderne slap op.`,
+    world: `${subject(s.winner)} har erobret hele kortet i runde ${s.round}.`,
+    mission: `${subject(s.winner)} klarede ${soloYou(s.winner) ? 'din' : 'sin'} mission i runde ${s.round}:<br><i>${missionText(w.mission)}</i>`,
+    rounds: `${subject(s.winner)} havde flest områder, da runderne slap op.`,
   }[s.won];
   const place = G.standings(s);
   const rows = place.map((p, i) => {
@@ -557,7 +561,7 @@ function missionText(m) {
   if (!m) return '';
   if (m.type === 'regions') return `Erobr ${regionNames(m.regions)}${m.plusOne ? ', og ét kontinent mere efter eget valg' : ''}.`;
   if (m.type === 'territories') return m.armies > 1 ? `Hold ${m.count} områder med mindst ${m.armies} hære i hvert.` : `Hold ${m.count} områder på én gang.`;
-  return `Slå ${s.players[m.target].name} ud. Gør en anden det før dig, skal du i stedet holde ${G.fallback(map).count} områder.`;
+  return `Slå ${object(m.target)} ud. Gør en anden det før dig, skal du i stedet holde ${G.fallback(map).count} områder.`;
 }
 
 function missionProgress(p) {
@@ -578,7 +582,7 @@ function missionProgress(p) {
     return `Du har ${have} af ${m.count}.`;
   }
   const left = G.owned(s, m.target).length;
-  return left ? `${s.players[m.target].name} har ${left} områder tilbage.` : `${s.players[m.target].name} er slået ud.`;
+  return left ? `${subject(m.target)} har ${left} områder tilbage.` : `${subject(m.target)} er slået ud.`;
 }
 
 function openMission() {
@@ -608,17 +612,16 @@ let lastLuck = null; // { p, round, armies }: war luck at the start of this turn
 // A message for everything that happens with war luck, so it is never a mystery.
 function luckNews(e) {
   const you = (p) => game.seats[p] === 'human';
-  const solo = game.seats.filter((x) => x === 'human').length === 1;
-  const name = (p) => (solo && you(p) ? 'Du' : s.players[p].name);
   if (e.type === 'star' && you(e.p)) {
-    toast(`★ for at erobre! ${name(e.p)} har nu ${starCount(e.stars)}, som er ${armies(worth(e.stars))} værd. Indløs dem, når du forstærker, eller spar op.`);
+    toast(`★ for at erobre! ${subject(e.p)} har nu ${starCount(e.stars)}, som er ${armies(worth(e.stars))} værd. Indløs dem, når du forstærker, eller spar op.`);
   }
   if (e.type === 'luck') {
     lastLuck = { p: e.p, round: s.round, armies: e.armies };
     toast(you(e.p) ? `Krigslykke! ${starCount(e.stars)} blev til ${armies(e.armies)} mere at placere.` : `${s.players[e.p].name} indløste ${starCount(e.stars)} til ${armies(e.armies)}.`);
   }
   if (e.type === 'eliminate' && e.stars > 0) {
-    toast(`${name(e.by)} slog ${s.players[e.p].name} ud og ${solo && you(e.by) ? 'fik' : 'overtog'} ${e.stars === 1 ? 'deres ★' : `deres ${e.stars} ★`}.`);
+    const stars = e.stars === 1 ? (soloYou(e.p) ? 'din ★' : 'deres ★') : `${soloYou(e.p) ? 'dine' : 'deres'} ${e.stars} ★`;
+    toast(`${subject(e.by)} slog ${object(e.p)} ud og ${soloYou(e.by) ? 'fik' : 'overtog'} ${stars}.`);
   }
 }
 

@@ -235,7 +235,12 @@ dialog .big { font-family: var(--title); font-size: 20px; margin: 8px 0; }
   .steam, #luck-btn.ready, #dice.rolling .die, #board .seal .wax, #board .washes path, #board .mark.target { animation: none !important; }
 }
 
-/* the standings at the end of a game */
+/* the standings at the end of a game, under the winner */
+.ruler { display: flex; flex-direction: column; align-items: center; text-align: center; margin: 6px 0 12px; }
+.ruler .seal-icon { width: 96px; height: 96px; filter: drop-shadow(0 3px 4px rgb(60 40 20 / 0.35)); }
+.ruler b { font: 700 28px var(--title); margin-top: 8px; overflow-wrap: anywhere; }
+.ruler span { font: italic 18px var(--title); color: var(--accent); letter-spacing: .04em; }
+.ruler span::before, .ruler span::after { content: '—'; margin: 0 .4em; opacity: .6; }
 .your-place { font: 700 18px var(--title); margin: 10px 0 4px; }
 .standings { list-style: none; margin: 8px 0 0; padding: 0; }
 .standings li { display: flex; align-items: flex-start; gap: 8px; padding: 6px 0; border-top: 1px solid var(--line); }

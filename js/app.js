@@ -564,6 +564,8 @@ function openGameOver() {
     mission: `${subject(s.winner)} klarede ${soloYou(s.winner) ? 'din' : 'sin'} mission i runde ${s.round}:<br><i>${missionText(w.mission)}</i>`,
     rounds: `${subject(s.winner)} havde flest områder, da runderne slap op.`,
   }[s.won];
+  // The winner, big: their coat of arms, their name and the title they have won.
+  $('over-ruler').innerHTML = `${sealIcon(lookOf(s.winner))}<b>${w.name}</b><span>Ruler of the Map</span>`;
   const place = G.standings(s);
   const rows = place.map((p, i) => {
     const pl = s.players[p];

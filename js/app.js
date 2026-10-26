@@ -15,7 +15,9 @@ import { Sound } from './audio.js';
 const KEY = 'conquest.v3';
 const DELAY = { normal: 650, fast: 140 };
 const SETTINGS = 'conquest.settings';
-const DEFAULTS = { opponents: 2, level: 'normal', mode: 'mission', humans: 1, speed: 'normal', sound: true };
+// name and look are the one person's own name and coat of arms (colour and emblem number).
+const DEFAULTS = { opponents: 2, level: 'normal', mode: 'mission', humans: 1, speed: 'normal', sound: true, name: '', look: 0 };
+const NAME_LENGTH = 14;
 // The computer opponents. Made-up commanders, so the table has someone to play against.
 const OPPONENTS = ['Grevinde Holm', 'Oberst Vind', 'Admiral Storm', 'Generalinde Ravn', 'Major Falk', 'Hertug Ulv'];
 
@@ -43,14 +45,16 @@ const DANISH = {
 
 /* ---------- game flow ---------- */
 
-// A player's colour: the humans have the first colours (you are always red), the opponents the
-// next, whatever order the turns come in.
+// A player's colour: alone you pick your own coat of arms; several people at the phone have the
+// first ones. The opponents take the rest, whatever order the turns come in.
 const lookOf = (p) => game?.colors?.[p] ?? p; // colour and emblem number
 const colorOf = (p) => COLORS[lookOf(p)];
 // With one person at the phone the texts speak to them: "Du" as subject, "dig" as object.
 const soloYou = (p) => game.seats[p] === 'human' && game.seats.filter((x) => x === 'human').length === 1;
 const subject = (p) => (soloYou(p) ? 'Du' : s.players[p].name);
 const object = (p) => (soloYou(p) ? 'dig' : s.players[p].name);
+
+const yourName = (x) => x.name.trim() || 'Dig';
 
 function loadSettings() {
   try {
@@ -67,13 +71,16 @@ function saveSettings(settings) {
 
 // A new game from the settings: who plays, then the turn order is drawn.
 function startFromSettings(settings = loadSettings()) {
-  const people = Array.from({ length: settings.humans }, (_, i) => ({
+  const solo = settings.humans === 1;
+  const looks = solo ? [settings.look] : Array.from({ length: settings.humans }, (_, i) => i);
+  const people = looks.map((color, i) => ({
     kind: 'human',
-    name: settings.humans === 1 ? 'Dig' : `Spiller ${i + 1}`,
-    color: i,
+    name: solo ? yourName(settings) : `Spiller ${i + 1}`,
+    color,
   }));
+  const free = COLORS.map((_, i) => i).filter((i) => !looks.includes(i));
   const names = [...OPPONENTS].sort(() => Math.random() - 0.5);
-  const bots = Array.from({ length: settings.opponents }, (_, i) => ({ kind: settings.level, name: names[i], color: settings.humans + i }));
+  const bots = Array.from({ length: settings.opponents }, (_, i) => ({ kind: settings.level, name: names[i], color: free[i] }));
   startGame([...people, ...bots].sort(() => Math.random() - 0.5), settings.speed, settings.mode);
 }
 
@@ -477,12 +484,28 @@ const CHOICES = {
 
 function summary(x) {
   const them = x.opponents ? `${x.opponents} ${x.opponents === 1 ? 'modstander' : 'modstandere'} (${x.level === 'easy' ? 'lette' : 'normale'})` : '';
-  const who = x.humans === 1 ? `Dig mod ${them}` : `${x.humans} spillere på denne telefon${them ? ` mod ${them}` : ''}`;
+  const who = x.humans === 1 ? `${yourName(x)} mod ${them}` : `${x.humans} spillere på denne telefon${them ? ` mod ${them}` : ''}`;
   return `${who} · ${x.mode === 'mission' ? 'hemmelig mission' : 'erobr hele verden'}`;
 }
 
 function renderSetup() {
   $('setup-summary').textContent = summary(draft);
+  $('you-fields').hidden = draft.humans !== 1;
+  if (document.activeElement !== $('your-name')) $('your-name').value = draft.name;
+  $('your-look').replaceChildren(
+    ...COLORS.map((_, i) => {
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.innerHTML = sealIcon(i);
+      b.setAttribute('aria-label', `Våbenskjold ${i + 1}`);
+      b.setAttribute('aria-pressed', String(draft.look === i));
+      b.addEventListener('click', () => {
+        draft.look = i;
+        renderSetup();
+      });
+      return b;
+    }),
+  );
   document.querySelectorAll('.pills').forEach((box) => {
     const name = box.dataset.name;
     box.replaceChildren(
@@ -503,6 +526,19 @@ function renderSetup() {
   });
 }
 
+$('your-name').maxLength = NAME_LENGTH;
+$('your-name').addEventListener('input', () => {
+  draft.name = $('your-name').value;
+  $('setup-summary').textContent = summary(draft);
+});
+// Enter closes the keyboard instead of pressing the dialog's first button (Tilbage).
+$('your-name').addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') {
+    e.preventDefault();
+    $('your-name').blur();
+  }
+});
+
 function openNewGame(change = false) {
   draft = loadSettings();
   renderSetup();
@@ -513,6 +549,7 @@ function openNewGame(change = false) {
 
 $('new-game').addEventListener('close', () => {
   if ($('new-game').returnValue !== 'start') return;
+  draft.name = draft.name.trim().slice(0, NAME_LENGTH);
   saveSettings({ ...draft, sound: Sound.enabled });
   startFromSettings(draft);
 });

@@ -216,6 +216,12 @@ dialog .big { font-family: var(--title); font-size: 20px; margin: 8px 0; }
 .pills { display: flex; flex-wrap: wrap; gap: 6px; }
 .pills button { min-height: 40px; padding: 0 14px; border-radius: 999px; font-size: 15px; }
 .pills button[aria-pressed='true'] { background: var(--ink); color: var(--panel-solid); border-color: var(--ink); }
+#your-name { width: 100%; min-height: 44px; padding: 0 12px; font: inherit; font-size: 17px; color: var(--ink);
+  background: var(--panel-solid); border: 1px solid var(--line); border-radius: 10px; box-sizing: border-box; }
+.looks { display: flex; flex-wrap: wrap; gap: 5px; }
+.looks button { width: 44px; height: 44px; padding: 0; border-radius: 50%; display: grid; place-items: center; }
+.looks .seal-icon { width: 36px; height: 36px; }
+.looks button[aria-pressed='true'] { border: 3px solid var(--ink); box-shadow: 0 0 0 2px var(--panel-solid) inset; }
 
 /* war luck */
 .stars-big { margin: 4px 0; font: 40px/1 var(--title); letter-spacing: 6px; color: var(--accent); }

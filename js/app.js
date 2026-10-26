@@ -561,7 +561,7 @@ function openGameOver() {
   $('over-title').textContent = you ? 'Tillykke!' : 'Spillet er slut';
   const how = {
     world: `${subject(s.winner)} har erobret hele kortet i runde ${s.round}.`,
-    mission: `${subject(s.winner)} klarede ${soloYou(s.winner) ? 'din' : 'sin'} mission i runde ${s.round}:<br><i>${missionText(w.mission)}</i>`,
+    mission: `${subject(s.winner)} klarede ${soloYou(s.winner) ? 'din' : 'sin'} mission i runde ${s.round}:<br><i>${missionText(w.mission, soloYou(s.winner))}</i>`,
     rounds: `${subject(s.winner)} havde flest områder, da runderne slap op.`,
   }[s.won];
   // The winner, big: their coat of arms, their name and the title they have won.
@@ -570,7 +570,7 @@ function openGameOver() {
   const rows = place.map((p, i) => {
     const pl = s.players[p];
     const fate = p === s.winner ? 'vandt' : pl.alive ? `${G.owned(s, p).length} ${G.owned(s, p).length === 1 ? 'område' : 'områder'}` : `slået ud i runde ${pl.outRound}`;
-    const mission = s.mode === 'mission' && p !== s.winner ? `<small>${missionText(pl.mission)}</small>` : '';
+    const mission = s.mode === 'mission' && p !== s.winner ? `<small>${missionText(pl.mission, soloYou(p))}</small>` : '';
     return `<li class="${game.seats[p] === 'human' ? 'you' : ''}"><span class="place">${i + 1}.</span>
       ${sealIcon(lookOf(p))}<span class="who">${pl.name}<small>${fate}</small>${mission}</span></li>`;
   });
@@ -596,11 +596,14 @@ function viewer() {
 
 const regionNames = (list) => list.map((r) => map.regions[r].name).join(' og ');
 
-function missionText(m) {
+// yours: the text speaks to you; otherwise it describes someone else's mission.
+function missionText(m, yours = true) {
   if (!m) return '';
   if (m.type === 'regions') return `Erobr ${regionNames(m.regions)}${m.plusOne ? ', og ét kontinent mere efter eget valg' : ''}.`;
   if (m.type === 'territories') return m.armies > 1 ? `Hold ${m.count} områder med mindst ${m.armies} hære i hvert.` : `Hold ${m.count} områder på én gang.`;
-  return `Slå ${object(m.target)} ud. Gør en anden det før dig, skal du i stedet holde ${G.fallback(map).count} områder.`;
+  const instead = G.fallback(map).count;
+  if (!yours) return `Slå ${object(m.target)} ud. Når en anden det først, gælder i stedet: hold ${instead} områder.`;
+  return `Slå ${object(m.target)} ud. Gør en anden det før dig, skal du i stedet holde ${instead} områder.`;
 }
 
 function missionProgress(p) {

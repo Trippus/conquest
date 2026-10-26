@@ -66,7 +66,7 @@
         <p class="credits">Tak til: emblemer af Lorc, <a href="https://game-icons.net" target="_blank" rel="noopener">game-icons.net</a> (CC BY 3.0) ·
           papir fra <a href="https://ambientcg.com" target="_blank" rel="noopener">ambientCG</a> (CC0)</p>
       </details>
-      <button type="button" class="link" id="sound-btn"></button>
+      <button type="button" class="link" id="settings-btn">Indstillinger</button>
       <div class="publisher">
         <svg class="pub-logo" viewBox="-80 -106 160 172" aria-hidden="true">
           <g class="steam" fill="none" stroke="#E2725B" stroke-width="6" stroke-linecap="round">
@@ -116,6 +116,15 @@
         <button value="cancel" id="cancel-new">Tilbage</button>
         <button value="start" class="primary" id="start">Start</button>
       </div>
+    </form>
+  </dialog>
+
+  <dialog id="settings">
+    <form method="dialog">
+      <h2>Indstillinger</h2>
+      <div class="field"><span>Lyd</span><div class="pills" id="sound-pills"></div></div>
+      <div class="field"><span>Udseende</span><div class="pills" id="theme-pills"></div></div>
+      <div class="buttons"><button value="ok" class="primary">OK</button></div>
     </form>
   </dialog>
 

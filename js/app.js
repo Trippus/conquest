@@ -16,7 +16,7 @@ const KEY = 'conquest.v3';
 const DELAY = { normal: 650, fast: 140 };
 const SETTINGS = 'conquest.settings';
 // name and look are the one person's own name and coat of arms (colour and emblem number).
-const DEFAULTS = { opponents: 2, level: 'normal', mode: 'mission', humans: 1, speed: 'normal', sound: true, name: '', look: 0 };
+const DEFAULTS = { opponents: 2, level: 'normal', mode: 'mission', humans: 1, speed: 'normal', sound: true, theme: 'auto', name: '', look: 0 };
 const NAME_LENGTH = 14;
 // The computer opponents. Made-up commanders, so the table has someone to play against.
 const OPPONENTS = ['Grevinde Holm', 'Oberst Vind', 'Admiral Storm', 'Generalinde Ravn', 'Major Falk', 'Hertug Ulv'];
@@ -506,7 +506,7 @@ function renderSetup() {
       return b;
     }),
   );
-  document.querySelectorAll('.pills').forEach((box) => {
+  document.querySelectorAll('#new-game .pills').forEach((box) => {
     const name = box.dataset.name;
     box.replaceChildren(
       ...CHOICES[name]().map(([value, label]) => {
@@ -550,7 +550,7 @@ function openNewGame(change = false) {
 $('new-game').addEventListener('close', () => {
   if ($('new-game').returnValue !== 'start') return;
   draft.name = draft.name.trim().slice(0, NAME_LENGTH);
-  saveSettings({ ...draft, sound: Sound.enabled });
+  saveSettings({ ...loadSettings(), ...draft, sound: Sound.enabled });
   startFromSettings(draft);
 });
 
@@ -712,7 +712,6 @@ function showIntro() {
   $('intro-continue').hidden = !going;
   $('intro-new').classList.toggle('primary', !going);
   $('intro-summary').textContent = summary(loadSettings());
-  soundLabel();
   $('intro').hidden = false;
 }
 // The title is two lines that never wrap: shrink it when a line is wider than the card, which
@@ -732,18 +731,51 @@ function hideIntro() {
   $('intro').hidden = true;
   schedule();
 }
-function soundLabel() {
-  $('sound-btn').textContent = Sound.enabled ? 'Lyd: til' : 'Lyd: fra';
-}
 $('intro-continue').addEventListener('click', hideIntro);
 $('intro-new').addEventListener('click', () => startFromSettings());
 $('intro-change').addEventListener('click', () => openNewGame(true));
-$('sound-btn').addEventListener('click', () => {
-  Sound.enabled = !Sound.enabled;
-  saveSettings({ ...loadSettings(), sound: Sound.enabled });
-  soundLabel();
-  Sound.play('place');
+
+/* ---------- settings: sound and light or dark ---------- */
+
+// 'auto' follows the phone's own light or dark setting.
+function applyTheme(theme) {
+  if (theme === 'auto') delete document.documentElement.dataset.theme;
+  else document.documentElement.dataset.theme = theme;
+  document.querySelector('meta[name="color-scheme"]').content = theme === 'auto' ? 'light dark' : theme;
+}
+
+function pills(box, options, current, pick) {
+  box.replaceChildren(
+    ...options.map(([value, label]) => {
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.textContent = label;
+      b.setAttribute('aria-pressed', String(value === current));
+      b.addEventListener('click', () => pick(value));
+      return b;
+    }),
+  );
+}
+
+function renderSettings() {
+  const x = loadSettings();
+  pills($('sound-pills'), [[true, 'Til'], [false, 'Fra']], Sound.enabled, (on) => {
+    Sound.enabled = on;
+    saveSettings({ ...loadSettings(), sound: on });
+    if (on) Sound.play('place');
+    renderSettings();
+  });
+  pills($('theme-pills'), [['auto', 'Som telefonen'], ['light', 'Lys'], ['dark', 'Mørk']], x.theme, (theme) => {
+    saveSettings({ ...loadSettings(), theme });
+    applyTheme(theme);
+    renderSettings();
+  });
+}
+$('settings-btn').addEventListener('click', () => {
+  renderSettings();
+  $('settings').showModal();
 });
+applyTheme(loadSettings().theme);
 // Audio may only start from a tap.
 document.addEventListener('pointerdown', () => Sound.unlock(), { capture: true });
 Sound.enabled = loadSettings().sound !== false;

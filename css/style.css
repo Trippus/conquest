@@ -189,21 +189,24 @@ button.wide { width: 100%; }
 @keyframes steam { 50% { transform: translateY(-4px) scaleY(1.06); opacity: .75; } }
 
 /* ---------- dialogs ---------- */
+/* the same frame as the start screen: a border with a thin line inside it */
 dialog {
   border: 1px solid var(--line);
-  border-radius: 18px;
+  border-radius: 20px;
+  outline: 1px solid var(--line); outline-offset: -8px;
   background: var(--panel-solid);
   color: var(--ink);
   box-shadow: var(--shadow);
   width: min(420px, calc(100vw - 32px));
   max-height: calc(100dvh - 32px);
-  padding: 20px;
+  padding: 24px;
 }
 dialog::backdrop { background: rgb(40 25 10 / 0.45); }
 dialog h2 { font-family: var(--title); margin: 0 0 4px; color: var(--accent); }
 dialog .sub { color: var(--muted); margin: 0 0 12px; font-size: 15px; }
 /* the buttons stay in sight at the bottom when a dialog's content scrolls */
-.buttons { display: flex; gap: 8px; margin-top: 4px; position: sticky; bottom: -20px; margin-bottom: -20px; padding: 12px 0 20px; background: var(--panel-solid); }
+.buttons { display: flex; gap: 8px; margin-top: 4px; position: sticky; bottom: -24px; margin-bottom: -24px; padding: 12px 0 24px;
+  background: linear-gradient(var(--panel-solid) calc(100% - 12px), transparent 0); } /* leaves the inner line showing */
 .buttons button { flex: 1; }
 dialog .big { font-family: var(--title); font-size: 20px; margin: 8px 0; }
 
@@ -222,9 +225,9 @@ dialog .big { font-family: var(--title); font-size: 20px; margin: 8px 0; }
 .pills button[aria-pressed='true'] { background: var(--ink); color: var(--panel-solid); border-color: var(--ink); }
 #your-name { width: 100%; min-height: 44px; padding: 0 12px; font: inherit; font-size: 17px; color: var(--ink);
   background: var(--panel-solid); border: 1px solid var(--line); border-radius: 10px; box-sizing: border-box; }
-.looks { display: flex; flex-wrap: wrap; gap: 5px; }
-.looks button { width: 44px; height: 44px; padding: 0; border-radius: 50%; display: grid; place-items: center; }
-.looks .seal-icon { width: 36px; height: 36px; }
+.looks { display: flex; justify-content: space-between; gap: 4px; max-width: 300px; }
+.looks button { flex: 0 1 44px; aspect-ratio: 1; min-width: 0; padding: 0; border-radius: 50%; display: grid; place-items: center; }
+.looks .seal-icon { width: 82%; height: 82%; }
 .looks button[aria-pressed='true'] { border: 3px solid var(--ink); box-shadow: 0 0 0 2px var(--panel-solid) inset; }
 
 /* war luck */

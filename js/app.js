@@ -16,7 +16,7 @@ const KEY = 'conquest.v3';
 const DELAY = { normal: 650, fast: 140 };
 const SETTINGS = 'conquest.settings';
 // name and look are the one person's own name and coat of arms (colour and emblem number).
-const DEFAULTS = { opponents: 2, level: 'normal', mode: 'mission', humans: 1, speed: 'normal', sound: true, theme: 'auto', name: '', look: 0 };
+const DEFAULTS = { opponents: 2, level: 'normal', mode: 'mission', humans: 1, speed: 'normal', sound: true, theme: 'dark', name: '', look: 0 };
 const NAME_LENGTH = 14;
 // The computer opponents. Made-up commanders, so the table has someone to play against.
 const OPPONENTS = ['Grevinde Holm', 'Oberst Vind', 'Admiral Storm', 'Generalinde Ravn', 'Major Falk', 'Hertug Ulv'];
@@ -737,7 +737,7 @@ $('intro-change').addEventListener('click', () => openNewGame(true));
 
 /* ---------- settings: sound and light or dark ---------- */
 
-// 'auto' follows the phone's own light or dark setting.
+// Dark is the game's own look; 'auto' follows the phone's light or dark setting.
 function applyTheme(theme) {
   if (theme === 'auto') delete document.documentElement.dataset.theme;
   else document.documentElement.dataset.theme = theme;

@@ -740,7 +740,6 @@ function soundLabel() {
 $('intro-continue').addEventListener('click', hideIntro);
 $('intro-new').addEventListener('click', () => startFromSettings());
 $('intro-change').addEventListener('click', () => openNewGame(true));
-$('intro-rules-btn').addEventListener('click', () => ($('intro-rules').hidden = !$('intro-rules').hidden));
 $('sound-btn').addEventListener('click', () => {
   Sound.enabled = !Sound.enabled;
   saveSettings({ ...loadSettings(), sound: Sound.enabled });

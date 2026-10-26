@@ -53,9 +53,9 @@
         <button type="button" class="primary wide" id="intro-continue" hidden>Fortsæt spillet</button>
         <button type="button" class="wide" id="intro-new">Nyt spil</button>
         <p class="intro-setup"><span id="intro-summary"></span> · <button type="button" class="link" id="intro-change">Skift</button></p>
-        <button type="button" class="link" id="intro-rules-btn">Sådan spiller du</button>
       </div>
-      <div class="intro-rules" id="intro-rules" hidden>
+      <details class="fold intro-rules" id="intro-rules">
+        <summary>Sådan spiller du</summary>
         <ul>
           <li><b>Forstærk:</b> du får nye hære hver tur, flere jo flere områder og hele kontinenter du har. Tryk på dine områder for at sætte dem ud.</li>
           <li><b>Angrib:</b> vælg et af dine områder og en nabo. Terningerne afgør det, og den største hær har oftest held med sig.</li>
@@ -63,7 +63,7 @@
           <li><b>Krigslykke:</b> erobr mindst ét område i din tur, så får du en ★. Indløs stjernerne til ekstra hære, når du vil. Jo flere du sparer op, jo flere hære.</li>
           <li><b>Sejr:</b> klar din hemmelige mission, eller erobr hele verden.</li>
         </ul>
-      </div>
+      </details>
       <button type="button" class="link" id="sound-btn"></button>
       <div class="publisher">
         <svg class="pub-logo" viewBox="-80 -106 160 172" aria-hidden="true">
@@ -97,7 +97,7 @@
     <form method="dialog">
       <h2>Nyt spil</h2>
       <p id="setup-summary" class="summary"></p>
-      <details id="setup-details">
+      <details class="fold" id="setup-details">
         <summary>Skift opsætning</summary>
         <div id="you-fields">
           <label class="field"><span>Dit navn</span><input id="your-name" type="text" autocomplete="nickname"

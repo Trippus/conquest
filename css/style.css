@@ -157,14 +157,15 @@ button.wide { width: 100%; }
 #toast { top: calc(max(8px, env(safe-area-inset-top)) + 96px); max-width: min(420px, calc(100% - 32px)); padding: 8px 14px; font-size: 15px; }
 
 /* ---------- start screen ---------- */
+/* flex and margin: auto rather than grid centring, so a tall card scrolls from its top */
 #intro {
-  position: fixed; inset: 0; display: grid; place-items: center; padding: 20px var(--gap);
+  position: fixed; inset: 0; display: flex; padding: 20px var(--gap);
   background: radial-gradient(ellipse at center, rgb(234 217 181 / 0.55), rgb(120 90 55 / 0.55));
   backdrop-filter: blur(2px); -webkit-backdrop-filter: blur(2px);
   overflow-y: auto;
 }
 .intro-card {
-  width: min(420px, 100%); text-align: center;
+  margin: auto; width: min(420px, 100%); text-align: center;
   background: var(--panel); box-shadow: var(--shadow);
   border: 1px solid var(--line); border-radius: 20px; padding: 28px 24px 20px;
   outline: 1px solid var(--line); outline-offset: -8px;
@@ -173,9 +174,10 @@ button.wide { width: 100%; }
 #intro h1 span { display: block; white-space: nowrap; }
 .intro-sub { margin: 0 0 20px; color: var(--muted); }
 .intro-buttons { display: flex; flex-direction: column; gap: 10px; align-items: center; }
-.intro-setup { margin: 0; font-size: 15px; color: var(--muted); }
-.intro-setup .link { min-height: 32px; font-size: 15px; }
-.intro-rules { text-align: left; font-size: 15px; margin-top: 8px; }
+.intro-setup { margin: 0; font-size: 15px; line-height: 1.45; color: var(--muted); }
+.intro-setup .link { min-height: 0; padding: 0 4px; font-size: 15px; line-height: inherit; vertical-align: baseline; }
+.intro-rules { text-align: left; font-size: 15px; margin-top: 4px; }
+.intro-rules summary { justify-content: center; color: var(--ink); }
 .intro-rules ul { margin: 0; padding-left: 18px; }
 .intro-rules li { margin: 6px 0; }
 #sound-btn { margin-top: 8px; font-size: 15px; }
@@ -200,17 +202,19 @@ dialog {
 dialog::backdrop { background: rgb(40 25 10 / 0.45); }
 dialog h2 { font-family: var(--title); margin: 0 0 4px; color: var(--accent); }
 dialog .sub { color: var(--muted); margin: 0 0 12px; font-size: 15px; }
-.buttons { display: flex; gap: 8px; margin-top: 16px; }
+/* the buttons stay in sight at the bottom when a dialog's content scrolls */
+.buttons { display: flex; gap: 8px; margin-top: 4px; position: sticky; bottom: -20px; margin-bottom: -20px; padding: 12px 0 20px; background: var(--panel-solid); }
 .buttons button { flex: 1; }
 dialog .big { font-family: var(--title); font-size: 20px; margin: 8px 0; }
 
 
 /* new game: summary, then pills to change it */
 .summary { font-size: 18px; margin: 4px 0 12px; }
-#setup-details summary { cursor: pointer; color: var(--muted); margin: 4px 0 8px; min-height: 32px; display: flex; align-items: center; }
-#setup-details summary::before { content: '▸'; display: inline-block; width: 1.2em; transition: transform .15s; }
-#setup-details[open] summary::before { transform: rotate(90deg); }
-#setup-details summary::-webkit-details-marker { display: none; }
+/* a fold-out: a chevron that turns down when open */
+.fold summary { cursor: pointer; list-style: none; color: var(--muted); margin: 4px 0 8px; min-height: 40px; display: flex; align-items: center; gap: .6em; }
+.fold summary::-webkit-details-marker { display: none; }
+.fold summary::before { content: ''; width: .45em; height: .45em; border: solid currentColor; border-width: 0 2px 2px 0; transform: rotate(-45deg); transition: transform .15s; }
+.fold[open] summary::before { transform: translateY(-.15em) rotate(45deg); }
 .field { margin: 10px 0; }
 .field > span { display: block; font-size: 14px; color: var(--muted); margin-bottom: 4px; }
 .pills { display: flex; flex-wrap: wrap; gap: 6px; }

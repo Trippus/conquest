@@ -557,8 +557,6 @@ $('new-game').addEventListener('close', () => {
 
 function openGameOver() {
   const w = s.players[s.winner];
-  const you = game.seats[s.winner] === 'human';
-  $('over-title').textContent = you ? 'Tillykke!' : 'Spillet er slut';
   const how = {
     world: `${subject(s.winner)} har erobret hele kortet i runde ${s.round}.`,
     mission: `${subject(s.winner)} klarede ${soloYou(s.winner) ? 'din' : 'sin'} mission i runde ${s.round}:<br><i>${missionText(w.mission, soloYou(s.winner))}</i>`,

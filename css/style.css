@@ -240,7 +240,7 @@ dialog .big { font-family: var(--title); font-size: 20px; margin: 8px 0; }
 }
 
 /* the standings at the end of a game, under the winner */
-.ruler { display: flex; flex-direction: column; align-items: center; text-align: center; margin: 6px 0 12px; }
+.ruler { display: flex; flex-direction: column; align-items: center; text-align: center; margin: 4px 0 12px; }
 .ruler .seal-icon { width: 96px; height: 96px; filter: drop-shadow(0 3px 4px rgb(60 40 20 / 0.35)); }
 .ruler b { font: 700 28px var(--title); margin-top: 8px; overflow-wrap: anywhere; }
 .ruler span { font: italic 18px var(--title); color: var(--accent); letter-spacing: .04em; }

@@ -99,16 +99,22 @@
       <p id="setup-summary" class="summary"></p>
       <details class="fold" id="setup-details">
         <summary>Skift opsætning</summary>
-        <div id="you-fields">
-          <label class="field"><span>Dit navn</span><input id="your-name" type="text" autocomplete="nickname"
-              enterkeyhint="done" placeholder="Dig" spellcheck="false"></label>
-          <div class="field"><span>Dit våbenskjold</span><div class="looks" id="your-look"></div></div>
-        </div>
-        <div class="field"><span>Modstandere</span><div class="pills" data-name="opponents"></div></div>
-        <div class="field"><span>Sværhedsgrad</span><div class="pills" data-name="level"></div></div>
-        <div class="field"><span>Sejr</span><div class="pills" data-name="mode"></div></div>
-        <div class="field"><span>Spillere på denne telefon</span><div class="pills" data-name="humans"></div></div>
-        <div class="field"><span>Modstandernes tempo</span><div class="pills" data-name="speed"></div></div>
+        <section class="group">
+          <h3>Deltagere</h3>
+          <div class="field"><span>Spillere på denne enhed</span>
+            <ol class="people" id="people"></ol>
+            <button type="button" class="link add-person" id="add-person">+ Tilføj spiller</button>
+          </div>
+          <div class="field"><span>Computerspillere</span><div class="pills" data-name="opponents"></div></div>
+          <div id="bot-fields">
+            <div class="field"><span>Computerens sværhedsgrad</span><div class="pills" data-name="level"></div></div>
+            <div class="field"><span>Computerens tempo</span><div class="pills" data-name="speed"></div></div>
+          </div>
+        </section>
+        <section class="group">
+          <h3>Spillet</h3>
+          <div class="field"><span>Sejr</span><div class="pills" data-name="mode"></div></div>
+        </section>
         <p class="sub">Turrækkefølgen trækkes ved start, og starthærene er justeret, så alle pladser har lige
           gode chancer.</p>
       </details>

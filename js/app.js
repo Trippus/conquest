@@ -15,8 +15,9 @@ import { Sound } from './audio.js';
 const KEY = 'conquest.v3';
 const DELAY = { normal: 650, fast: 140 };
 const SETTINGS = 'conquest.settings';
-// name and look are the one person's own name and coat of arms (colour and emblem number).
-const DEFAULTS = { opponents: 2, level: 'medium', mode: 'mission', humans: 1, speed: 'normal', sound: true, theme: 'dark', name: '', look: 0 };
+// people: the players at this device, each with a name (empty: a default) and a coat of arms
+// (colour and emblem number); opponents: how many computer players.
+const DEFAULTS = { people: [{ name: '', look: 0 }], opponents: 2, level: 'medium', mode: 'mission', speed: 'normal', sound: true, theme: 'dark' };
 const NAME_LENGTH = 14;
 // The computer opponents. Made-up commanders, so the table has someone to play against.
 const OPPONENTS = ['Grevinde Holm', 'Oberst Vind', 'Admiral Storm', 'Generalinde Ravn', 'Major Falk', 'Hertug Ulv'];
@@ -54,19 +55,27 @@ const soloYou = (p) => game.seats[p] === 'human' && game.seats.filter((x) => x =
 const subject = (p) => (soloYou(p) ? 'Du' : s.players[p].name);
 const object = (p) => (soloYou(p) ? 'dig' : s.players[p].name);
 
-const yourName = (x) => x.name.trim() || 'Dig';
+const personName = (x, i) => x.people[i].name.trim() || (x.people.length === 1 ? 'Dig' : `Spiller ${i + 1}`);
 
 // The levels had other names before there were three: 'bot' and 'easy' are today's medium,
 // 'normal' is today's hard.
 const OLD_LEVELS = { bot: 'medium', easy: 'medium', normal: 'hard' };
 const level = (seat) => OLD_LEVELS[seat] ?? seat;
 
+// Settings saved before every player had a name and a coat of arms said how many people played,
+// and the name and coat of arms of the one person.
+function oldPeople(x) {
+  if (x.humans > 1) return Array.from({ length: x.humans }, (_, i) => ({ name: '', look: i }));
+  return [{ name: x.name ?? '', look: x.look ?? 0 }];
+}
+
 function loadSettings() {
   try {
-    const x = { ...DEFAULTS, ...JSON.parse(localStorage.getItem(SETTINGS)) };
-    return { ...x, level: level(x.level) };
+    const saved = JSON.parse(localStorage.getItem(SETTINGS)) ?? {};
+    const { humans, name, look, ...x } = { ...DEFAULTS, ...saved };
+    return { ...x, people: saved.people ?? oldPeople(saved), level: level(x.level) };
   } catch {
-    return { ...DEFAULTS };
+    return structuredClone(DEFAULTS); // a copy: the setup dialog changes the people in place
   }
 }
 function saveSettings(settings) {
@@ -77,14 +86,8 @@ function saveSettings(settings) {
 
 // A new game from the settings: who plays, then the turn order is drawn.
 function startFromSettings(settings = loadSettings()) {
-  const solo = settings.humans === 1;
-  const looks = solo ? [settings.look] : Array.from({ length: settings.humans }, (_, i) => i);
-  const people = looks.map((color, i) => ({
-    kind: 'human',
-    name: solo ? yourName(settings) : `Spiller ${i + 1}`,
-    color,
-  }));
-  const free = COLORS.map((_, i) => i).filter((i) => !looks.includes(i));
+  const people = settings.people.map((x, i) => ({ kind: 'human', name: personName(settings, i), color: x.look }));
+  const free = COLORS.map((_, i) => i).filter((i) => !settings.people.some((x) => x.look === i));
   const names = [...OPPONENTS].sort(() => Math.random() - 0.5);
   const bots = Array.from({ length: settings.opponents }, (_, i) => ({ kind: settings.level, name: names[i], color: free[i] }));
   startGame([...people, ...bots].sort(() => Math.random() - 0.5), settings.speed, settings.mode);
@@ -475,41 +478,110 @@ function showDice(rolls, conquest, out) {
 // The new game dialog: a summary of the last setup and Start. The choices sit folded away under
 // "Skift opsætning", since most of the time you just want another game like the last one.
 let draft = loadSettings();
+let lookOpen = 0; // whose coat-of-arms picker is open (-1: none)
+const MAX_PLAYERS = 6;
+// The table holds 2 to 6 players; one person alone needs at least one computer player.
+const fewestBots = () => (draft.people.length > 1 ? 0 : 1);
+const fitBots = () => (draft.opponents = Math.max(fewestBots(), Math.min(MAX_PLAYERS - draft.people.length, draft.opponents)));
 const CHOICES = {
-  opponents: () => {
-    const least = draft.humans > 1 ? 0 : 1;
-    return Array.from({ length: 6 - draft.humans - least + 1 }, (_, i) => [least + i, String(least + i)]);
-  },
+  opponents: () =>
+    Array.from({ length: MAX_PLAYERS - draft.people.length - fewestBots() + 1 }, (_, i) => [fewestBots() + i, String(fewestBots() + i)]),
   level: () => [['novice', 'Let'], ['medium', 'Normal'], ['hard', 'Svær']],
   mode: () => [['mission', 'Hemmelig mission'], ['world', 'Hele verden']],
-  humans: () => [[1, 'Kun mig'], [2, '2'], [3, '3']],
   speed: () => [['normal', 'Roligt'], ['fast', 'Hurtigt']],
 };
 
+const andList = (list) => (list.length > 1 ? `${list.slice(0, -1).join(', ')} og ${list.at(-1)}` : list[0]);
+
 function summary(x) {
-  const them = x.opponents ? `${x.opponents} ${x.opponents === 1 ? 'modstander' : 'modstandere'} (${{ novice: 'lette', medium: 'normale', hard: 'svære' }[x.level]})` : '';
-  const who = x.humans === 1 ? `${yourName(x)} mod ${them}` : `${x.humans} spillere på denne telefon${them ? ` mod ${them}` : ''}`;
-  return `${who} · ${x.mode === 'mission' ? 'hemmelig mission' : 'erobr hele verden'}`;
+  const names = andList(x.people.map((_, i) => personName(x, i)));
+  const bots = `${x.opponents} ${x.opponents === 1 ? 'computerspiller' : 'computerspillere'} (${{ novice: 'lette', medium: 'normale', hard: 'svære' }[x.level]})`;
+  return `${x.opponents ? `${names} mod ${bots}` : `${names} mod hinanden`} · ${x.mode === 'mission' ? 'hemmelig mission' : 'erobr hele verden'}`;
 }
+
+// One row per person: their coat of arms (tap to change it), their name, and × to remove them.
+// The picker under a row shows the coats of arms; those someone else has are greyed out.
+function renderPeople() {
+  const rows = draft.people.flatMap((person, i) => {
+    const li = document.createElement('li');
+    li.className = 'person';
+    const look = document.createElement('button');
+    look.type = 'button';
+    look.className = 'person-look';
+    look.innerHTML = sealIcon(person.look);
+    look.setAttribute('aria-label', 'Skift våbenskjold');
+    look.setAttribute('aria-expanded', String(lookOpen === i));
+    look.addEventListener('click', () => {
+      lookOpen = lookOpen === i ? -1 : i;
+      renderSetup();
+    });
+    const input = document.createElement('input');
+    Object.assign(input, { type: 'text', value: person.name, maxLength: NAME_LENGTH, spellcheck: false, enterKeyHint: 'done' });
+    input.placeholder = draft.people.length === 1 ? 'Dig' : `Spiller ${i + 1}`;
+    input.setAttribute('aria-label', `Navn på spiller ${i + 1}`);
+    input.addEventListener('input', () => {
+      person.name = input.value;
+      $('setup-summary').textContent = summary(draft);
+    });
+    // Enter closes the keyboard instead of pressing the dialog's first button (Tilbage).
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        input.blur();
+      }
+    });
+    li.append(look, input);
+    if (draft.people.length > 1) {
+      const remove = document.createElement('button');
+      remove.type = 'button';
+      remove.className = 'person-remove';
+      remove.textContent = '×';
+      remove.setAttribute('aria-label', `Fjern ${personName(draft, i)}`);
+      remove.addEventListener('click', () => {
+        draft.people.splice(i, 1);
+        lookOpen = -1;
+        fitBots();
+        renderSetup();
+      });
+      li.append(remove);
+    }
+    if (lookOpen !== i) return [li];
+    const picker = document.createElement('li');
+    picker.className = 'looks';
+    picker.append(
+      ...COLORS.map((_, k) => {
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.innerHTML = sealIcon(k);
+        b.setAttribute('aria-label', `Våbenskjold ${k + 1}`);
+        b.setAttribute('aria-pressed', String(person.look === k));
+        b.disabled = draft.people.some((other) => other !== person && other.look === k);
+        b.addEventListener('click', () => {
+          person.look = k;
+          lookOpen = -1;
+          renderSetup();
+        });
+        return b;
+      }),
+    );
+    return [li, picker];
+  });
+  $('people').replaceChildren(...rows);
+  $('add-person').hidden = draft.people.length >= MAX_PLAYERS;
+}
+
+$('add-person').addEventListener('click', () => {
+  draft.people.push({ name: '', look: COLORS.findIndex((_, k) => !draft.people.some((x) => x.look === k)) });
+  lookOpen = -1;
+  fitBots();
+  renderSetup();
+  [...$('people').querySelectorAll('input')].at(-1).focus();
+});
 
 function renderSetup() {
   $('setup-summary').textContent = summary(draft);
-  $('you-fields').hidden = draft.humans !== 1;
-  if (document.activeElement !== $('your-name')) $('your-name').value = draft.name;
-  $('your-look').replaceChildren(
-    ...COLORS.map((_, i) => {
-      const b = document.createElement('button');
-      b.type = 'button';
-      b.innerHTML = sealIcon(i);
-      b.setAttribute('aria-label', `Våbenskjold ${i + 1}`);
-      b.setAttribute('aria-pressed', String(draft.look === i));
-      b.addEventListener('click', () => {
-        draft.look = i;
-        renderSetup();
-      });
-      return b;
-    }),
-  );
+  renderPeople();
+  $('bot-fields').hidden = !draft.opponents;
   document.querySelectorAll('#new-game .pills').forEach((box) => {
     const name = box.dataset.name;
     box.replaceChildren(
@@ -520,8 +592,7 @@ function renderSetup() {
         b.setAttribute('aria-pressed', String(draft[name] === value));
         b.addEventListener('click', () => {
           draft[name] = value;
-          // Keep the table between 2 and 6 players.
-          draft.opponents = Math.max(draft.humans > 1 ? 0 : 1, Math.min(6 - draft.humans, draft.opponents));
+          fitBots();
           renderSetup();
         });
         return b;
@@ -530,21 +601,9 @@ function renderSetup() {
   });
 }
 
-$('your-name').maxLength = NAME_LENGTH;
-$('your-name').addEventListener('input', () => {
-  draft.name = $('your-name').value;
-  $('setup-summary').textContent = summary(draft);
-});
-// Enter closes the keyboard instead of pressing the dialog's first button (Tilbage).
-$('your-name').addEventListener('keydown', (e) => {
-  if (e.key === 'Enter') {
-    e.preventDefault();
-    $('your-name').blur();
-  }
-});
-
 function openNewGame(change = false) {
   draft = loadSettings();
+  lookOpen = draft.people.length === 1 ? 0 : -1;
   renderSetup();
   $('setup-details').open = change;
   $('cancel-new').hidden = false;
@@ -553,7 +612,7 @@ function openNewGame(change = false) {
 
 $('new-game').addEventListener('close', () => {
   if ($('new-game').returnValue !== 'start') return;
-  draft.name = draft.name.trim().slice(0, NAME_LENGTH);
+  draft.people.forEach((x) => (x.name = x.name.trim().slice(0, NAME_LENGTH)));
   saveSettings({ ...loadSettings(), ...draft, sound: Sound.enabled });
   startFromSettings(draft);
 });

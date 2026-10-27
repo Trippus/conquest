@@ -129,7 +129,8 @@ button.wide { width: 100%; }
   background: var(--panel); box-shadow: var(--shadow);
   border: 1px solid var(--line); border-radius: 18px;
 }
-.bar-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 32px; }
+/* On a narrow phone the mission and war-luck buttons move down under the round and phase. */
+.bar-top { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 6px 8px; min-height: 32px; }
 #phase { margin: 0; font: italic 15px var(--title); color: var(--accent); letter-spacing: 0.02em; white-space: nowrap; }
 #hint { margin: 4px 0 10px; }
 #actions { display: flex; flex-wrap: wrap; gap: 8px; }
@@ -137,7 +138,7 @@ button.wide { width: 100%; }
 #stepper { display: flex; align-items: center; justify-content: center; gap: 12px; margin-bottom: 8px; }
 #stepper button { min-width: 56px; font-size: 24px; }
 #amount { min-width: 2.5em; text-align: center; font: 700 26px var(--title); }
-#hand-buttons { display: flex; gap: 6px; }
+#hand-buttons { display: flex; gap: 6px; margin-left: auto; }
 #hand-buttons button { white-space: nowrap; min-height: 34px; padding: 0 12px; font-size: 14px; border-radius: 999px; }
 #luck-btn.ready { background: var(--primary); color: var(--primary-ink); border-color: transparent; font-weight: 700; animation: glow 1.6s ease-in-out infinite alternate; }
 @keyframes glow { to { box-shadow: 0 0 0 4px rgb(255 210 90 / 0.45); } }

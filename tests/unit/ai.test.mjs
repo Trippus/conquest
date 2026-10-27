@@ -31,24 +31,24 @@ test('bots of every level finish games with 2–6 players', () => {
 
 test('mixed bots finish games on the large map', () => {
   for (let seed = 1; seed <= 5; seed++) {
-    const { state } = playBots(large, MODERN, { players: names.slice(0, 4), seed }, ['normal', 'easy', 'normal', 'easy']);
+    const { state } = playBots(large, MODERN, { players: names.slice(0, 4), seed }, ['hard', 'medium', 'novice', 'medium']);
     assert.equal(state.phase, 'over');
   }
 });
 
-// The games are seeded, so this is the same 300 games every time. The normal bot wins about 1.3
+// The games are seeded, so this is the same 300 games every time. The hard bot wins about 1.3
 // times its fair share; the test only asks for clearly more than fair.
-test('the normal bot beats easy bots more often than its fair share', () => {
+test('the hard bot beats medium bots more often than its fair share', () => {
   let wins = 0;
   const games = 300;
   for (let g = 0; g < games; g++) {
     const seat = g % 3;
-    const levels = ['easy', 'easy', 'easy'];
-    levels[seat] = 'normal';
+    const levels = ['medium', 'medium', 'medium'];
+    levels[seat] = 'hard';
     const { state } = playBots(large, { ...MODERN, maxRounds: 150 }, { players: names.slice(0, 3), seed: 900 + g }, levels);
     if (state.winner === seat) wins++;
   }
-  assert.ok(wins / games > 0.4, `normal won ${wins} of ${games} (fair share is a third)`);
+  assert.ok(wins / games > 0.4, `hard won ${wins} of ${games} (fair share is a third)`);
 });
 
 test('a game replays exactly from its setup and actions', () => {

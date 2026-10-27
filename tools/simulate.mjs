@@ -2,8 +2,8 @@
 // endings. Used for balance (a seat or region that wins far too often shows up here) and to check
 // that a stronger bot really is stronger.
 //
-// Run: npm run sim -- [games=200] [bots=easy,easy,easy,easy] [map=test|large|world] [mode=world|mission]
-//   npm run sim -- 400 normal,easy,easy,easy large   one normal bot against three easy ones, 30 territories
+// Run: npm run sim -- [games=200] [bots=medium,medium,medium,medium] [map=test|large|world] [mode=world|mission]
+//   npm run sim -- 400 hard,medium,medium,medium large   one hard bot against three medium ones, 30 territories
 // The bots move one seat on each game, so no bot always gets the first move.
 import * as G from '../js/engine.js';
 import { playBots, LEVELS } from '../js/ai.js';
@@ -13,7 +13,7 @@ import { WORLD } from '../js/maps/world.js';
 import { MODERN } from '../js/rules/modern.js';
 
 const games = +(process.argv[2] ?? 200);
-const bots = (process.argv[3] ?? 'easy,easy,easy,easy').split(',');
+const bots = (process.argv[3] ?? 'medium,medium,medium,medium').split(',');
 if (bots.length < 2 || bots.some((b) => !LEVELS.includes(b))) {
   console.error(`bots: 2–6 of ${LEVELS.join(', ')}, separated by commas`);
   process.exit(1);

@@ -1,18 +1,21 @@
 // Computer players. botAction() picks the next action for whoever's turn it is. Bots roll no dice
 // of their own, so a bot game is an ordinary list of actions and replays like any other game.
 //
-// Two levels:
-// - easy: greedy and short-sighted. Stacks all new armies on the front territory facing the best
+// Three levels (in the game: Let, Normal, Svær):
+// - novice: gentle. Spreads its new armies, attacks only with a clear lead, takes at most one
+//   territory a turn and goes for the leader rather than whoever is weakest, so a player who falls
+//   behind can come back. Never moves armies at the end of its turn.
+// - medium: greedy and short-sighted. Stacks all new armies on the front territory facing the best
 //   target, attacks while it clearly outnumbers a neighbour, and moves its largest stack from behind
 //   the lines to the most threatened front.
-// - normal: picks a region to take and builds up next to it, guards the regions it holds, attacks
+// - hard: picks a region to take and builds up next to it, guards the regions it holds, attacks
 //   when the exact odds are good and the prize is worth it (finishing a region, breaking someone
 //   else's, knocking a player out for their cards, the turn's card), and spreads armies by threat.
 
 import * as G from './engine.js';
 import { winChance } from './odds.js';
 
-export const LEVELS = ['easy', 'normal'];
+export const LEVELS = ['novice', 'medium', 'hard'];
 
 const enemies = (map, s, t) => G.attackTargets(map, s, t);
 // How much of a region player p holds (0–1).
@@ -21,9 +24,9 @@ const regionOf = (map, t) => map.territories[t].region;
 // Enemy armies that could attack t (each enemy territory keeps one army at home).
 const pressure = (map, s, t) => enemies(map, s, t).reduce((n, e) => n + s.armies[e] - 1, 0);
 
-export function botAction(map, rules, s, level = 'easy') {
+export function botAction(map, rules, s, level = 'medium') {
   const p = s.current;
-  const bot = BOTS[level] ?? BOTS.easy;
+  const bot = BOTS[level] ?? BOTS.medium;
   if (s.phase === 'reinforce') return bot.reinforce(map, rules, s, p);
   if (s.phase === 'attack') return bot.attack(map, rules, s, p);
   if (s.phase === 'occupy') return bot.occupy(map, s);
@@ -31,9 +34,57 @@ export function botAction(map, rules, s, level = 'easy') {
   return null;
 }
 
-/* ---------- easy ---------- */
+/* ---------- novice ---------- */
 
-const EASY = {
+// Who holds the most territories.
+const leader = (s) => s.players.reduce((best, _, p) => (G.owned(s, p).length > G.owned(s, best).length ? p : best), 0);
+
+const NOVICE = {
+  reinforce(map, rules, s, p) {
+    if (s.players[p].stars && rules.luck !== 'cards') return { type: 'luck' };
+    const set = G.findSet(map, s.players[p].cards);
+    if (set) return { type: 'trade', cards: set };
+    if (!s.reserve) return { type: 'end' };
+    // One army at a time, by turns where it can attack and on its weakest front, so it never
+    // builds one big stack.
+    if (s.reserve % 2) return { type: 'place', t: MEDIUM.reinforce(map, rules, s, p).t, n: 1 };
+    const front = G.owned(s, p).filter((t) => enemies(map, s, t).length);
+    return { type: 'place', t: front.reduce((a, b) => (s.armies[b] < s.armies[a] ? b : a)), n: 1 };
+  },
+
+  // Only clear wins, and after the turn's first conquest only very clear ones. It goes for the
+  // leader rather than whoever is weakest, so a player who falls behind can come back.
+  attack(map, rules, s, p) {
+    const lead = leader(s);
+    const need = s.conquered ? NOVICE_TUNING.marginAfter : NOVICE_TUNING.margin;
+    let best = null;
+    let bestScore = -Infinity;
+    for (const t of G.owned(s, p)) {
+      if (s.armies[t] < 4) continue;
+      for (const e of enemies(map, s, t)) {
+        const margin = s.armies[t] - s.armies[e];
+        if (margin < need) continue;
+        const score = margin + (s.owner[e] === lead ? NOVICE_TUNING.leaderBonus : 0);
+        if (score > bestScore) (bestScore = score), (best = { type: 'blitz', from: t, to: e });
+      }
+    }
+    return best ?? { type: 'end' };
+  },
+
+  occupy: (map, s) => MEDIUM.occupy(map, s),
+  fortify: () => ({ type: 'end' }), // never moves armies at the end of its turn
+};
+// Chosen by bot games on the world map with missions (400 games each, seats rotated): a hard bot
+// wins 53% against three novices and 85% against two, against 29% and 40% with medium bots.
+export const NOVICE_TUNING = {
+  margin: 4, // attack only with this many more armies than the defender
+  marginAfter: 99, // the same after the turn's first conquest: in practice one territory a turn
+  leaderBonus: 2, // how much more it likes attacking whoever holds the most territories
+};
+
+/* ---------- medium ---------- */
+
+const MEDIUM = {
   reinforce(map, rules, s, p) {
     if (s.players[p].stars && rules.luck !== 'cards') return { type: 'luck' };
     const set = G.findSet(map, s.players[p].cards);
@@ -92,7 +143,7 @@ const EASY = {
   },
 };
 
-/* ---------- normal ---------- */
+/* ---------- hard ---------- */
 
 // The region worth going for: a good bonus for little fighting, and somewhere to attack it from.
 // A region the bot's mission asks for counts three times as much (with "one more of your choice",
@@ -128,9 +179,9 @@ function guardNeeds(map, s, p) {
   return needs.sort((a, b) => b.short - a.short);
 }
 
-// Weights for the normal bot, kept together so experiments can change them. Chosen by bot games
-// against easy bots on the large test map (1500 games per setting, seats rotated): with these the
-// normal bot wins 1.27–1.43 times its fair share with 2–6 players. A lost stack costs a lot,
+// Weights for the hard bot, kept together so experiments can change them. Chosen by bot games
+// against medium bots on the large test map (1500 games per setting, seats rotated): with these the
+// hard bot wins 1.27–1.43 times its fair share with 2–6 players. A lost stack costs a lot,
 // because in games with more players a third player profits from every failed attack.
 export const TUNING = {
   minChance: 0.45, // never blitz with worse odds than this
@@ -158,7 +209,7 @@ function prize(map, s, p, e, target) {
   return value;
 }
 
-const NORMAL = {
+const HARD = {
   reinforce(map, rules, s, p) {
     const stars = s.players[p].stars;
     if (stars && rules.luck !== 'cards' && (stars >= G.STARS || G.owned(s, p).length <= 6)) return { type: 'luck' };
@@ -233,9 +284,9 @@ const NORMAL = {
 };
 
 // By level. Exported so experiments can mix the parts of different bots.
-export const BOTS = { easy: EASY, normal: NORMAL };
+export const BOTS = { novice: NOVICE, medium: MEDIUM, hard: HARD };
 
-// Plays a game with bots in every seat (levels: one per seat, default easy). Returns the final
+// Plays a game with bots in every seat (levels: one per seat, default medium). Returns the final
 // state and the actions, which replay() turns back into the same game.
 export function playBots(map, rules, setup, levels = [], maxActions = 20000) {
   let s = G.newGame(map, rules, setup);

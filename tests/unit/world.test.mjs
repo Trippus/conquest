@@ -44,7 +44,7 @@ test('shapes: one outline per territory, plus coast, borders and sea routes', ()
 test('normal bots finish games on the world map', () => {
   const map = G.prepareMap(W.WORLD);
   for (let seed = 1; seed <= 3; seed++) {
-    const { state } = playBots(map, MODERN, { players: ['A', 'B', 'C', 'D'], seed }, Array(4).fill('normal'));
+    const { state } = playBots(map, MODERN, { players: ['A', 'B', 'C', 'D'], seed }, Array(4).fill('hard'));
     assert.equal(state.phase, 'over');
   }
 });
@@ -54,7 +54,7 @@ test('the world map\'s region missions name real regions, and mission games end'
   assert.equal(map.missions.length, W.MISSIONS.length);
   for (const m of map.missions) assert.ok(m.regions.every((r) => r >= 0 && r < map.regions.length));
   for (let seed = 1; seed <= 3; seed++) {
-    const { state } = playBots(map, MODERN, { players: ['A', 'B', 'C'], seed, mode: 'mission' }, Array(3).fill('normal'));
+    const { state } = playBots(map, MODERN, { players: ['A', 'B', 'C'], seed, mode: 'mission' }, Array(3).fill('hard'));
     assert.equal(state.phase, 'over');
   }
 });

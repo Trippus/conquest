@@ -16,7 +16,7 @@ const KEY = 'conquest.v3';
 const DELAY = { normal: 650, fast: 140 };
 const SETTINGS = 'conquest.settings';
 // name and look are the one person's own name and coat of arms (colour and emblem number).
-const DEFAULTS = { opponents: 2, level: 'normal', mode: 'mission', humans: 1, speed: 'normal', sound: true, theme: 'dark', name: '', look: 0 };
+const DEFAULTS = { opponents: 2, level: 'medium', mode: 'mission', humans: 1, speed: 'normal', sound: true, theme: 'dark', name: '', look: 0 };
 const NAME_LENGTH = 14;
 // The computer opponents. Made-up commanders, so the table has someone to play against.
 const OPPONENTS = ['Grevinde Holm', 'Oberst Vind', 'Admiral Storm', 'Generalinde Ravn', 'Major Falk', 'Hertug Ulv'];
@@ -30,7 +30,7 @@ const board = createBoard($('board'), WORLD, map, {
   insets: () => ({ top: $('hud').getBoundingClientRect().bottom, bottom: innerHeight - $('bar').getBoundingClientRect().top }),
 });
 
-let game = null; // { setup, seats: ['human' | 'easy' | 'normal'], colors, speed, actions }
+let game = null; // { setup, seats: ['human' | 'novice' | 'medium' | 'hard'], colors, speed, actions }
 let s = null; // the current state
 let sel = { from: -1, to: -1, n: 0 }; // what the player has tapped
 let botTimer = 0;
@@ -56,9 +56,15 @@ const object = (p) => (soloYou(p) ? 'dig' : s.players[p].name);
 
 const yourName = (x) => x.name.trim() || 'Dig';
 
+// The levels had other names before there were three: 'bot' and 'easy' are today's medium,
+// 'normal' is today's hard.
+const OLD_LEVELS = { bot: 'medium', easy: 'medium', normal: 'hard' };
+const level = (seat) => OLD_LEVELS[seat] ?? seat;
+
 function loadSettings() {
   try {
-    return { ...DEFAULTS, ...JSON.parse(localStorage.getItem(SETTINGS)) };
+    const x = { ...DEFAULTS, ...JSON.parse(localStorage.getItem(SETTINGS)) };
+    return { ...x, level: level(x.level) };
   } catch {
     return { ...DEFAULTS };
   }
@@ -84,7 +90,7 @@ function startFromSettings(settings = loadSettings()) {
   startGame([...people, ...bots].sort(() => Math.random() - 0.5), settings.speed, settings.mode);
 }
 
-// order: [{ kind: 'human' | 'easy' | 'normal', name, color }] in turn order.
+// order: [{ kind: 'human' | 'novice' | 'medium' | 'hard', name, color }] in turn order.
 function startGame(order, speed, mode = 'mission', seed = (Math.random() * 2 ** 31) | 0) {
   const humans = order.filter((x) => x.kind === 'human').length;
   $('intro').hidden = true;
@@ -165,8 +171,6 @@ function finishWithoutYou() {
 }
 
 const isBot = () => game.seats[s.current] !== 'human';
-// Games saved before there were levels say 'bot': those were easy bots.
-const level = (seat) => (seat === 'bot' ? 'easy' : seat);
 
 // Bots play one action at a time, with a pause so you can follow them.
 function schedule() {
@@ -476,14 +480,14 @@ const CHOICES = {
     const least = draft.humans > 1 ? 0 : 1;
     return Array.from({ length: 6 - draft.humans - least + 1 }, (_, i) => [least + i, String(least + i)]);
   },
-  level: () => [['easy', 'Let'], ['normal', 'Normal']],
+  level: () => [['novice', 'Let'], ['medium', 'Normal'], ['hard', 'Svær']],
   mode: () => [['mission', 'Hemmelig mission'], ['world', 'Hele verden']],
   humans: () => [[1, 'Kun mig'], [2, '2'], [3, '3']],
   speed: () => [['normal', 'Roligt'], ['fast', 'Hurtigt']],
 };
 
 function summary(x) {
-  const them = x.opponents ? `${x.opponents} ${x.opponents === 1 ? 'modstander' : 'modstandere'} (${x.level === 'easy' ? 'lette' : 'normale'})` : '';
+  const them = x.opponents ? `${x.opponents} ${x.opponents === 1 ? 'modstander' : 'modstandere'} (${{ novice: 'lette', medium: 'normale', hard: 'svære' }[x.level]})` : '';
   const who = x.humans === 1 ? `${yourName(x)} mod ${them}` : `${x.humans} spillere på denne telefon${them ? ` mod ${them}` : ''}`;
   return `${who} · ${x.mode === 'mission' ? 'hemmelig mission' : 'erobr hele verden'}`;
 }
@@ -809,7 +813,7 @@ window.__conquest = {
   board,
   act,
   tap,
-  // start(['human', 'normal', …], speed, mode, seed): a game with these seats in this order.
+  // start(['human', 'hard', …], speed, mode, seed): a game with these seats in this order.
   start: (seats, speed = 'fast', mode = 'mission', seed) =>
     startGame(seats.map((kind, i) => ({ kind, name: kind === 'human' ? 'Dig' : OPPONENTS[i], color: i })), speed, mode, seed),
   startFromSettings,

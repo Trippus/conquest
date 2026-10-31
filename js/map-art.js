@@ -148,6 +148,11 @@ export function mapArt(grid, { keepClear = [], seaLines = [], compass = null } =
     const c = Math.round((x - Math.sqrt(3) / 2) / Math.sqrt(3) - 0.5 * (r & 1));
     return (dist[r]?.[c] ?? 0) >= 1;
   };
+  const openSea = (x, y) => {
+    const r = Math.round((y - 1) / 1.5);
+    const c = Math.round((x - Math.sqrt(3) / 2) / Math.sqrt(3) - 0.5 * (r & 1));
+    return (dist[r]?.[c] ?? 0) >= 2; // two cells from any coast
+  };
   const routes = seaLines
     .map(([x1, y1, x2, y2]) => ({ x1, y1, x2, y2, len: Math.hypot(x2 - x1, y2 - y1) }))
     .filter((l) => l.len > 6 && l.len < cols)
@@ -160,7 +165,11 @@ export function mapArt(grid, { keepClear = [], seaLines = [], compass = null } =
       for (const side of [2.4, -2.4, 3.2, -3.2]) {
         const x = x1 + (x2 - x1) * along + nx * side;
         const y = y1 + (y2 - y1) * along + ny * side;
-        if (!seaCell(x, y) || !free(x, y, 2.4)) continue;
+        // The whole ship on open water, with a hex to spare (a cell's coast runs up to a hex from its
+        // middle): bow, stern, mast top and keel, not only its middle.
+        const afloat =
+          openSea(x, y) && [[-3.7, 0], [3.7, 0], [0, -3.2], [0, 1.8], [-3, -1.6], [3, -1.6], [-3, .9], [3, .9]].every(([dx, dy]) => seaCell(x + dx, y + dy));
+        if (!afloat || !free(x, y, 2.4)) continue;
         deco += ship(x, y);
         take(x, y, 2.6);
         ships--;

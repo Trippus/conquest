@@ -6,9 +6,7 @@
 
 import * as G from './engine.js';
 import { botAction } from './ai.js';
-import { WORLD_GRID } from './maps/world.js';
-import { VIKINGS_GRID } from './maps/vikings.js';
-import { ENGLAND_GRID } from './maps/england.js';
+import { MAPS, rulesFor } from './maps/index.js';
 import { MODERN } from './rules/modern.js';
 import { createBoard, PLAYER_COLORS as COLORS, sealIcon } from './board.js';
 import { Sound } from './audio.js';
@@ -25,9 +23,8 @@ const NAME_LENGTH = 14;
 // another age has its own (RULERS).
 const OPPONENTS = ['Grevinde Holm', 'Oberst Vind', 'Admiral Storm', 'Generalinde Ravn', 'Major Falk', 'Hertug Ulv'];
 
-// The maps, in the order the setup shows them. A saved game names its map; older saves were all
-// played on the world.
-const MAPS = { vikings: VIKINGS_GRID, england: ENGLAND_GRID, world: WORLD_GRID };
+// The maps are listed in js/maps/index.js. A saved game names its map; older saves were all played
+// on the world.
 let rules = MODERN; // the game's rules, with the map's own changes
 const $ = (id) => document.getElementById(id);
 // A test switch for finding what makes a phone flicker: ?plain=paper,ink,bands,sea leaves those out.
@@ -39,9 +36,9 @@ let board = null;
 // Draws a map. The board is made anew on a fresh copy of the <svg>, so the old one's listeners go too.
 function useMap(id) {
   if (grid?.id === id) return;
-  grid = MAPS[id] ?? WORLD_GRID;
+  grid = MAPS[id] ?? MAPS.world;
   map = G.prepareMap(grid.MAP);
-  rules = { ...MODERN, ...grid.RULES };
+  rules = rulesFor(grid, MODERN);
   const svg = $('board').cloneNode(false);
   $('board').replaceWith(svg);
   board = createBoard(svg, grid, map, {

@@ -56,6 +56,20 @@ export function createBoard(svg, grid, map, { onTap, onRegion = () => {}, insets
     )
     .join('');
   const outline = (i) => shapes.outlines[letterOf[T[i].id]];
+  const unexplored = shapes.outlines['#'] ?? '';
+  // Parallel lines 1.1 apart at 40° over the whole map, for the unexplored land's hatching.
+  const hatching = () => {
+    const a = (40 * Math.PI) / 180;
+    const [nx, ny] = [Math.cos(a), Math.sin(a)]; // across the lines
+    const [tx, ty] = [-ny, nx]; // along them
+    const reach = W + H;
+    let d = '';
+    for (let c = -reach; c <= reach; c += 1.1) {
+      const [x, y] = [W / 2 + nx * c, H / 2 + ny * c];
+      d += `M${n(x - tx * reach)} ${n(y - ty * reach)}L${n(x + tx * reach)} ${n(y + ty * reach)}`;
+    }
+    return d;
+  };
   // Map art keeps out of every seal, name and region name.
   const clear = (x, y, w, h) => ({ x0: x - w, y0: y - h, x1: x + w, y1: y + h });
   const nameBox = (t) => {
@@ -97,11 +111,7 @@ export function createBoard(svg, grid, map, { onTap, onRegion = () => {}, insets
       </pattern>
       ${EMBLEMS.map((d, i) => `<symbol id="emblem-${i}" viewBox="0 0 512 512"><path d="${d}"/></symbol>`).join('')}
       ${ART_DEFS}
-      ${map.regions.map((r, i) => `<clipPath id="region-${i}"><path d="${regionOutlines[r.id]}"/></clipPath>`).join('')}
-      <!-- Land outside the game: fine hatching, like the unexplored parts of an old map. -->
-      <pattern id="unexplored" patternUnits="userSpaceOnUse" width="1.1" height="1.1" patternTransform="rotate(40)">
-        <rect width="1.1" height="1.1" fill="#e2d1aa"/><path d="M0 0V1.1" stroke="#a88e62" stroke-width=".16"/>
-      </pattern>
+      <clipPath id="unexplored"><path d="${unexplored}" clip-rule="evenodd"/></clipPath>
       <filter id="ink"><feTurbulence type="fractalNoise" baseFrequency="1.4" numOctaves="2" seed="8" result="t"/>
         <feDisplacementMap in="SourceGraphic" in2="t" scale=".35"/></filter>
     </defs>
@@ -114,12 +124,16 @@ export function createBoard(svg, grid, map, { onTap, onRegion = () => {}, insets
     <g class="art waves" pointer-events="none" opacity=".5">${art.sea}</g>
     <g class="art" pointer-events="none" opacity=".85">${art.deco}</g>
     <path d="${sea}" fill="none" stroke="${INK}" stroke-width=".16" stroke-dasharray=".1 .45" stroke-linecap="round"/>
-    <path class="unexplored" d="${shapes.outlines['#'] ?? ''}"/>
+    <!-- Land outside the game: fine hatching, like the unexplored parts of an old map. The lines are
+         drawn once and clipped to the land; an SVG pattern is redrawn on every zoom and flickers. -->
+    <path class="unexplored" d="${unexplored}"/>
+    <path class="hatch" d="${unexplored ? hatching() : ''}" clip-path="url(#unexplored)"/>
     <g class="lands">${T.map((t, i) => `<path class="land" data-t="${i}" d="${outline(i)}" fill="${LAND}"/>`).join('')}</g>
     <g class="washes">${T.map((t, i) => `<path data-t="${i}" d="${outline(i)}" opacity=".4"/>`).join('')}</g>
-    <!-- Each region has a band just inside its outline, like the hand-coloured borders of an old map. -->
+    <!-- Each region has a band along its outline, like the hand-coloured borders of an old map. Not
+         clipped to the region: clipping is redrawn on every zoom and makes the land flicker. -->
     <g class="region-bands" pointer-events="none">${map.regions
-      .map((r, i) => `<path data-region="${i}" d="${regionOutlines[r.id]}" clip-path="url(#region-${i})"/>`)
+      .map((r, i) => `<path data-region="${i}" d="${regionOutlines[r.id]}"/>`)
       .join('')}</g>
     <g class="art" pointer-events="none" opacity=".7">${art.land}</g>
     <!-- Crumpled paper over land and sea alike (CC0 texture, see LICENSES.md). -->
@@ -272,7 +286,14 @@ export function createBoard(svg, grid, map, { onTap, onRegion = () => {}, insets
   const pointers = new Map();
   let moved = 0;
   let pinch = null;
+  let still = 0;
+  const moving = (ms) => {
+    svg.classList.add('moving');
+    clearTimeout(still);
+    if (ms) still = setTimeout(() => svg.classList.remove('moving'), ms);
+  };
   svg.addEventListener('pointerdown', (e) => {
+    moving(0);
     cancelAnimationFrame(glide); // a finger on the map stops it gliding
     svg.setPointerCapture(e.pointerId);
     pointers.set(e.pointerId, [e.clientX, e.clientY]);
@@ -305,6 +326,7 @@ export function createBoard(svg, grid, map, { onTap, onRegion = () => {}, insets
     if (!pointers.has(e.pointerId)) return;
     pointers.delete(e.pointerId);
     if (pointers.size < 2) pinch = null;
+    if (!pointers.size) moving(200);
     if (e.type === 'pointerup' && !pointers.size && moved <= TAP_SLOP) {
       // The pointer is captured by the svg, so find what is under it by position.
       const under = document.elementFromPoint(e.clientX, e.clientY);
@@ -320,6 +342,7 @@ export function createBoard(svg, grid, map, { onTap, onRegion = () => {}, insets
     'wheel',
     (e) => {
       e.preventDefault();
+      moving(300);
       zoomAt(Math.exp(-e.deltaY * 0.0015), e.clientX, e.clientY);
     },
     { passive: false },

@@ -84,4 +84,8 @@ Commit og push; GitHub Pages har det oppe efter et par minutter. Martin prøver 
 
 ## Ikke besluttet endnu
 
-Oplåsning og togter i rækkefølge (et kort åbner det næste), og om verdenskortet skal være det sidste.
+Tages op, når der er flere togter at se dem i sammenhæng med:
+
+- Oplåsning og togter i rækkefølge (et kort åbner det næste), og om verdenskortet skal være det sidste.
+- Om hvert togt skal have en historie: en kort indledning til perioden (fx "Det er 1066. Kong Edvard
+  er død, og tre mænd gør krav på tronen …"), og måske en afslutning, når man vinder.

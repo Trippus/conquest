@@ -72,6 +72,18 @@ export const ART_DEFS = `
     <path d="M-.8.3L-1.05.75M-.3.42L-.45.85M.3.42L.45.85M.8.3L1.05.75" fill="none" opacity=".8"/>
     <path d="M-1.6.95q.3-.15.6 0t.6 0M.4.95q.3-.15.6 0t.6 0" fill="none" opacity=".6"/>
   </g>
+  <g id="art-galley" stroke="${INK}" stroke-width=".05" stroke-linejoin="round" stroke-linecap="round">
+    <path d="M-.55-1.5H.55V-.55Q0-.45-.55-.55Z" fill="#f6ecd4"/>
+    <path d="M-.18-1.5V-.5M.18-1.5V-.5" stroke="#a3261b" stroke-width=".16"/>
+    <path d="M-.55-1.5H.55V-.55Q0-.45-.55-.55Z" fill="none"/>
+    <path d="M0-.45V-1.75M-.65-1.5H.65" fill="none"/>
+    <path d="M-1.6-.55Q-1.75-.25-1.35-.05H1.3L1.85.1L1.3.18Q1.5-.15 1.45-.45Q.2-.25-1.6-.55Z" fill="#8a6a4a"/>
+    <path d="M-1.6-.55q-.12-.45.18-.6q-.02.25.12.35" fill="none"/>
+    <path d="M-1.25-.18H1.25" fill="none" opacity=".6"/>
+    <circle cx="1.12" cy="-.28" r=".07" fill="${INK}" stroke="none"/>
+    <path d="M-1.1.02L-1.35.6M-.7.05L-.9.65M-.3.07L-.45.68M.1.07L-.02.68M.5.06L.42.66M.9.04L.86.62" fill="none" opacity=".85"/>
+    <path d="M-1.6.85q.3-.15.6 0t.6 0M.3.85q.3-.15.6 0t.6 0" fill="none" opacity=".6"/>
+  </g>
   <g id="art-compass">${compassRose()}</g>`;
 
 // A fixed "random" number for a cell, so the map looks the same every time.

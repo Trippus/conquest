@@ -160,6 +160,6 @@ export const COMPASS = [91, 35.5]; // in the open sea between Africa and Austral
 // The world's sea routes are short, so most ships sail the great oceans: [row, column].
 export const OCEANS = [[17, 5], [9, 68], [13, 26]];
 
-export const WORLD_GRID = hexMap({ id: 'world', name: 'Verden', GRID, REGIONS, TERRITORIES, TERRAIN, PLACES, MISSIONS, SEA, REGION_PLACES, COMPASS, OCEANS, SHIP_COUNT: 4, WRAPS: true });
+export const WORLD_GRID = hexMap({ id: 'world', name: 'Verden', GRID, REGIONS, TERRITORIES, TERRAIN, PLACES, MISSIONS, SEA, REGION_PLACES, COMPASS, OCEANS, SHIP_COUNT: 4, WRAPS: true, TITLE: 'Ruler of the World' });
 export const { hexCenter, hexCorners, hexNeighbours, cellAt, WIDTH, HEIGHT, WRAPS } = WORLD_GRID;
 export const WORLD = WORLD_GRID.MAP;

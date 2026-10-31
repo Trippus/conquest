@@ -265,10 +265,13 @@ dialog .big { font-family: var(--title); font-size: 20px; margin: 8px 0; }
 #ladder span.next { background: var(--primary); border-color: transparent; font-weight: 700; color: var(--primary-ink); }
 
 /* a little life at sea: the ships rock, the waves drift */
-#board .bob { transform-box: fill-box; transform-origin: 50% 85%; animation: bob 4.5s ease-in-out infinite; }
-@keyframes bob { 0%, 100% { transform: rotate(-3deg); } 50% { transform: rotate(3deg) translateY(-.12px); } }
-#board .waves { animation: drift 7s ease-in-out infinite alternate; }
-@keyframes drift { to { transform: translateX(.45px); } }
+#board .bob { transform-box: fill-box; transform-origin: 50% 85%; animation: bob 3.6s ease-in-out infinite; }
+@keyframes bob {
+  0%, 100% { transform: translate(0, 0) rotate(-7deg); }
+  50% { transform: translate(.5px, -.35px) rotate(7deg); }
+}
+#board .waves { animation: drift 5s ease-in-out infinite alternate; }
+@keyframes drift { from { transform: translateX(-.6px); opacity: .38; } to { transform: translateX(.6px); opacity: .55; } }
 
 @media (prefers-reduced-motion: reduce) {
   #board .bob, #board .waves,

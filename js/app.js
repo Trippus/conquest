@@ -8,6 +8,7 @@ import * as G from './engine.js';
 import { botAction } from './ai.js';
 import { WORLD_GRID } from './maps/world.js';
 import { VIKINGS_GRID } from './maps/vikings.js';
+import { ENGLAND_GRID } from './maps/england.js';
 import { MODERN } from './rules/modern.js';
 import { createBoard, PLAYER_COLORS as COLORS, sealIcon } from './board.js';
 import { Sound } from './audio.js';
@@ -26,7 +27,7 @@ const OPPONENTS = ['Grevinde Holm', 'Oberst Vind', 'Admiral Storm', 'Generalinde
 
 // The maps, in the order the setup shows them. A saved game names its map; older saves were all
 // played on the world.
-const MAPS = { vikings: VIKINGS_GRID, world: WORLD_GRID };
+const MAPS = { vikings: VIKINGS_GRID, england: ENGLAND_GRID, world: WORLD_GRID };
 let rules = MODERN; // the game's rules, with the map's own changes
 const $ = (id) => document.getElementById(id);
 let grid = null; // the map's drawing data (js/maps/hex.js)

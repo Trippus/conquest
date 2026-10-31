@@ -158,7 +158,9 @@ export function missionPool(map, players) {
   return [
     ...map.missions.map((m) => ({ ...m })),
     fallback(map),
-    { type: 'territories', count: Math.round(T * 0.36), armies: 2 },
+    // At least one more than a player starts with, or with few players it is done before it begins.
+    // Two players start with half the map each, so they never get it.
+    ...(players > 2 ? [{ type: 'territories', count: Math.max(Math.round(T * 0.36), Math.ceil(T / players) + 1), armies: 2 }] : []),
     ...Array.from({ length: players }, (_, target) => ({ type: 'eliminate', target })),
   ];
 }

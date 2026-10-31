@@ -1,54 +1,23 @@
-// Draws the Viking map's hex grid from real coastlines and prints it, to paste into
-// js/maps/vikings.js. Each land cell goes to the nearest territory centre on the same piece of land;
-// land with no centre of its own, and land near an "unknown" centre, becomes '#': land outside the
-// campaign, drawn as unexplored.
+// Draws a map's hex grid from real coastlines and prints it, to paste into js/maps/<map>.js. The
+// window, the territory centres and the islands are in tools/grids/<map>.mjs. Each land cell goes to
+// the nearest territory centre on the same piece of land; land near an "unknown" centre ('#'), and
+// land with no centre of its own, becomes '#': land outside the campaign, drawn as unexplored.
 //
 // Coastlines: Natural Earth 1:50m land (public domain), from the world-atlas package:
 //   curl -L -o land-50m.json https://cdn.jsdelivr.net/npm/world-atlas@2.0.2/land-50m.json
-// Run: node tools/make-viking-grid.mjs path/to/land-50m.json
+// Run: node tools/make-grid.mjs <map> path/to/land-50m.json   (map: vikings, england)
 import { readFileSync } from 'node:fs';
 import { hexCenter, hexNeighbours } from '../js/maps/hex.js';
 
-// The window and the projection. A row is LAT_STEP degrees of latitude; across, longitude is
-// shortened by cos(58°) so the North looks right. Greenland can be moved GREENLAND_SHIFT degrees
-// east, so the map is not mostly empty ocean (0: where it is; more moves it into Iceland's way).
-const LAT_TOP = 72;
-const LAT_STEP = 0.5;
-const ROWS = 72; // down to the Mediterranean
-const LON_WEST = -46;
-const LON_EAST = 41;
-const SQUASH = Math.cos((58 * Math.PI) / 180);
-const GREENLAND_SHIFT = 0;
+const { LAT_TOP, LAT_STEP, ROWS, LON_WEST, LON_EAST, SQUASH_AT, CENTRES, FORCE_LAND = [], FORCE_SEA = [], ISLAND = 3, ISLAND_REACH = 6 } =
+  await import(`./grids/${process.argv[2]}.mjs`);
+const SQUASH = Math.cos((SQUASH_AT * Math.PI) / 180);
 const UNIT = LAT_STEP / 1.5; // degrees per map unit (a row is 1.5 units)
 const COLS = Math.ceil(((LON_EAST - LON_WEST) * SQUASH) / UNIT / Math.sqrt(3));
-const isGreenland = (lat, lon) => lon < -26 || (lon < -19 && lat > 66.7);
-
-// Territory centres [lat, lon, letter]; '#' marks land outside the campaign.
-const CENTRES = [
-  [62, -45, 'G'], [70, -27, '#'], [64.9, -18.5, 'I'], [62.05, -6.9, 'x'], [59.0, -3.0, 'O'], [53.3, -8, 'R'],
-  [57.0, -4.3, 'S'], [54.8, -1.8, 'N'], [52.6, -2.4, 'M'], [52.4, 0.8, 'E'], [51.0, -2.0, 'W'],
-  [49.1, 0.3, 'n'], [53.2, 6.8, 'f'], [51.0, 3.9, 'L'], [48.2, -3.0, 'B'],
-  [56.2, 9.1, 'j'], [55.4, 11.7, 'o'], [55.9, 13.7, 'k'],
-  [54.0, 10.8, 'H'], [54.0, 15.5, 'P'], [54.6, 20.8, 'p'],
-  [60.8, 6.2, 'v'], [59.6, 10.6, 'w'], [63.4, 10.8, 't'], [68.5, 17.5, 'h'],
-  [60.4, 16.8, 'u'], [57.6, 14.2, 'g'], [57.5, 18.5, 'l'],
-  [61.4, 25.2, 'F'], [66.6, 26.5, 'F'], [70.2, 25.0, 'h'], [56.9, 22.4, 'K'], [58.6, 25.6, 'e'], [58.8, 32.0, 'Z'],
-  // Unexplored: inland behind the southern coast, Russia beyond Gardarike, and Europe down to the
-  // Mediterranean.
-  [47.0, 2.5, '#'], [48.7, 4.0, '#'], [50.0, 7.5, '#'], [51.6, 10.0, '#'], [52.0, 13.0, '#'], [52.3, 16.5, '#'],
-  [52.3, 20.0, '#'], [53.3, 23.5, '#'], [55.0, 26.5, '#'], [53.5, 29.5, '#'], [55.5, 36.5, '#'], [61.5, 39.0, '#'],
-  [64.5, 35.0, '#'], [68.6, 35.0, '#'], [47.5, 10, '#'], [45, 0, '#'], [44, 5, '#'], [43, -4, '#'], [40, -4, '#'],
-  [38, -5, '#'], [44, 11, '#'], [41, 15, '#'], [45, 20, '#'], [42, 24, '#'], [39, 22, '#'], [47, 15, '#'],
-  [47, 24, '#'], [50, 30, '#'], [45, 30, '#'], [48, 36, '#'], [39, 35, '#'],
-];
-// Small islands the grid would miss, and the narrow Øresund it would close. Shetland stays out:
-// a speck of Orkney far out at sea only confused the sea routes.
-const FORCE_LAND = [[62.05, -6.9], [59.0, -3.0], [57.4, 18.5], [57.75, 18.8]];
-const FORCE_SEA = [[55.6, 12.75], [56.0, 12.65], [55.3, 12.85], [60.3, -1.3], [60.6, -1.2], [60.0, -1.3], [71.0, -8.4], [70.9, -8.0]];
 
 /* ---------- the land polygons ---------- */
 
-const topo = JSON.parse(readFileSync(process.argv[2], 'utf8'));
+const topo = JSON.parse(readFileSync(process.argv[3], 'utf8'));
 const { scale, translate } = topo.transform;
 const arcs = topo.arcs.map((arc) => {
   let x = 0;
@@ -71,7 +40,7 @@ const unfold = (r) => {
 const rings = topo.objects.land.geometries
   .flatMap((g) => (g.type === 'Polygon' ? [g.arcs] : g.arcs))
   .flatMap((poly) => poly.map((r) => unfold(ring(r))))
-  .filter((r) => r.some(([lon, lat]) => lat > 40 && lat < 80 && lon > -75 && lon < 50));
+  .filter((r) => r.some(([lon, lat]) => lat > LAT_TOP - ROWS * LAT_STEP - 2 && lat < LAT_TOP + 2 && lon > LON_WEST - 30 && lon < LON_EAST + 10));
 
 function isLand(lat, lon) {
   let inside = false;
@@ -90,10 +59,7 @@ function isLand(lat, lon) {
 // Map units to latitude and longitude, and back.
 const toGeo = ([x, y]) => [LAT_TOP - (y - 1) * UNIT, LON_WEST + (x * UNIT) / SQUASH];
 const toMap = (lat, lon) => [((lon - LON_WEST) * SQUASH) / UNIT, (LAT_TOP - lat) / UNIT + 1];
-const landAt = (lat, lon) => {
-  if (isGreenland(lat, lon - GREENLAND_SHIFT)) return isLand(lat, lon - GREENLAND_SHIFT);
-  return !isGreenland(lat, lon) && isLand(lat, lon);
-};
+const landAt = isLand;
 const near = (lat, lon, list) => list.some(([a, b]) => Math.abs(a - lat) < LAT_STEP / 2 && Math.abs(b - lon) < (UNIT * Math.sqrt(3)) / SQUASH / 2);
 
 const land = [];
@@ -131,8 +97,7 @@ for (let r = 0; r < ROWS; r++) {
 }
 
 const centres = CENTRES.map(([lat, lon, letter]) => {
-  const shift = letter === 'G' ? GREENLAND_SHIFT : 0;
-  const [x, y] = toMap(lat, lon + shift);
+  const [x, y] = toMap(lat, lon);
   let best = null;
   for (let r = 0; r < ROWS; r++)
     for (let c = 0; c < COLS; c++) {
@@ -144,11 +109,9 @@ const centres = CENTRES.map(([lat, lon, letter]) => {
   return { letter, x, y, piece: piece[best.r][best.c] };
 });
 
-// A small island with no centre of its own (Shetland, Bornholm) joins the nearest territory close by.
+// A small island with no centre of its own joins the nearest territory close by.
 const size = Array(pieces).fill(0);
 land.forEach((line, r) => line.forEach((isL, c) => isL && size[piece[r][c]]++));
-const ISLAND = 3; // cells
-const ISLAND_REACH = 6; // map units
 
 const grid = land.map((line, r) =>
   line

@@ -157,7 +157,9 @@ export const SEA = [
 // Where the region names and the compass go, in map units.
 export const REGION_PLACES = { na: [10, 19], sa: [22, 33], eu: [57.5, 5], af: [55, 30], as: [84, 27], oc: [119, 30] };
 export const COMPASS = [91, 35.5]; // in the open sea between Africa and Australia
+// The world's sea routes are short, so most ships sail the great oceans: [row, column].
+export const OCEANS = [[17, 5], [9, 68], [13, 26]];
 
-export const WORLD_GRID = hexMap({ id: 'world', name: 'Verden', GRID, REGIONS, TERRITORIES, TERRAIN, PLACES, MISSIONS, SEA, REGION_PLACES, COMPASS, WRAPS: true });
+export const WORLD_GRID = hexMap({ id: 'world', name: 'Verden', GRID, REGIONS, TERRITORIES, TERRAIN, PLACES, MISSIONS, SEA, REGION_PLACES, COMPASS, OCEANS, SHIP_COUNT: 4, WRAPS: true });
 export const { hexCenter, hexCorners, hexNeighbours, cellAt, WIDTH, HEIGHT, WRAPS } = WORLD_GRID;
 export const WORLD = WORLD_GRID.MAP;

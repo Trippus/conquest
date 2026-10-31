@@ -122,9 +122,43 @@ export function mapArt(grid, { keepClear = [], seaLines = [], compass = null } =
   let land = '';
   let sea = '';
   let deco = ''; // the ships and the compass: drawn stronger than the waves
-  // A ship in each great ocean: the free open-sea cell nearest to where it should sail ([row, col],
-  // grid.SHIPS, or the world's oceans). grid.SHIP names the kind: 'ship' or 'longship'.
-  for (const [row, col] of grid.SHIPS ?? [[13, 26], [17, 5], [21, 47], [9, 68]]) {
+  if (compass) {
+    const size = compass[2] ?? 1.1;
+    deco += use('compass', compass[0], compass[1], size);
+    take(compass[0], compass[1], 5.3 * size);
+  }
+  // Ships sail beside the longest sea routes (not those round the back of the map), a little to
+  // one side of the dashed line, on open sea. grid.SHIP names the kind ('ship' or 'longship'),
+  // grid.SHIP_COUNT how many (3).
+  const seaCell = (x, y) => {
+    const r = Math.round((y - 1) / 1.5);
+    const c = Math.round((x - Math.sqrt(3) / 2) / Math.sqrt(3) - 0.5 * (r & 1));
+    return (dist[r]?.[c] ?? 0) >= 1;
+  };
+  const routes = seaLines
+    .map(([x1, y1, x2, y2]) => ({ x1, y1, x2, y2, len: Math.hypot(x2 - x1, y2 - y1) }))
+    .filter((l) => l.len > 6 && l.len < cols)
+    .sort((p, q) => q.len - p.len);
+  let ships = grid.SHIP_COUNT ?? 3;
+  for (const { x1, y1, x2, y2, len } of routes) {
+    if (!ships) break;
+    const [nx, ny] = [-(y2 - y1) / len, (x2 - x1) / len]; // across the route
+    spot: for (const along of [0.5, 0.4, 0.6, 0.3, 0.7]) {
+      for (const side of [2.4, -2.4, 3.2, -3.2]) {
+        const x = x1 + (x2 - x1) * along + nx * side;
+        const y = y1 + (y2 - y1) * along + ny * side;
+        if (!seaCell(x, y) || !free(x, y, 2.4)) continue;
+        deco += use(grid.SHIP ?? 'ship', x, y, 1.5);
+        take(x, y, 2.6);
+        ships--;
+        break spot;
+      }
+    }
+  }
+  // Too few long routes (the world's are short or go round the back): the rest sail the open ocean,
+  // the free cell nearest to where they should be ([row, col], grid.OCEANS).
+  for (const [row, col] of grid.OCEANS ?? []) {
+    if (!ships) break;
     let best = null;
     for (let r = Math.max(0, row - 4); r <= Math.min(rows - 1, row + 4); r++) {
       for (let c = Math.max(0, col - 6); c <= Math.min(cols - 1, col + 6); c++) {
@@ -137,12 +171,8 @@ export function mapArt(grid, { keepClear = [], seaLines = [], compass = null } =
     if (best) {
       deco += use(grid.SHIP ?? 'ship', best.x, best.y, 1.5);
       take(best.x, best.y, 2.6);
+      ships--;
     }
-  }
-  if (compass) {
-    const size = compass[2] ?? 1.1;
-    deco += use('compass', compass[0], compass[1], size);
-    take(compass[0], compass[1], 5.3 * size);
   }
   for (let r = 0; r < rows; r++) {
     for (let c = 0; c < cols; c++) {

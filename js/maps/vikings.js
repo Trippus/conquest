@@ -174,10 +174,9 @@ export const MISSIONS = [
   { type: 'regions', regions: ['fr', 'vn', 'dk'] },
 ];
 
-// Where the region names, the compass and the ships go. A name may sit on unexplored land.
+// Where the region names and the compass go. A name may sit on unexplored land.
 export const REGION_PLACES = { dk: [80, 44.5], no: [85, 22], sv: [104, 51], oe: [121.25, 51], br: [55.25, 64.5], ve: [49.3, 32.5], fr: [84.35, 75], vn: [99, 60] };
 export const COMPASS = [27, 70, 1.7];
-export const SHIPS = [[42, 18], [9, 42], [24, 12]]; // [row, column] they sail near
 export const SHIP = 'longship';
 // The Norse called the empty parts of Greenland Óbyggðir: the unsettled lands.
 export const LANDMARKS = [[27, 8, 'Ubygderne']];
@@ -203,7 +202,6 @@ export const VIKINGS_GRID = hexMap({
   MISSIONS,
   REGION_PLACES,
   COMPASS,
-  SHIPS,
   SHIP,
   LANDMARKS,
   RULES,

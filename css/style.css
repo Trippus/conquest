@@ -75,6 +75,11 @@ button.wide { width: 100%; }
 /* land outside the game: pale and faded, like the unexplored parts of an old map */
 #board .unexplored { fill: #e2d1aa; fill-rule: evenodd; opacity: 0.75; pointer-events: none; }
 #board .hatch { fill: none; stroke: #a88e62; stroke-width: .16; opacity: .75; pointer-events: none; }
+/* ?plain=… (js/app.js) leaves effects out, to find what makes a phone flicker */
+[data-plain~='paper'] #board .paper { display: none; }
+[data-plain~='ink'] #board .ink { filter: none; }
+[data-plain~='bands'] #board .region-bands { display: none; }
+[data-plain~='sea'] #board .waves, [data-plain~='sea'] #board .deco { display: none; }
 /* while the map is dragged or zoomed the sea holds still, so the phone only redraws the map once */
 #board.moving .bob, #board.moving .waves { animation-play-state: paused; }
 /* A mirror seal: the territory across the edge of the map, in a dashed ring. */

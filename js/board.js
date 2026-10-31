@@ -122,7 +122,7 @@ export function createBoard(svg, grid, map, { onTap, onRegion = () => {}, insets
       <path d="${shapes.coast}" stroke-width="1.5" opacity=".12"/>
       <path d="${shapes.coast}" stroke-width=".8" opacity=".18"/></g>
     <g class="art waves" pointer-events="none" opacity=".5">${art.sea}</g>
-    <g class="art" pointer-events="none" opacity=".85">${art.deco}</g>
+    <g class="art deco" pointer-events="none" opacity=".85">${art.deco}</g>
     <path d="${sea}" fill="none" stroke="${INK}" stroke-width=".16" stroke-dasharray=".1 .45" stroke-linecap="round"/>
     <!-- Land outside the game: fine hatching, like the unexplored parts of an old map. The lines are
          drawn once and clipped to the land; an SVG pattern is redrawn on every zoom and flickers. -->
@@ -137,8 +137,8 @@ export function createBoard(svg, grid, map, { onTap, onRegion = () => {}, insets
       .join('')}</g>
     <g class="art" pointer-events="none" opacity=".7">${art.land}</g>
     <!-- Crumpled paper over land and sea alike (CC0 texture, see LICENSES.md). -->
-    <rect x="${n(-W)}" y="${n(-H)}" width="${n(3 * W)}" height="${n(3 * H)}" fill="url(#paper)" pointer-events="none" style="mix-blend-mode: multiply" opacity=".75"/>
-    <g fill="none" stroke="${INK}" stroke-linejoin="round" filter="url(#ink)" pointer-events="none">
+    <rect x="${n(-W)}" y="${n(-H)}" width="${n(3 * W)}" height="${n(3 * H)}" class="paper" fill="url(#paper)" pointer-events="none" style="mix-blend-mode: multiply" opacity=".75"/>
+    <g class="ink" fill="none" stroke="${INK}" stroke-linejoin="round" filter="url(#ink)" pointer-events="none">
       <path d="${shapes.borders}" stroke-width=".13" stroke-dasharray=".45 .3"/>
       <path d="${shapes.regions}" stroke-width=".24"/>
       <path d="${shapes.coast}" stroke-width=".26"/>

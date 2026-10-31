@@ -30,6 +30,8 @@ const OPPONENTS = ['Grevinde Holm', 'Oberst Vind', 'Admiral Storm', 'Generalinde
 const MAPS = { vikings: VIKINGS_GRID, england: ENGLAND_GRID, world: WORLD_GRID };
 let rules = MODERN; // the game's rules, with the map's own changes
 const $ = (id) => document.getElementById(id);
+// A test switch for finding what makes a phone flicker: ?plain=paper,ink,bands,sea leaves those out.
+document.documentElement.dataset.plain = new URLSearchParams(location.search).get('plain')?.replaceAll(',', ' ') ?? '';
 let grid = null; // the map's drawing data (js/maps/hex.js)
 let map = null; // the map the engine plays on
 let board = null;

@@ -3,8 +3,8 @@
 //
 // Three levels (in the game: Let, Normal, Svær):
 // - novice: gentle. Spreads its new armies, attacks only with a clear lead, takes at most one
-//   territory a turn and goes for the leader rather than whoever is weakest, so a player who falls
-//   behind can come back. Never moves armies at the end of its turn.
+//   territory a turn and rather leaves the leader alone, so a player who gets ahead is not set upon
+//   by everyone. Never moves armies at the end of its turn.
 // - medium: greedy and short-sighted. Stacks all new armies on the front territory facing the best
 //   target, attacks while it clearly outnumbers a neighbour, and moves its largest stack from behind
 //   the lines to the most threatened front.
@@ -52,8 +52,8 @@ const NOVICE = {
     return { type: 'place', t: front.reduce((a, b) => (s.armies[b] < s.armies[a] ? b : a)), n: 1 };
   },
 
-  // Only clear wins, and after the turn's first conquest only very clear ones. It goes for the
-  // leader rather than whoever is weakest, so a player who falls behind can come back.
+  // Only clear wins, and after the turn's first conquest only very clear ones. It rather leaves
+  // the leader alone (leaderBonus is negative).
   attack(map, rules, s, p) {
     const lead = leader(s);
     const need = s.conquered ? NOVICE_TUNING.marginAfter : NOVICE_TUNING.margin;
@@ -74,12 +74,14 @@ const NOVICE = {
   occupy: (map, s) => MEDIUM.occupy(map, s),
   fortify: () => ({ type: 'end' }), // never moves armies at the end of its turn
 };
-// Chosen by bot games on the world map with missions (400 games each, seats rotated): a hard bot
-// wins 53% against three novices and 85% against two, against 29% and 40% with medium bots.
+// Chosen by bot games with missions (400 games each, seats rotated), with a medium bot standing in
+// for a player who knows the game: it wins 92% against two novices and 75% against three on the
+// world, 90% and 69% on Vikingetogtet. Going for the leader (+2) and a margin of 4 gave only
+// 46% and 42% against three: they all set upon whoever got ahead.
 export const NOVICE_TUNING = {
-  margin: 4, // attack only with this many more armies than the defender
+  margin: 5, // attack only with this many more armies than the defender
   marginAfter: 99, // the same after the turn's first conquest: in practice one territory a turn
-  leaderBonus: 2, // how much more it likes attacking whoever holds the most territories
+  leaderBonus: -2, // how much more it likes attacking whoever holds the most territories
 };
 
 /* ---------- medium ---------- */

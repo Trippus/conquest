@@ -115,6 +115,10 @@ export function mapArt(grid, { keepClear = [], seaLines = [], compass = null } =
     edge = next;
   }
 
+  // A ship rocks on the waves (CSS .bob), each in its own time.
+  const ship = (x, y) =>
+    `<g transform="translate(${x.toFixed(2)} ${y.toFixed(2)})"><g class="bob" style="animation-delay: -${((x * 7 + y * 3) % 4.5).toFixed(1)}s">` +
+    `<use href="#art-${grid.SHIP ?? 'ship'}" transform="scale(1.5)"/></g></g>`;
   const use = (id, x, y, scale = 1) => `<use href="#art-${id}" transform="translate(${x.toFixed(2)} ${y.toFixed(2)}) scale(${scale})"/>`;
   const jitter = (h, shift) => (((h >>> shift) % 100) / 100 - 0.5) * 0.5;
   const DENSITY = { mountains: 2, forest: 2, desert: 3 }; // one cell in this many gets a drawing
@@ -148,7 +152,7 @@ export function mapArt(grid, { keepClear = [], seaLines = [], compass = null } =
         const x = x1 + (x2 - x1) * along + nx * side;
         const y = y1 + (y2 - y1) * along + ny * side;
         if (!seaCell(x, y) || !free(x, y, 2.4)) continue;
-        deco += use(grid.SHIP ?? 'ship', x, y, 1.5);
+        deco += ship(x, y);
         take(x, y, 2.6);
         ships--;
         break spot;
@@ -169,7 +173,7 @@ export function mapArt(grid, { keepClear = [], seaLines = [], compass = null } =
       }
     }
     if (best) {
-      deco += use(grid.SHIP ?? 'ship', best.x, best.y, 1.5);
+      deco += ship(best.x, best.y);
       take(best.x, best.y, 2.6);
       ships--;
     }

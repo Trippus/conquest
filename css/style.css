@@ -264,7 +264,14 @@ dialog .big { font-family: var(--title); font-size: 20px; margin: 8px 0; }
 #ladder span { padding: 2px 8px; border-radius: 6px; border: 1px solid var(--line); font-size: 14px; }
 #ladder span.next { background: var(--primary); border-color: transparent; font-weight: 700; color: var(--primary-ink); }
 
+/* a little life at sea: the ships rock, the waves drift */
+#board .bob { transform-box: fill-box; transform-origin: 50% 85%; animation: bob 4.5s ease-in-out infinite; }
+@keyframes bob { 0%, 100% { transform: rotate(-3deg); } 50% { transform: rotate(3deg) translateY(-.12px); } }
+#board .waves { animation: drift 7s ease-in-out infinite alternate; }
+@keyframes drift { to { transform: translateX(.45px); } }
+
 @media (prefers-reduced-motion: reduce) {
+  #board .bob, #board .waves,
   .steam, #luck-btn.ready, #dice.rolling .die, #board .seal .wax, #board .washes path, #board .mark.target { animation: none !important; }
 }
 

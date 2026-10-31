@@ -111,7 +111,7 @@ export function createBoard(svg, grid, map, { onTap, onRegion = () => {}, insets
       <path d="${shapes.coast}" stroke-width="2.4" opacity=".08"/>
       <path d="${shapes.coast}" stroke-width="1.5" opacity=".12"/>
       <path d="${shapes.coast}" stroke-width=".8" opacity=".18"/></g>
-    <g class="art" pointer-events="none" opacity=".5">${art.sea}</g>
+    <g class="art waves" pointer-events="none" opacity=".5">${art.sea}</g>
     <g class="art" pointer-events="none" opacity=".85">${art.deco}</g>
     <path d="${sea}" fill="none" stroke="${INK}" stroke-width=".16" stroke-dasharray=".1 .45" stroke-linecap="round"/>
     <path class="unexplored" d="${shapes.outlines['#'] ?? ''}"/>

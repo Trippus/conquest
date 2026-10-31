@@ -164,10 +164,10 @@ export const SHIP = 'galley'; // with oars, a ram at the bow and a striped squar
 export const LANDMARKS = [[22.6, 16, 'Gallien'], [6.8, 52, 'Iberien'], [63.4, 6, 'Germanien'], [92.8, 31, 'Illyrien'], [108.7, 61, 'Grækenland'], [90.6, 106, 'Libyen'], [138, 110, 'Egypten · Alexandria']];
 
 // Rules that differ from the modern rules on this map, measured with npm run balance -- italy:
-// seats 49/51, 34/29/37 and 24/26/24/26 with 2, 3 and 4 players; easy computer players start with 40%
-// fewer armies, so a medium bot standing in for a player wins 97%/79% against two/three of them
-// (93%/70% with 30%).
-export const RULES = { laterSeatArmies: { 2: 7, 3: 2, 4: 1, 5: 0, 6: 0 }, noviceHandicap: 0.4 };
+// seats 49/51, 34/29/37 and 24/26/24/26 with 2, 3 and 4 players; easy computer players start with 50%
+// fewer armies, so a medium bot standing in for a player wins 100%/88% against two/three of them,
+// above the aim: with 40% (95%/79%) Martin was overrun early, as the map is small and games short.
+export const RULES = { laterSeatArmies: { 2: 7, 3: 2, 4: 1, 5: 0, 6: 0 }, noviceHandicap: 0.5 };
 
 // The flavour of the age: the computer players' names and what the winner becomes.
 export const RULERS = ['Hannibal Barkas', 'Pyrrhus af Epirus', 'Hieron af Syrakus', 'Brennus', 'Hamilkar Barkas', 'Gaius Pontius'];

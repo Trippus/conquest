@@ -8,3 +8,7 @@ Alt i spillet er lavet til spillet, undtagen:
 | `assets/paper.jpg` | Papirtekstur (Paper 003, farvebilledet) | [ambientCG](https://ambientcg.com/view?id=Paper003) | [CC0](https://creativecommons.org/publicdomain/zero/1.0/) |
 
 Kortet, kystlinjerne, kortsymbolerne og lydene er tegnet og lavet i koden.
+
+## Natural Earth (kystlinjer)
+
+Vikingetogtets kystlinjer er tegnet ud fra Natural Earth 1:50m land (public domain, naturalearthdata.com), via pakken world-atlas. Kun det færdige sekskantgitter ligger i spillet.

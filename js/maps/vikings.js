@@ -1,38 +1,66 @@
 // Vikingetogtet: the North in the Viking age, 25 territories in 7 regions, drawn as a hex grid
-// (see hex.js for what each part means). Not to scale: Greenland and Gardarike are pulled in close.
+// (see hex.js for what each part means).
 //
 // The Vikings sailed, so there are many sea routes: west over Orkney, the Faroes and Iceland to
-// Greenland (Vesterleden), east over Gotland and Åland to Kurland and Finland (Østerleden).
+// Greenland (Vesterleden), east over Gotland to Kurland and up the Neva to Gardarike (Østerleden).
+// The coastlines are real (tools/make-viking-grid.mjs draws the grid from Natural Earth); land
+// outside the campaign is '#', drawn as unexplored.
 
 import { hexMap } from './hex.js';
 
 export const GRID = [
-  'GGGGG...........................hhhhhhh.................',
-  'GGGGGG.........................hhhhhhhhh................',
-  'GGGGGG........................hhhhhhhhhhh...............',
-  'GGGGG.........................hhhhhhhhhhhFFFFF..........',
-  'GGGG.....IIIII...............hhhhhhh....FFFFFFF.........',
-  'GGG.....IIIIII.............ttttttt.....FFFFFFFF.........',
-  'GG.......IIII.............ttttttt......FFFFFFFFZZZZZZZ..',
-  '..........................ttttttt.......FFFFFFZZZZZZZZ..',
-  '................xx.....vvvtttttt.........FFFF.ZZZZZZZZZ.',
-  '................xx.....vvvvtttttuuuuuu........ZZZZZZZZZ.',
-  '...................OO..vvvvvwww..uuuuuu.......ZZZZZZZZZ.',
-  '...................OO..vvvvvwwww..uuuuu........ZZZZZZZZ.',
-  '........................vvvvwwwwggggg..........ZZZZZZZZ.',
-  '..............SSSS...........wwwgggggg.........ZZZZZZZZ.',
-  '.............SSSSSS.............gggggg.........ZZZZZZZZ.',
-  '.............SSSSS...............gggg..l...KKKKZZZZZZZ..',
-  '..............SSSS.........jjj...kkk...ll.KKKKKZZZZZZ...',
-  '..............SSSS.........jjj....kkk......KKKKZZZZZZ...',
-  '........RRR...NNNN.........jjj.oo..........KKK..........',
-  '........RRRR...NNNN........jjj.oo.......................',
-  '........RRRR..MMMEE.......jjjj..........................',
-  '........RRR..MMMMEEE.....ffff...........................',
-  '.............WWWWWW.....fffff...........................',
-  '............WWWWWW....fffff.............................',
-  '...................nnnnn................................',
-  '...................nnnn.................................',
+  '#####################...........................................................',
+  'G####################...........................................................',
+  'GG#################.##............#................................#............',
+  'GG###############...##........................................hhhh####..........',
+  'GGG###################........................................hhhh####..........',
+  'GGGG###############.......................................hhhhhhh#######........',
+  'GGGGG##############.....................................h.hhhhhhhh##########....',
+  'GGGGG###########.......................................hhhhhhhhhh############...',
+  'GGGGGG#######...........................................hhhhhhhhhh#############.',
+  'GGGGGG#####............................................hhhhhhhhhh##############.',
+  'GGGGGGGG###............................................hhhhhhhhhhh##############',
+  'GGGGGGGG##............................................hhhhhhhhhhFF######..#####.',
+  'GGGGGGGGG...........III.IIIII.........................thhhhhhhhFFFF#######......',
+  'GGGGG..............I.IIIIIIII........................ttthhhhhF...FF######.....##',
+  'GGGGG................IIIIIIIII.......................ttttthhhF...FFF######..#..#',
+  'GGGGG................IIIIIII........................tttttthFF...FFFF######..####',
+  'GGGGG................IIIIII........................tttttttuuF...FFFFF#######.###',
+  'GGGG....................I........................ttttttttuuu..FFFFFFF###########',
+  'GGGG.............................................ttttttttuu...FFFFFFFF##########',
+  'GGG............................................vvttttttuuu...FFFFFFFFF##########',
+  'GGGG...............................x...........vvvtttttuuu....FFFFFFFFF#########',
+  'GGG................................x..........vvvvvwttuuu.....FFFFFFFFZZZ#######',
+  'GGG............................................vvvvwwwuuuu....FFFFFFFZZZZZ######',
+  'GG......................................O.....vvvvwwwwuuuu....#####.ZZZZZZ######',
+  '.GG............................................vvvwwwwwuuuuu...#.....ZZZZZZ#####',
+  '...............................................vvwwwwwwuuuu.....##.#ZZZZZZZ#####',
+  '.......................................O........vww.wwgguuu.....#####ZZZZZZZ####',
+  '.....................................OO........vww..wgggg.....######ZZZZZZZZ####',
+  '.....................................SS..............ggggg....K..####ZZZZZZZ####',
+  '....................................SSSS.............gggg.l...K.####ZZZZZZ######',
+  '.....................................SSS...........j..ggg.....KKKK###ZZZZ#######',
+  '....................................SSS..........jjj..kkk....KKKK###ZZZZ########',
+  '.....................................SSS..........jj..k.......K#################',
+  '....................................SSNN.........jjoo.k......###################',
+  '...................................RR.NNN.........j..o........##################',
+  '..................................RRR.NNN.........#......##.####################',
+  '.................................RRRR..NNN........#####.########################',
+  '................................RRRR...MME......ff##############################',
+  '..................................RRR.MMMME....fff##############################',
+  '.................................RRR..MMMEE...ffff##############################',
+  '.................................RR...MMMEEE..##fff#############################',
+  '......................................WWWEE..###################################',
+  '......................................WWWWW.####################################',
+  '.....................................WW....#####################################',
+  '...........................................nn###################################',
+  '........................................n.nnn###################################',
+  '.........................................nnnnn##################################',
+  '.....................................###nnnn####################################',
+  '......................................###nn#####################################',
+  '.......................................#########################################',
+  '........................................#####################################.##',
+  '........................................##############################.###..####',
 ];
 
 export const REGIONS = {
@@ -90,28 +118,21 @@ export const SEA = [
   ['I', 'x'],
   ['x', 'O'],
   ['x', 'v'],
-  ['O', 'S'],
   ['O', 'v'],
-  ['R', 'S'],
   ['R', 'M'], // Det Irske Hav
   ['W', 'n'], // Kanalen
   ['f', 'E'], // over Nordsøen
+  ['f', 'j'], // along the Frisian coast
+  ['f', 'n'], // along the Flemish coast
   ['j', 'N'],
   ['j', 'w'], // Skagerrak
-  ['j', 'o'], // Lillebælt
   ['o', 'k'], // Øresund
   ['g', 'l'],
   ['u', 'l'],
   ['l', 'K'],
-  ['u', 'F'], // over Ålandshavet
+  ['K', 'Z'], // into the Gulf of Finland and up the Neva
 ];
 
-// Britain is small: its names go where there is room.
-export const PLACES = {
-  N: [18, 16, 'right'],
-  M: [21, 14, 'left'],
-  E: [21, 18, 'right'],
-};
 
 // Region missions: about 9–11 territories each; the small ones need one more region of your choice.
 export const MISSIONS = [
@@ -123,14 +144,16 @@ export const MISSIONS = [
   { type: 'regions', regions: ['ve', 'br'] },
 ];
 
-export const REGION_PLACES = { dk: [40, 25], no: [34.6, 10], sv: [74.4, 19], oe: [67.5, 31], br: [12, 22.5], ve: [13.8, 14.5], fr: [57, 37.5] };
-export const COMPASS = [84.8, 35.5];
+// Where the region names, the compass and the ships go. A name may sit on unexplored land.
+export const REGION_PLACES = { dk: [99, 57], no: [85.5, 23.5], sv: [107.15, 42], oe: [123, 57], br: [44, 54], ve: [47.3, 33.5], fr: [80, 75.5] };
+export const COMPASS = [27, 70];
+export const SHIPS = [[42, 18], [9, 42], [24, 12]]; // [row, column] they sail near
 
 // The flavour of the age: the computer players' names and what the winner becomes.
 // Rules that differ from the modern rules on this map. Later seats get extra start armies; on a
 // small map moving first is worth more than on the world. Measured with hard bots and missions
-// (900 games each): 2 players 54/46 with +6 and 44/56 with +8; 3 players 34/31/36 with +2;
-// 4 players even without help.
+// (900 games each): 2 players 50/50 with +7 (57/43 with +5, 43/57 with +9); 3 players 33/31/36
+// with +2; 4 players 27/25/25/23 without help.
 export const RULES = { laterSeatArmies: { 2: 7, 3: 2, 4: 0, 5: 0, 6: 0 } };
 
 export const RULERS = ['Jarl Ragnar', 'Dronning Gunhild', 'Erik Blodøkse', 'Harald Hårderåde', 'Skjoldmø Lagertha', 'Knud den Store'];
@@ -143,11 +166,11 @@ export const VIKINGS_GRID = hexMap({
   REGIONS,
   TERRITORIES,
   TERRAIN,
-  PLACES,
   SEA,
   MISSIONS,
   REGION_PLACES,
   COMPASS,
+  SHIPS,
   RULES,
   RULERS,
   TITLE,

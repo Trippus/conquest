@@ -94,6 +94,10 @@ export function createBoard(svg, grid, map, { onTap, insets = () => ({ top: 0, b
       </pattern>
       ${EMBLEMS.map((d, i) => `<symbol id="emblem-${i}" viewBox="0 0 512 512"><path d="${d}"/></symbol>`).join('')}
       ${ART_DEFS}
+      <!-- Land outside the game: fine hatching, like the unexplored parts of an old map. -->
+      <pattern id="unexplored" patternUnits="userSpaceOnUse" width=".7" height=".7" patternTransform="rotate(40)">
+        <rect width=".7" height=".7" fill="#e2d1aa"/><path d="M0 0V.7" stroke="#a88e62" stroke-width=".09"/>
+      </pattern>
       <filter id="ink"><feTurbulence type="fractalNoise" baseFrequency="1.4" numOctaves="2" seed="8" result="t"/>
         <feDisplacementMap in="SourceGraphic" in2="t" scale=".35"/></filter>
     </defs>
@@ -105,6 +109,7 @@ export function createBoard(svg, grid, map, { onTap, insets = () => ({ top: 0, b
       <path d="${shapes.coast}" stroke-width=".8" opacity=".18"/></g>
     <g class="art" pointer-events="none" opacity=".5">${art.sea}</g>
     <path d="${sea}" fill="none" stroke="${INK}" stroke-width=".16" stroke-dasharray=".1 .45" stroke-linecap="round"/>
+    <path class="unexplored" d="${shapes.outlines['#'] ?? ''}"/>
     <g class="lands">${T.map((t, i) => `<path class="land" data-t="${i}" d="${outline(i)}" fill="${LAND}"/>`).join('')}</g>
     <g class="washes">${T.map((t, i) => `<path data-t="${i}" d="${outline(i)}" opacity=".4"/>`).join('')}</g>
     <g class="art" pointer-events="none" opacity=".7">${art.land}</g>
@@ -113,7 +118,9 @@ export function createBoard(svg, grid, map, { onTap, insets = () => ({ top: 0, b
     <g fill="none" stroke="${INK}" stroke-linejoin="round" filter="url(#ink)" pointer-events="none">
       <path d="${shapes.borders}" stroke-width=".13" stroke-dasharray=".45 .3"/>
       <path d="${shapes.regions}" stroke-width=".24"/>
-      <path d="${shapes.coast}" stroke-width=".26"/></g>
+      <path d="${shapes.coast}" stroke-width=".26"/>
+      <path d="${shapes.frontier}" stroke-width=".2"/>
+      <path d="${shapes.shore}" stroke-width=".18" opacity=".6"/></g>
     <g class="marks" pointer-events="none">${T.map((t, i) => `<path class="mark" data-t="${i}" d="${outline(i)}"/>`).join('')}</g>
     <g class="region-names" pointer-events="none">${map.regions
       .map((r) => `<text x="${REGION_PLACES[r.id][0]}" y="${REGION_PLACES[r.id][1]}">${r.name} +${r.bonus}</text>`)

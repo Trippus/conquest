@@ -3,7 +3,8 @@
 // is just data:
 //
 //   id, name      the map's id and name ('world', 'Verden')
-//   GRID          one letter per hex, '.' is sea. Odd rows sit half a hex to the right. Territories
+//   GRID          one letter per hex, '.' is sea, '#' land outside the game (drawn as unexplored).
+//                 Odd rows sit half a hex to the right. Territories
 //                 that touch on the grid are neighbours; a territory may be in several pieces.
 //   REGIONS       region id: name
 //   TERRITORIES   letter: [id, name, region id]
@@ -72,12 +73,12 @@ export function hexMap(def) {
   const cells = Object.fromEntries(Object.keys(TERRITORIES).map((l) => [l, []]));
   GRID.forEach((line, row) => {
     [...line].forEach((l, col) => {
-      if (l === '.') return;
+      if (l === '.' || l === '#') return;
       if (!TERRITORIES[l]) throw new Error(`${def.id}: unknown letter ${l} at row ${row}, column ${col}`);
       cells[l].push([row, col]);
       for (const [r, c] of hexNeighbours(row, col)) {
         const n = cellAt(r, c);
-        if (n !== '.' && n !== l) adj[l].add(n);
+        if (n !== '.' && n !== '#' && n !== l) adj[l].add(n);
       }
     });
   });

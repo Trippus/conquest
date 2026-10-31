@@ -1,6 +1,7 @@
-// Turns a hex-grid map (see js/maps/world.js) into shapes to draw: each territory's outline, the
+// Turns a hex-grid map (see js/maps/hex.js) into shapes to draw: each territory's outline, the
 // borders between territories (marked when they also divide two regions), the coastline and the
-// sea routes. Pure geometry, no DOM.
+// sea routes. Land outside the game ('#') gets an outline of its own (outlines['#']), a fainter
+// coast (shore) and a line where the game's land ends (frontier). Pure geometry, no DOM.
 //
 // The outlines are smoothed so coasts are not saw-toothed: every corner where only two boundary
 // lines meet is pulled towards its two neighbours a few times, while corners where three meet stay
@@ -22,6 +23,7 @@ export function mapShapes(grid, { smooth = 4 } = {}) {
     links.get(b).add(a);
   };
   const regionOf = (l) => TERRITORIES[l][2];
+  const OUT = '#'; // land outside the game
 
   GRID.forEach((line, row) => {
     [...line].forEach((l, col) => {
@@ -39,7 +41,8 @@ export function mapShapes(grid, { smooth = 4 } = {}) {
         link(a, b);
         next[l].set(a, b);
         if (n !== '.' && n < l) continue; // a border between two territories is drawn once
-        const kind = n === '.' ? 'coast' : regionOf(n) === regionOf(l) ? 'border' : 'region';
+        const kind =
+          n === '.' ? (l === OUT ? 'shore' : 'coast') : l === OUT || n === OUT ? 'frontier' : regionOf(n) === regionOf(l) ? 'border' : 'region';
         const id = `${kind}:${[l, n].sort().join('')}`;
         if (!lines.has(id)) lines.set(id, []);
         lines.get(id).push([a, b]);
@@ -80,7 +83,7 @@ export function mapShapes(grid, { smooth = 4 } = {}) {
   }
 
   // Boundary pieces chained into as few polylines as possible, so dashes run on smoothly.
-  const paths = { coast: [], border: [], region: [] };
+  const paths = { coast: [], border: [], region: [], shore: [], frontier: [] };
   for (const [id, pieces] of lines) {
     const [kind] = id.split(':');
     const from = new Map();
@@ -125,5 +128,13 @@ export function mapShapes(grid, { smooth = 4 } = {}) {
     return { from: a, to: b, ...best, wraps: !!grid.WRAPS && Math.abs(best.p[0] - best.q[0]) > grid.WIDTH / 2 };
   });
 
-  return { outlines, coast: paths.coast.join(''), borders: paths.border.join(''), regions: paths.region.join(''), sea };
+  return {
+    outlines,
+    coast: paths.coast.join(''),
+    borders: paths.border.join(''),
+    regions: paths.region.join(''),
+    shore: paths.shore.join(''),
+    frontier: paths.frontier.join(''),
+    sea,
+  };
 }

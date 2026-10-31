@@ -81,8 +81,9 @@ export function mapArt(grid, { keepClear = [], seaLines = [], compass = null } =
   const ART = { mountains: 'mountain', forest: 'forest', desert: 'desert' };
   let land = '';
   let sea = '';
-  // A ship in each great ocean: the free open-sea cell nearest to where it should sail.
-  for (const [row, col] of [[13, 26], [17, 5], [21, 47], [9, 68]]) {
+  // A ship in each great ocean: the free open-sea cell nearest to where it should sail ([row, col],
+  // grid.SHIPS, or the world's oceans).
+  for (const [row, col] of grid.SHIPS ?? [[13, 26], [17, 5], [21, 47], [9, 68]]) {
     let best = null;
     for (let r = Math.max(0, row - 4); r <= Math.min(rows - 1, row + 4); r++) {
       for (let c = Math.max(0, col - 6); c <= Math.min(cols - 1, col + 6); c++) {

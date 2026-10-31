@@ -31,6 +31,7 @@ npm run design-shots                          # stilprøverne som PNG (kræver n
 | `js/emblems.js` | Spillernes emblemer, lavet af `tools/make-emblems.mjs` fra `assets/emblems` (se `LICENSES.md`) |
 | `js/board.js` | Verdenskortet i papirkort-stil: farver, laksegl med hære, markeringer, træk og zoom (knib, hjul, +/−) |
 | `tools/simulate.mjs` | Mange bot-spil til balance |
+| `tools/make-viking-grid.mjs` | Tegner Vikingetogtets gitter ud fra rigtige kystlinjer (Natural Earth, public domain); land uden for spillet bliver `#`, tegnet som uudforsket |
 
 ## Et spil er en liste af handlinger
 Et spil er en opsætning (kort, regelsæt, spillere, seed) plus de handlinger, spillerne har lavet.

@@ -102,13 +102,24 @@ function saveSettings(settings) {
   } catch {}
 }
 
+// A fair shuffle. Sorting by a random comparison is not: it left the first player (you) first or
+// last far more often than in the middle.
+function shuffled(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
 // A new game from the settings: who plays, then the turn order is drawn.
 function startFromSettings(settings = loadSettings()) {
   const people = settings.people.map((x, i) => ({ kind: 'human', name: personName(settings, i), color: x.look }));
   const free = COLORS.map((_, i) => i).filter((i) => !settings.people.some((x) => x.look === i));
-  const names = [...(MAPS[settings.map]?.RULERS ?? OPPONENTS)].sort(() => Math.random() - 0.5);
+  const names = shuffled(MAPS[settings.map]?.RULERS ?? OPPONENTS);
   const bots = Array.from({ length: settings.opponents }, (_, i) => ({ kind: settings.level, name: names[i], color: free[i] }));
-  startGame([...people, ...bots].sort(() => Math.random() - 0.5), settings.speed, settings.mode, undefined, settings.map);
+  startGame(shuffled([...people, ...bots]), settings.speed, settings.mode, undefined, settings.map);
 }
 
 // order: [{ kind: 'human' | 'novice' | 'medium' | 'hard', name, color }] in turn order.

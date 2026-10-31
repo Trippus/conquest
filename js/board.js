@@ -6,7 +6,7 @@
 // pinch or the +/− buttons to zoom (mouse wheel on a computer). A tap that did not move is a tap
 // on a territory and goes to onTap(territory index).
 
-import { mapShapes } from './map-shapes.js';
+import { mapShapes, regionShapes } from './map-shapes.js';
 import { mapArt, ART_DEFS } from './map-art.js';
 import { EMBLEMS } from './emblems.js';
 
@@ -35,8 +35,10 @@ const NAME_AT = {
 
 // insets(): how many pixels at the top and bottom of the screen are covered by panels, so the map
 // can be moved out from under them and is centred in what is left.
-export function createBoard(svg, grid, map, { onTap, insets = () => ({ top: 0, bottom: 0 }) }) {
+// onRegion(r): a region's name was tapped.
+export function createBoard(svg, grid, map, { onTap, onRegion = () => {}, insets = () => ({ top: 0, bottom: 0 }) }) {
   const shapes = mapShapes(grid);
+  const regionOutlines = regionShapes(grid);
   const letterOf = Object.fromEntries(Object.entries(grid.TERRITORIES).map(([l, [id]]) => [id, l]));
   const T = map.territories;
   const W = grid.WIDTH;
@@ -95,6 +97,7 @@ export function createBoard(svg, grid, map, { onTap, insets = () => ({ top: 0, b
       </pattern>
       ${EMBLEMS.map((d, i) => `<symbol id="emblem-${i}" viewBox="0 0 512 512"><path d="${d}"/></symbol>`).join('')}
       ${ART_DEFS}
+      ${map.regions.map((r, i) => `<clipPath id="region-${i}"><path d="${regionOutlines[r.id]}"/></clipPath>`).join('')}
       <!-- Land outside the game: fine hatching, like the unexplored parts of an old map. -->
       <pattern id="unexplored" patternUnits="userSpaceOnUse" width="1.1" height="1.1" patternTransform="rotate(40)">
         <rect width="1.1" height="1.1" fill="#e2d1aa"/><path d="M0 0V1.1" stroke="#a88e62" stroke-width=".16"/>
@@ -114,6 +117,10 @@ export function createBoard(svg, grid, map, { onTap, insets = () => ({ top: 0, b
     <path class="unexplored" d="${shapes.outlines['#'] ?? ''}"/>
     <g class="lands">${T.map((t, i) => `<path class="land" data-t="${i}" d="${outline(i)}" fill="${LAND}"/>`).join('')}</g>
     <g class="washes">${T.map((t, i) => `<path data-t="${i}" d="${outline(i)}" opacity=".4"/>`).join('')}</g>
+    <!-- Each region has a band just inside its outline, like the hand-coloured borders of an old map. -->
+    <g class="region-bands" pointer-events="none">${map.regions
+      .map((r, i) => `<path data-region="${i}" d="${regionOutlines[r.id]}" clip-path="url(#region-${i})"/>`)
+      .join('')}</g>
     <g class="art" pointer-events="none" opacity=".7">${art.land}</g>
     <!-- Crumpled paper over land and sea alike (CC0 texture, see LICENSES.md). -->
     <rect x="${n(-W)}" y="${n(-H)}" width="${n(3 * W)}" height="${n(3 * H)}" fill="url(#paper)" pointer-events="none" style="mix-blend-mode: multiply" opacity=".75"/>
@@ -124,8 +131,8 @@ export function createBoard(svg, grid, map, { onTap, insets = () => ({ top: 0, b
       <path d="${shapes.frontier}" stroke-width=".2"/>
       <path d="${shapes.shore}" stroke-width=".18" opacity=".6"/></g>
     <g class="marks" pointer-events="none">${T.map((t, i) => `<path class="mark" data-t="${i}" d="${outline(i)}"/>`).join('')}</g>
-    <g class="region-names" pointer-events="none">${map.regions
-      .map((r) => `<text x="${REGION_PLACES[r.id][0]}" y="${REGION_PLACES[r.id][1]}">${r.name} +${r.bonus}</text>`)
+    <g class="region-names">${map.regions
+      .map((r, i) => `<text data-region="${i}" x="${REGION_PLACES[r.id][0]}" y="${REGION_PLACES[r.id][1]}">${r.name} +${r.bonus}</text>`)
       .join('')}${LANDMARKS.map(([x, y, name]) => `<text class="landmark" x="${x}" y="${y}">${name}</text>`).join('')}</g>
     <g class="seals">${T.map(
       (t, i) => `<g class="seal" data-t="${i}" transform="translate(${n(t.x)} ${n(t.y)})">
@@ -300,8 +307,11 @@ export function createBoard(svg, grid, map, { onTap, insets = () => ({ top: 0, b
     if (pointers.size < 2) pinch = null;
     if (e.type === 'pointerup' && !pointers.size && moved <= TAP_SLOP) {
       // The pointer is captured by the svg, so find what is under it by position.
-      const hit = document.elementFromPoint(e.clientX, e.clientY)?.closest('[data-t]');
+      const under = document.elementFromPoint(e.clientX, e.clientY);
+      const hit = under?.closest('[data-t]');
+      const region = under?.closest('[data-region]');
       if (hit && svg.contains(hit)) onTap(+hit.dataset.t);
+      else if (region && svg.contains(region)) onRegion(+region.dataset.region);
     }
   };
   svg.addEventListener('pointerup', release);
@@ -322,5 +332,14 @@ export function createBoard(svg, grid, map, { onTap, insets = () => ({ top: 0, b
     zoomAt(factor, b.left + b.width / 2, b.top + b.height / 2);
   };
 
-  return { update, flash, focus, reveal, zoomIn: () => zoom(1.4), zoomOut: () => zoom(1 / 1.4), get view() { return view; } };
+  // Lights up region r's band for a moment.
+  const bands = [...svg.querySelectorAll('.region-bands path')];
+  let lit = 0;
+  function showRegion(r) {
+    bands.forEach((b, i) => b.classList.toggle('lit', i === r));
+    clearTimeout(lit);
+    lit = setTimeout(() => bands[r].classList.remove('lit'), 3000);
+  }
+
+  return { update, flash, focus, reveal, showRegion, zoomIn: () => zoom(1.4), zoomOut: () => zoom(1 / 1.4), get view() { return view; } };
 }

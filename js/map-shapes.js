@@ -144,3 +144,16 @@ export function mapShapes(grid, { smooth = 4 } = {}) {
     sea,
   };
 }
+
+// The outline of each region as one shape: the same tracing, on a grid where every territory's
+// letter is replaced by its region's. Returns { regionId: path }.
+export function regionShapes(grid, options) {
+  const ids = [...new Set(Object.values(grid.TERRITORIES).map(([, , r]) => r))];
+  const code = Object.fromEntries(ids.map((r, i) => [r, String.fromCharCode(0x100 + i)]));
+  const letter = Object.fromEntries(Object.entries(grid.TERRITORIES).map(([l, [, , r]]) => [l, code[r]]));
+  const GRID = grid.GRID.map((line) => [...line].map((c) => letter[c] ?? c).join(''));
+  const TERRITORIES = Object.fromEntries(ids.map((r) => [code[r], [r, r, r]]));
+  const cellAt = (row, col) => GRID[row]?.[col] ?? '.';
+  const { outlines } = mapShapes({ ...grid, GRID, TERRITORIES, SEA: [], cellAt }, options);
+  return Object.fromEntries(ids.map((r) => [r, outlines[code[r]]]));
+}

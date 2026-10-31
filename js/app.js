@@ -43,6 +43,7 @@ function useMap(id) {
   $('board').replaceWith(svg);
   board = createBoard(svg, grid, map, {
     onTap: (t) => tap(t),
+    onRegion: (r) => showRegion(r),
     // The players at the top and the turn panel at the bottom cover the map.
     insets: () => ({ top: $('hud').getBoundingClientRect().bottom, bottom: innerHeight - $('bar').getBoundingClientRect().top }),
   });
@@ -428,6 +429,24 @@ function showToast() {
 }
 
 const flash = (t, kind) => board.flash(t, kind);
+
+// A region's name was tapped: light it up and say what it is made of and who holds it.
+function showRegion(r) {
+  const region = map.regions[r];
+  const n = region.members.length;
+  const names = region.members.map((t) => map.territories[t].name);
+  let text = `${region.name}: ${andList(names)}. Holder man alle ${n}, får man ${region.bonus} ekstra hære hver tur.`;
+  if (game) {
+    const held = s.players
+      .map((_, p) => [p, region.members.filter((t) => s.owner[t] === p).length])
+      .filter(([, k]) => k)
+      .sort((a, b) => b[1] - a[1]);
+    text += held.length === 1 ? ` ${subject(held[0][0])} har dem alle.` : ` ${held.map(([p, k]) => `${subject(p)} har ${k}`).join(', ')}.`;
+  }
+  board.showRegion(r);
+  toasts.length = 0; // the newest tap wins
+  toast(text);
+}
 
 /* ---------- what happened: dice and messages ---------- */
 

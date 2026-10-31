@@ -73,7 +73,7 @@ button.wide { width: 100%; }
 #board:active { cursor: grabbing; }
 #board .land, #board .seal, #board .mirror { cursor: pointer; }
 /* land outside the game: pale and faded, like the unexplored parts of an old map */
-#board .unexplored { fill: url(#unexplored); opacity: 0.75; pointer-events: none; }
+#board .unexplored { fill: url(#unexplored); fill-rule: evenodd; opacity: 0.75; pointer-events: none; }
 /* A mirror seal: the territory across the edge of the map, in a dashed ring. */
 #board .mirror .ring { fill: #f4e8cc; stroke: #4a3726; stroke-width: .12; stroke-dasharray: .35 .25; opacity: .9; }
 #board .mirror .name { font-size: .85px; }

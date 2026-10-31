@@ -14,7 +14,7 @@ import { hexCenter, hexNeighbours } from '../js/maps/hex.js';
 // east, so the map is not mostly empty ocean (0: where it is; more moves it into Iceland's way).
 const LAT_TOP = 72;
 const LAT_STEP = 0.5;
-const ROWS = 52;
+const ROWS = 72; // down to the Mediterranean
 const LON_WEST = -46;
 const LON_EAST = 41;
 const SQUASH = Math.cos((58 * Math.PI) / 180);
@@ -25,21 +25,26 @@ const isGreenland = (lat, lon) => lon < -26 || (lon < -19 && lat > 66.7);
 
 // Territory centres [lat, lon, letter]; '#' marks land outside the campaign.
 const CENTRES = [
-  [62, -45, 'G'], [70, -27, '#'], [64.9, -18.5, 'I'], [62.05, -6.9, 'x'], [59.0, -3.0, 'O'], [53.3, -8, 'R'],
+  [64, -42, 'G'], [64.9, -18.5, 'I'], [62.05, -6.9, 'x'], [59.0, -3.0, 'O'], [53.3, -8, 'R'],
   [57.0, -4.3, 'S'], [54.8, -1.8, 'N'], [52.6, -2.4, 'M'], [52.4, 0.8, 'E'], [51.0, -2.0, 'W'],
-  [49.1, 0.3, 'n'], [53.2, 6.8, 'f'],
+  [49.1, 0.3, 'n'], [53.2, 6.8, 'f'], [51.0, 3.9, 'L'], [48.2, -3.0, 'B'],
   [56.2, 9.1, 'j'], [55.4, 11.7, 'o'], [55.9, 13.7, 'k'],
+  [54.0, 10.8, 'H'], [54.0, 15.5, 'P'], [54.6, 20.8, 'p'],
   [60.8, 6.2, 'v'], [59.6, 10.6, 'w'], [63.4, 10.8, 't'], [68.5, 17.5, 'h'],
   [60.4, 16.8, 'u'], [57.6, 14.2, 'g'], [57.5, 18.5, 'l'],
-  [62.5, 25.5, 'F'], [56.9, 22.0, 'K'], [58.8, 32.0, 'Z'],
-  // Unexplored: France, the Low Countries, Germany, Poland, the Baltic south, Russia beyond.
-  [47.0, 2.5, '#'], [48.1, -3.2, '#'], [51.0, 4.6, '#'], [50.3, 8.5, '#'], [53.6, 10.4, '#'], [52.0, 13.5, '#'],
-  [54.0, 17.0, '#'], [51.5, 19.5, '#'], [55.0, 24.0, '#'], [58.8, 25.6, '#'], [53.5, 28.5, '#'],
-  [55.5, 36.5, '#'], [61.5, 39.0, '#'], [64.5, 33.5, '#'], [68.0, 34.0, '#'], [47.5, 10, '#'],
+  [61.4, 25.2, 'F'], [56.9, 22.4, 'K'], [58.6, 25.6, 'e'], [58.8, 32.0, 'Z'],
+  // Unexplored: inland behind the southern coast, Russia beyond Gardarike, and Europe down to the
+  // Mediterranean.
+  [47.0, 2.5, '#'], [48.7, 4.0, '#'], [50.0, 7.5, '#'], [51.6, 10.0, '#'], [52.0, 13.0, '#'], [52.3, 16.5, '#'],
+  [52.3, 20.0, '#'], [53.3, 23.5, '#'], [55.0, 26.5, '#'], [53.5, 29.5, '#'], [55.5, 36.5, '#'], [61.5, 39.0, '#'],
+  [64.5, 33.5, '#'], [68.0, 34.0, '#'], [47.5, 10, '#'], [45, 0, '#'], [44, 5, '#'], [43, -4, '#'], [40, -4, '#'],
+  [38, -5, '#'], [44, 11, '#'], [41, 15, '#'], [45, 20, '#'], [42, 24, '#'], [39, 22, '#'], [47, 15, '#'],
+  [47, 24, '#'], [50, 30, '#'], [45, 30, '#'], [48, 36, '#'], [39, 35, '#'],
 ];
-// Small islands the grid would miss, and the narrow Øresund it would close.
-const FORCE_LAND = [[62.05, -6.9], [59.0, -3.0], [60.3, -1.3], [57.4, 18.5], [57.75, 18.8]];
-const FORCE_SEA = [[55.6, 12.75], [56.0, 12.65], [55.3, 12.85]];
+// Small islands the grid would miss, and the narrow Øresund it would close. Shetland stays out:
+// a speck of Orkney far out at sea only confused the sea routes.
+const FORCE_LAND = [[62.05, -6.9], [59.0, -3.0], [57.4, 18.5], [57.75, 18.8]];
+const FORCE_SEA = [[55.6, 12.75], [56.0, 12.65], [55.3, 12.85], [60.3, -1.3], [60.6, -1.2], [60.0, -1.3], [71.0, -8.4], [70.9, -8.0]];
 
 /* ---------- the land polygons ---------- */
 

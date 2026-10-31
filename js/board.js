@@ -95,8 +95,8 @@ export function createBoard(svg, grid, map, { onTap, insets = () => ({ top: 0, b
       ${EMBLEMS.map((d, i) => `<symbol id="emblem-${i}" viewBox="0 0 512 512"><path d="${d}"/></symbol>`).join('')}
       ${ART_DEFS}
       <!-- Land outside the game: fine hatching, like the unexplored parts of an old map. -->
-      <pattern id="unexplored" patternUnits="userSpaceOnUse" width=".7" height=".7" patternTransform="rotate(40)">
-        <rect width=".7" height=".7" fill="#e2d1aa"/><path d="M0 0V.7" stroke="#a88e62" stroke-width=".09"/>
+      <pattern id="unexplored" patternUnits="userSpaceOnUse" width="1.1" height="1.1" patternTransform="rotate(40)">
+        <rect width="1.1" height="1.1" fill="#e2d1aa"/><path d="M0 0V1.1" stroke="#a88e62" stroke-width=".16"/>
       </pattern>
       <filter id="ink"><feTurbulence type="fractalNoise" baseFrequency="1.4" numOctaves="2" seed="8" result="t"/>
         <feDisplacementMap in="SourceGraphic" in2="t" scale=".35"/></filter>

@@ -39,7 +39,9 @@ export function mapShapes(grid, { smooth = 4 } = {}) {
         pos.set(a, corners[i]);
         pos.set(b, corners[(i + 1) % 6]);
         link(a, b);
-        next[l].set(a, b);
+        // A list: where a territory touches itself at one corner, two outline edges start there.
+        if (!next[l].has(a)) next[l].set(a, []);
+        next[l].get(a).push(b);
         if (n !== '.' && n < l) continue; // a border between two territories is drawn once
         const kind =
           n === '.' ? (l === OUT ? 'shore' : 'coast') : l === OUT || n === OUT ? 'frontier' : regionOf(n) === regionOf(l) ? 'border' : 'region';
@@ -65,16 +67,20 @@ export function mapShapes(grid, { smooth = 4 } = {}) {
   // Each territory: all its outline loops in one path (Japan, Madagascar … have several).
   const outlines = {};
   for (const [l, steps] of Object.entries(next)) {
-    const left = new Map(steps);
+    const left = new Map([...steps].map(([a, tos]) => [a, [...tos]]));
+    const take = (a) => {
+      const tos = left.get(a);
+      const to = tos.pop();
+      if (!tos.length) left.delete(a);
+      return to;
+    };
     let d = '';
     while (left.size) {
       const [start] = left.keys();
       let at = start;
       d += `M${pt(at)}`;
       do {
-        const to = left.get(at);
-        left.delete(at);
-        at = to;
+        at = take(at);
         if (at !== start) d += `L${pt(at)}`;
       } while (at !== start && left.has(at));
       d += 'Z';

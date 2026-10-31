@@ -222,7 +222,9 @@ export function fortifyTargets(map, rules, s, from) {
 // start armies are spread at random over their own territories. Moving first is an advantage, so
 // each later player gets seatArmies() more armies than the one before.
 // mode: 'world' (hold every territory) or 'mission' (each player gets a secret mission).
-export function newGame(map, rules, { players, seed = 1, mode = 'world' }) {
+// handicap: start armies to add (or, negative, take away) per player; the easy computer players
+// start weaker this way.
+export function newGame(map, rules, { players, seed = 1, mode = 'world', handicap = [] }) {
   const n = players.length;
   if (n < 2 || n > 6) throw new Error('A game needs 2–6 players');
   const T = map.territories.length;
@@ -251,7 +253,7 @@ export function newGame(map, rules, { players, seed = 1, mode = 'world' }) {
   const start = startArmies(rules, T, n);
   for (let p = 0; p < n; p++) {
     const own = owned(s, p);
-    const mine = start + p * seatArmies(rules, n);
+    const mine = start + p * seatArmies(rules, n) + (handicap[p] ?? 0);
     for (let k = own.length; k < mine; k++) s.armies[own[Math.floor(random(s) * own.length)]]++;
   }
   s.deck = shuffle(s, [...Array(T + rules.wildCards).keys()]);

@@ -29,4 +29,6 @@ export const MODERN = {
   laterSeatArmies: { 2: 6, 3: 0, 4: 0, 5: 0, 6: 0 },
   peaceRounds: 0, // rounds at the start without attacks (measured: helps little)
   maxRounds: 0, // 0: play until one player holds the world; otherwise most territories wins after this round
+  // The share of the start armies an easy (novice) computer player goes without; a map may set more.
+  noviceHandicap: 0,
 };

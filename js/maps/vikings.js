@@ -185,7 +185,9 @@ export const LANDMARKS = [[27, 8, 'Ubygderne']];
 // small map moving first is worth more than on the world. Measured with hard bots and missions
 // (900 games each): 2 players 54/46 with +7 and 45/55 with +9; 3 players 32/33/35 with +2;
 // 4 players 27/25/23/25 without help.
-export const RULES = { laterSeatArmies: { 2: 8, 3: 2, 4: 0, 5: 0, 6: 0 } };
+// Easy computer players start with 15% fewer armies: a medium bot standing in for a player then
+// wins 97%/80% against two/three of them (95%/72% with 10%), about as on the world without.
+export const RULES = { laterSeatArmies: { 2: 8, 3: 2, 4: 0, 5: 0, 6: 0 }, noviceHandicap: 0.15 };
 
 // The flavour of the age: the computer players' names and what the winner becomes.
 export const RULERS = ['Jarl Ragnar', 'Dronning Gunhild', 'Erik Blodøkse', 'Harald Hårderåde', 'Skjoldmø Lagertha', 'Knud den Store'];

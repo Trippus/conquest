@@ -50,3 +50,15 @@ test('two players never get a hold-territories-with-armies mission', () => {
   const three = G.missionPool(map, 3).find((m) => m.type === 'territories' && m.armies > 1);
   assert.ok(three.count > Math.ceil(26 / 3), 'more than a player starts with');
 });
+
+test('easy computer players can start with fewer armies (handicap), and the game still replays', () => {
+  const map = G.prepareMap(E.ENGLAND);
+  const total = (s, p) => s.armies.reduce((n, a, t) => n + (s.owner[t] === p ? a : 0), 0);
+  const plain = G.newGame(map, rules, { players: ['A', 'B', 'C'], seed: 5 });
+  const setup = { players: ['A', 'B', 'C'], seed: 5, handicap: [0, -6, -6] };
+  const weaker = G.newGame(map, rules, setup);
+  assert.equal(total(weaker, 0), total(plain, 0));
+  assert.equal(total(weaker, 1), total(plain, 1) - 6);
+  const { state, actions } = playBots(map, rules, setup, ['hard', 'novice', 'novice']);
+  assert.deepEqual(G.replay(map, rules, setup, actions), state);
+});

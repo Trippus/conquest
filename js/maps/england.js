@@ -158,7 +158,10 @@ export const LANDMARKS = [[81.4, 5.5, 'Norge'], [77.9, 58, 'Det Tyske Rige'], [7
 // Rules that differ from the modern rules on this map. Later seats get extra start armies, measured
 // with hard bots and missions (900 games each): 2 players 50/50 with +7 (55/45 with +6); 3 players
 // 33/33/35 with +2; 4 players 26/24/24/26 with +1 (28/26/24/23 without).
-export const RULES = { laterSeatArmies: { 2: 7, 3: 2, 4: 1, 5: 0, 6: 0 } };
+// Easy computer players start with 35% fewer armies: on this small map, where every territory has
+// many neighbours, a medium bot standing in for a player otherwise wins only 84%/58% against
+// two/three of them; with 35% 98%/82%, about as on the other maps.
+export const RULES = { laterSeatArmies: { 2: 7, 3: 2, 4: 1, 5: 0, 6: 0 }, noviceHandicap: 0.35 };
 
 // The flavour of the age: the computer players' names and what the winner becomes.
 export const RULERS = ['Vilhelm Erobreren', 'Harold Godwinson', 'Harald Hårderåde', 'Edgar Ætheling', 'Malcolm af Skotland', 'Svend Estridsen'];

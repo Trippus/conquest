@@ -91,6 +91,8 @@ button.wide { width: 100%; }
 #board .name { font: italic 1px Georgia, serif; fill: #3d2c1c; paint-order: stroke; stroke: #f4e8cc; stroke-width: .25px; stroke-linejoin: round; pointer-events: none; }
 #board .name:not([text-anchor]) { text-anchor: middle; }
 #board .region-names text { font: italic 1.6px Georgia, serif; letter-spacing: .35px; fill: #7a2e1d; opacity: .55; text-anchor: middle; }
+/* names on unexplored land: in brown ink, fainter than the regions' */
+#board .region-names .landmark { font-size: 1.3px; fill: #5b4630; opacity: .5; }
 /* Placing armies stamps the seal; a conquest stamps it harder and floods the land with ink. */
 #board .seal.stamp .wax { animation: stamp .45s cubic-bezier(.3, 1.6, .5, 1); }
 #board .seal.conquer .wax { animation: stamp .7s cubic-bezier(.3, 1.8, .5, 1); }

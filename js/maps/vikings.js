@@ -9,18 +9,18 @@
 import { hexMap } from './hex.js';
 
 export const GRID = [
-  'GGGGGGGGGGGGGGGGGGGGG...........................................................',
-  'GGGGGGGGGGGGGGGGGGGGG...........................................................',
-  'GGGGGGGGGGGGGGGGGGG.GG.............................................#............',
-  'GGGGGGGGGGGGGGGGG...GG........................................hhhh####..........',
-  'GGGGGGGGGGGGGGGGGGGGGG........................................hhhh####..........',
-  'GGGGGGGGGGGGGGGGGGG.......................................hhhhhhh#######........',
-  'GGGGGGGGGGGGGGGGGGG.....................................h.hhhhhhhh##########....',
-  'GGGGGGGGGGGGGGGG.......................................hhhhhhhhhh############...',
-  'GGGGGGGGGGGGG...........................................hhhhhhhhhh#############.',
-  'GGGGGGGGGGG............................................hhhhhhhhhh##############.',
-  'GGGGGGGGGGG............................................hhhhhhhhhhh##############',
-  'GGGGGGGGGG............................................hhhhhhhhhhh#######..#####.',
+  '#####################...........................................................',
+  'G####################...........................................................',
+  'GG#################.##.............................................#............',
+  'GG###############...##........................................hhhh####..........',
+  'GGG###################........................................hhhh####..........',
+  'GGGG###############.......................................hhhhhhh#######........',
+  'GGGGG##############.....................................h.hhhhhhhh##########....',
+  'GGGGG###########.......................................hhhhhhhhhh############...',
+  'GGGGGG#######...........................................hhhhhhhhhh#############.',
+  'GGGGGG#####............................................hhhhhhhhhh##############.',
+  'GGGGGGGG###............................................hhhhhhhhhhh##############',
+  'GGGGGGGG##............................................hhhhhhhhhhh#######..#####.',
   'GGGGGGGGG...........III.IIIII.........................thhhhhhhhhh#########......',
   'GGGGG..............I.IIIIIIII........................ttthhhhhh...F#######.....##',
   'GGGGG................IIIIIIIII.......................ttttthhhh...FF#######..#..#',
@@ -176,8 +176,11 @@ export const MISSIONS = [
 
 // Where the region names, the compass and the ships go. A name may sit on unexplored land.
 export const REGION_PLACES = { dk: [80, 44.5], no: [85, 22], sv: [104, 51], oe: [121.25, 51], br: [55.25, 64.5], ve: [49.3, 32.5], fr: [84.35, 75], vn: [99, 60] };
-export const COMPASS = [27, 70];
+export const COMPASS = [27, 70, 1.7];
 export const SHIPS = [[42, 18], [9, 42], [24, 12]]; // [row, column] they sail near
+export const SHIP = 'longship';
+// The Norse called the empty parts of Greenland Óbyggðir: the unsettled lands.
+export const LANDMARKS = [[27, 8, 'Ubygderne']];
 
 // Rules that differ from the modern rules on this map. Later seats get extra start armies; on a
 // small map moving first is worth more than on the world. Measured with hard bots and missions
@@ -201,6 +204,8 @@ export const VIKINGS_GRID = hexMap({
   REGION_PLACES,
   COMPASS,
   SHIPS,
+  SHIP,
+  LANDMARKS,
   RULES,
   RULERS,
   TITLE,

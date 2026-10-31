@@ -14,10 +14,12 @@
 //                 'below', 'above', 'left' or 'right'. The rest use the cell closest to their middle.
 //   MISSIONS      region missions for mission games
 //   REGION_PLACES region id: [x, y], where the region's name is written, in map units
-//   COMPASS       [x, y], the compass rose, in open sea
+//   COMPASS       [x, y] or [x, y, size], the compass rose, in open sea
 //   BONUS         optional region id: bonus, instead of the bonus worked out from the map
 //   WRAPS         true when the left and right edges meet (the world: the Pacific is at both edges)
 //   RULES         optional rules that differ from the game's rules on this map
+//   LANDMARKS     optional names on unexplored land: [[x, y, name]], in map units
+//   SHIPS, SHIP   optional: where the ships sail ([row, column]) and which kind ('ship', 'longship')
 //   RULERS, TITLE optional flavour: the computer players' names, and what the winner becomes
 //
 // Region bonus, unless BONUS says otherwise: how many of the region's territories can be attacked

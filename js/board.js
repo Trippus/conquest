@@ -42,7 +42,7 @@ export function createBoard(svg, grid, map, { onTap, insets = () => ({ top: 0, b
   const W = grid.WIDTH;
   const H = grid.HEIGHT;
   // Region names sit in the sea next to their land (map units).
-  const { REGION_PLACES, COMPASS } = grid;
+  const { REGION_PLACES, COMPASS, LANDMARKS = [] } = grid;
 
   /* ---------- drawing, once ---------- */
 
@@ -69,6 +69,7 @@ export function createBoard(svg, grid, map, { onTap, insets = () => ({ top: 0, b
       ...T.map((t) => clear(t.x, t.y, 1.6, 1.6)),
       ...T.map(nameBox),
       ...map.regions.map((r) => clear(REGION_PLACES[r.id][0], REGION_PLACES[r.id][1] - 0.5, (r.name.length + 3) * 0.55, 1.1)),
+      ...LANDMARKS.map(([x, y, name]) => clear(x, y - 0.5, name.length * 0.55, 1.1)),
     ],
     seaLines: shapes.sea.map(({ p, q }) => [p[0], p[1], q[0], q[1]]),
     compass: COMPASS,
@@ -108,6 +109,7 @@ export function createBoard(svg, grid, map, { onTap, insets = () => ({ top: 0, b
       <path d="${shapes.coast}" stroke-width="1.5" opacity=".12"/>
       <path d="${shapes.coast}" stroke-width=".8" opacity=".18"/></g>
     <g class="art" pointer-events="none" opacity=".5">${art.sea}</g>
+    <g class="art" pointer-events="none" opacity=".85">${art.deco}</g>
     <path d="${sea}" fill="none" stroke="${INK}" stroke-width=".16" stroke-dasharray=".1 .45" stroke-linecap="round"/>
     <path class="unexplored" d="${shapes.outlines['#'] ?? ''}"/>
     <g class="lands">${T.map((t, i) => `<path class="land" data-t="${i}" d="${outline(i)}" fill="${LAND}"/>`).join('')}</g>
@@ -124,7 +126,7 @@ export function createBoard(svg, grid, map, { onTap, insets = () => ({ top: 0, b
     <g class="marks" pointer-events="none">${T.map((t, i) => `<path class="mark" data-t="${i}" d="${outline(i)}"/>`).join('')}</g>
     <g class="region-names" pointer-events="none">${map.regions
       .map((r) => `<text x="${REGION_PLACES[r.id][0]}" y="${REGION_PLACES[r.id][1]}">${r.name} +${r.bonus}</text>`)
-      .join('')}</g>
+      .join('')}${LANDMARKS.map(([x, y, name]) => `<text class="landmark" x="${x}" y="${y}">${name}</text>`).join('')}</g>
     <g class="seals">${T.map(
       (t, i) => `<g class="seal" data-t="${i}" transform="translate(${n(t.x)} ${n(t.y)})">
         <circle r="1.35" class="wax"/><use class="emblem" x="-1.08" y="-1.08" width="2.16" height="2.16"/><circle r="1.08" class="rim"/>

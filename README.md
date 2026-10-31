@@ -21,7 +21,7 @@ npm run design-shots                          # stilprøverne som PNG (kræver n
 | `js/engine.js` | Reglerne (ren logik, intet DOM): kort, turfaser, kamp, kort-sæt, gem/genspil, `view()` til online |
 | `js/ai.js` | Computerspillere: novice, medium og hard, i spillet "Let", "Normal" og "Svær" (vægtene står i `NOVICE_TUNING` og `TUNING`) og `playBots()` |
 | `js/odds.js` | Præcise chancer for et terningslag og for "kæmp til enden" |
-| `js/maps/*.js` | Kort som data: territorier, naboer, regioner og bonus. `test.js` er et lille testkort (12), `test-large.js` et stort (30) til simulationer, `world.js` verdenskortet (udkast) |
+| `js/maps/*.js` | Kort som data: territorier, naboer, regioner og bonus. `hex.js` gør et sekskantgitter med bogstaver til et kort; `vikings.js` er Vikingetogtet (25), `world.js` verdenskortet (40). `test.js` (12) og `test-large.js` (30) er testkort til simulationer |
 | `js/map-shapes.js` | Gør sekskantgitteret til tegnbare former: udjævnede omrids, grænser, kyst, havruter |
 | `design/` | Stilprøver til kortet (`stilproever.html`, `stil-*.png`) |
 | `js/rules/*.js` | Regelsæt som data: starthære, terninger, kort-bytte, rundegrænse |

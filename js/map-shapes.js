@@ -116,13 +116,13 @@ export function mapShapes(grid, { smooth = 4 } = {}) {
     let best = null;
     for (const p of cellsOf(a)) {
       for (const q of cellsOf(b)) {
-        // Across the date line (Alaska–Far East) the short way is round the back of the map.
+        // On a map whose edges meet (the world: Alaska–Far East) the short way may be round the back.
         const dx = Math.abs(p[0] - q[0]);
-        const d = Math.hypot(Math.min(dx, grid.WIDTH - dx), p[1] - q[1]);
+        const d = Math.hypot(grid.WRAPS ? Math.min(dx, grid.WIDTH - dx) : dx, p[1] - q[1]);
         if (!best || d < best.d) best = { d, p, q };
       }
     }
-    return { from: a, to: b, ...best, wraps: Math.abs(best.p[0] - best.q[0]) > grid.WIDTH / 2 };
+    return { from: a, to: b, ...best, wraps: !!grid.WRAPS && Math.abs(best.p[0] - best.q[0]) > grid.WIDTH / 2 };
   });
 
   return { outlines, coast: paths.coast.join(''), borders: paths.border.join(''), regions: paths.region.join(''), sea };

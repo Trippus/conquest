@@ -2,7 +2,7 @@
 // endings. Used for balance (a seat or region that wins far too often shows up here) and to check
 // that a stronger bot really is stronger.
 //
-// Run: npm run sim -- [games=200] [bots=medium,medium,medium,medium] [map=test|large|world] [mode=world|mission]
+// Run: npm run sim -- [games=200] [bots=medium,medium,medium,medium] [map=test|large|world|vikings] [mode=world|mission]
 //   npm run sim -- 400 hard,medium,medium,medium large   one hard bot against three medium ones, 30 territories
 // The bots move one seat on each game, so no bot always gets the first move.
 import * as G from '../js/engine.js';
@@ -10,6 +10,7 @@ import { playBots, LEVELS } from '../js/ai.js';
 import { TEST_MAP } from '../js/maps/test.js';
 import { TEST_LARGE } from '../js/maps/test-large.js';
 import { WORLD } from '../js/maps/world.js';
+import { VIKINGS, RULES as VIKING_RULES } from '../js/maps/vikings.js';
 import { MODERN } from '../js/rules/modern.js';
 
 const games = +(process.argv[2] ?? 200);
@@ -19,9 +20,9 @@ if (bots.length < 2 || bots.some((b) => !LEVELS.includes(b))) {
   process.exit(1);
 }
 const n = bots.length;
-const MAPS = { test: TEST_MAP, large: TEST_LARGE, world: WORLD };
+const MAPS = { test: TEST_MAP, large: TEST_LARGE, world: WORLD, vikings: VIKINGS };
 const map = G.prepareMap(MAPS[process.argv[4] ?? 'test']);
-const rules = { ...MODERN, maxRounds: 150 };
+const rules = { ...MODERN, ...(process.argv[4] === 'vikings' ? VIKING_RULES : {}), maxRounds: 150 };
 
 const seatWins = Array(n).fill(0);
 const botWins = Array(n).fill(0); // by bot (its place in the list), whatever seat it had

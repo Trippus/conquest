@@ -10,7 +10,9 @@
 //
 // Region bonus: how many of the region's territories can be attacked from outside, plus one per
 // three territories, minus one (at least 2). Few ways in and many territories is worth more.
-// Bot games tune it later (npm run sim -- 1000 normal,normal,normal world).
+// Bot games tune it later (npm run sim -- 1000 hard,hard,hard world).
+
+import { hexMap } from './hex.js';
 
 export const GRID = [
   '................bbbbb.ggggggggg.........................................',
@@ -152,77 +154,10 @@ export const SEA = [
   ['q', 'g'], // Davisstrædet
 ];
 
-/* ---------- geometry ---------- */
+// Where the region names and the compass go, in map units.
+export const REGION_PLACES = { na: [10, 19], sa: [22, 33], eu: [57.5, 5], af: [55, 30], as: [84, 27], oc: [119, 30] };
+export const COMPASS = [91, 35.5]; // in the open sea between Africa and Australia
 
-const ROOT3 = Math.sqrt(3);
-// Centre of a hex with side 1. Odd rows are shifted half a hex to the right.
-export const hexCenter = (row, col) => [ROOT3 * (col + 0.5 * (row & 1)) + ROOT3 / 2, 1.5 * row + 1];
-export const WIDTH = ROOT3 * (GRID[0].length + 0.5);
-export const HEIGHT = 1.5 * GRID.length + 0.5;
-
-// Corners of a pointy-top hex, clockwise from the top.
-export function hexCorners(row, col) {
-  const [x, y] = hexCenter(row, col);
-  return [0, 1, 2, 3, 4, 5].map((i) => {
-    const a = (Math.PI / 3) * i - Math.PI / 2;
-    return [x + Math.cos(a), y + Math.sin(a)];
-  });
-}
-
-// The six neighbouring cells in GRID (odd-row offset layout), in the same order as the hex edges:
-// edge i runs from corner i to corner i + 1.
-export function hexNeighbours(row, col) {
-  const odd = row & 1;
-  return [
-    [row - 1, col + odd], // up right
-    [row, col + 1], // right
-    [row + 1, col + odd], // down right
-    [row + 1, col - 1 + odd], // down left
-    [row, col - 1], // left
-    [row - 1, col - 1 + odd], // up left
-  ];
-}
-
-export const cellAt = (row, col) => GRID[row]?.[col] ?? '.';
-
-/* ---------- the map definition ---------- */
-
-function build() {
-  const adj = Object.fromEntries(Object.keys(TERRITORIES).map((l) => [l, new Set()]));
-  const cells = Object.fromEntries(Object.keys(TERRITORIES).map((l) => [l, []]));
-  GRID.forEach((line, row) => {
-    [...line].forEach((l, col) => {
-      if (l === '.') return;
-      if (!TERRITORIES[l]) throw new Error(`unknown letter ${l} at row ${row}, column ${col}`);
-      cells[l].push([row, col]);
-      for (const [r, c] of hexNeighbours(row, col)) {
-        const n = cellAt(r, c);
-        if (n !== '.' && n !== l) adj[l].add(n);
-      }
-    });
-  });
-  for (const [a, b] of SEA) adj[a].add(b), adj[b].add(a);
-
-  const territories = {};
-  for (const [l, [id, name, region]] of Object.entries(TERRITORIES)) {
-    // The label goes on the territory's own cell closest to the middle of all its cells.
-    const pts = cells[l].map(([r, c]) => hexCenter(r, c));
-    const mx = pts.reduce((n, p) => n + p[0], 0) / pts.length;
-    const my = pts.reduce((n, p) => n + p[1], 0) / pts.length;
-    const [x, y] = PLACES[l]
-      ? hexCenter(PLACES[l][0], PLACES[l][1])
-      : pts.reduce((best, p) => (Math.hypot(p[0] - mx, p[1] - my) < Math.hypot(best[0] - mx, best[1] - my) ? p : best));
-    const label = PLACES[l]?.[2] ?? 'below';
-    territories[id] = { name, region, adj: [...adj[l]].map((n) => TERRITORIES[n][0]), x, y, label, letter: l };
-  }
-
-  const regions = {};
-  for (const [r, name] of Object.entries(REGIONS)) {
-    const own = Object.values(territories).filter((t) => t.region === r);
-    const entries = own.filter((t) => t.adj.some((n) => territories[n].region !== r)).length;
-    regions[r] = { name, bonus: Math.max(2, entries + Math.floor(own.length / 3) - 1) };
-  }
-  return { id: 'world', name: 'Verden', regions, territories, missions: MISSIONS };
-}
-
-export const WORLD = build();
+export const WORLD_GRID = hexMap({ id: 'world', name: 'Verden', GRID, REGIONS, TERRITORIES, TERRAIN, PLACES, MISSIONS, SEA, REGION_PLACES, COMPASS, WRAPS: true });
+export const { hexCenter, hexCorners, hexNeighbours, cellAt, WIDTH, HEIGHT, WRAPS } = WORLD_GRID;
+export const WORLD = WORLD_GRID.MAP;

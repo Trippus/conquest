@@ -1,12 +1,13 @@
-// The game screen: the world map (js/board.js draws it), turns taps into engine actions and lets
-// the bots play their turns.
+// The game screen: the map (js/board.js draws it), turns taps into engine actions and lets the
+// bots play their turns.
 //
 // The saved game is the setup plus the list of actions, replayed on load, exactly like a
 // replay or (later) an online game. Debug hook: window.__conquest.
 
 import * as G from './engine.js';
 import { botAction } from './ai.js';
-import * as WORLD from './maps/world.js';
+import { WORLD_GRID } from './maps/world.js';
+import { VIKINGS_GRID } from './maps/vikings.js';
 import { MODERN } from './rules/modern.js';
 import { createBoard, PLAYER_COLORS as COLORS, sealIcon } from './board.js';
 import { Sound } from './audio.js';
@@ -17,21 +18,37 @@ const DELAY = { normal: 650, fast: 140 };
 const SETTINGS = 'conquest.settings';
 // people: the players at this device, each with a name (empty: a default) and a coat of arms
 // (colour and emblem number); opponents: how many computer players.
-const DEFAULTS = { people: [{ name: '', look: 0 }], opponents: 2, level: 'medium', mode: 'mission', speed: 'normal', sound: true, theme: 'dark' };
+const DEFAULTS = { people: [{ name: '', look: 0 }], opponents: 2, level: 'medium', mode: 'mission', map: 'vikings', speed: 'normal', sound: true, theme: 'dark' };
 const NAME_LENGTH = 14;
-// The computer opponents. Made-up commanders, so the table has someone to play against.
+// The computer opponents. Made-up commanders, so the table has someone to play against; a map from
+// another age has its own (RULERS).
 const OPPONENTS = ['Grevinde Holm', 'Oberst Vind', 'Admiral Storm', 'Generalinde Ravn', 'Major Falk', 'Hertug Ulv'];
 
-const map = G.prepareMap(WORLD.WORLD);
-const rules = MODERN;
+// The maps, in the order the setup shows them. A saved game names its map; older saves were all
+// played on the world.
+const MAPS = { vikings: VIKINGS_GRID, world: WORLD_GRID };
+let rules = MODERN; // the game's rules, with the map's own changes
 const $ = (id) => document.getElementById(id);
-const board = createBoard($('board'), WORLD, map, {
-  onTap: (t) => tap(t),
-  // The players at the top and the turn panel at the bottom cover the map.
-  insets: () => ({ top: $('hud').getBoundingClientRect().bottom, bottom: innerHeight - $('bar').getBoundingClientRect().top }),
-});
+let grid = null; // the map's drawing data (js/maps/hex.js)
+let map = null; // the map the engine plays on
+let board = null;
 
-let game = null; // { setup, seats: ['human' | 'novice' | 'medium' | 'hard'], colors, speed, actions }
+// Draws a map. The board is made anew on a fresh copy of the <svg>, so the old one's listeners go too.
+function useMap(id) {
+  if (grid?.id === id) return;
+  grid = MAPS[id] ?? WORLD_GRID;
+  map = G.prepareMap(grid.MAP);
+  rules = { ...MODERN, ...grid.RULES };
+  const svg = $('board').cloneNode(false);
+  $('board').replaceWith(svg);
+  board = createBoard(svg, grid, map, {
+    onTap: (t) => tap(t),
+    // The players at the top and the turn panel at the bottom cover the map.
+    insets: () => ({ top: $('hud').getBoundingClientRect().bottom, bottom: innerHeight - $('bar').getBoundingClientRect().top }),
+  });
+}
+
+let game = null; // { map, setup, seats: ['human' | 'novice' | 'medium' | 'hard'], colors, speed, actions }
 let s = null; // the current state
 let sel = { from: -1, to: -1, n: 0 }; // what the player has tapped
 let botTimer = 0;
@@ -88,16 +105,18 @@ function saveSettings(settings) {
 function startFromSettings(settings = loadSettings()) {
   const people = settings.people.map((x, i) => ({ kind: 'human', name: personName(settings, i), color: x.look }));
   const free = COLORS.map((_, i) => i).filter((i) => !settings.people.some((x) => x.look === i));
-  const names = [...OPPONENTS].sort(() => Math.random() - 0.5);
+  const names = [...(MAPS[settings.map]?.RULERS ?? OPPONENTS)].sort(() => Math.random() - 0.5);
   const bots = Array.from({ length: settings.opponents }, (_, i) => ({ kind: settings.level, name: names[i], color: free[i] }));
-  startGame([...people, ...bots].sort(() => Math.random() - 0.5), settings.speed, settings.mode);
+  startGame([...people, ...bots].sort(() => Math.random() - 0.5), settings.speed, settings.mode, undefined, settings.map);
 }
 
 // order: [{ kind: 'human' | 'novice' | 'medium' | 'hard', name, color }] in turn order.
-function startGame(order, speed, mode = 'mission', seed = (Math.random() * 2 ** 31) | 0) {
+function startGame(order, speed, mode = 'mission', seed = (Math.random() * 2 ** 31) | 0, mapId = 'world') {
   const humans = order.filter((x) => x.kind === 'human').length;
   $('intro').hidden = true;
+  useMap(mapId);
   game = {
+    map: grid.id,
     setup: { players: order.map((x) => x.name), seed, mode },
     seats: order.map((x) => x.kind),
     colors: order.map((x) => x.color),
@@ -198,6 +217,7 @@ function load() {
   try {
     const saved = JSON.parse(localStorage.getItem(KEY));
     if (!saved) return false;
+    useMap(saved.map ?? 'world');
     s = G.replay(map, rules, saved.setup, saved.actions);
     game = saved;
     return true;
@@ -487,7 +507,8 @@ const CHOICES = {
   opponents: () =>
     Array.from({ length: MAX_PLAYERS - draft.people.length - fewestBots() + 1 }, (_, i) => [fewestBots() + i, String(fewestBots() + i)]),
   level: () => [['novice', 'Let'], ['medium', 'Normal'], ['hard', 'Svær']],
-  mode: () => [['mission', 'Hemmelig mission'], ['world', 'Hele verden']],
+  map: () => Object.entries(MAPS).map(([id, g]) => [id, g.name]),
+  mode: () => [['mission', 'Hemmelig mission'], ['world', 'Erobr hele kortet']],
   speed: () => [['normal', 'Roligt'], ['fast', 'Hurtigt']],
 };
 
@@ -496,7 +517,7 @@ const andList = (list) => (list.length > 1 ? `${list.slice(0, -1).join(', ')} og
 function summary(x) {
   const names = andList(x.people.map((_, i) => personName(x, i)));
   const bots = `${x.opponents} ${x.opponents === 1 ? 'computerspiller' : 'computerspillere'} (${{ novice: 'lette', medium: 'normale', hard: 'svære' }[x.level]})`;
-  return `${x.opponents ? `${names} mod ${bots}` : `${names} mod hinanden`} · ${x.mode === 'mission' ? 'hemmelig mission' : 'erobr hele verden'}`;
+  return `${x.opponents ? `${names} mod ${bots}` : `${names} mod hinanden`} · ${MAPS[x.map]?.name ?? 'Verden'} · ${x.mode === 'mission' ? 'hemmelig mission' : 'erobr hele kortet'}`;
 }
 
 // One row per person: their coat of arms (tap to change it), their name, and × to remove them.
@@ -626,7 +647,7 @@ function openGameOver() {
     rounds: `${subject(s.winner)} havde flest områder, da runderne slap op.`,
   }[s.won];
   // The winner, big: their coat of arms, their name and the title they have won.
-  $('over-ruler').innerHTML = `${sealIcon(lookOf(s.winner))}<b>${w.name}</b><span>Ruler of the Map</span>`;
+  $('over-ruler').innerHTML = `${sealIcon(lookOf(s.winner))}<b>${w.name}</b><span>${grid.TITLE ?? 'Ruler of the Map'}</span>`;
   const place = G.standings(s);
   const rows = place.map((p, i) => {
     const pl = s.players[p];
@@ -848,8 +869,8 @@ new ResizeObserver(() => document.documentElement.style.setProperty('--bar-h', `
 
 /* ---------- start ---------- */
 
-$('zoom-in').addEventListener('click', board.zoomIn);
-$('zoom-out').addEventListener('click', board.zoomOut);
+$('zoom-in').addEventListener('click', () => board.zoomIn());
+$('zoom-out').addEventListener('click', () => board.zoomOut());
 
 if (load()) {
   if (s.phase === 'occupy') sel.n = s.armies[s.occupy.from] - 1;
@@ -857,6 +878,7 @@ if (load()) {
   focusOnPlayer();
 } else {
   // An empty map behind the start screen until the first game starts.
+  useMap(loadSettings().map);
   s = G.newGame(map, rules, { players: ['', ''], seed: 1 });
   game = null;
   board.update({ ...s, owner: s.owner.map(() => -1) });
@@ -867,14 +889,14 @@ showIntro();
 window.__conquest = {
   get state() { return s; },
   get game() { return game; },
-  map,
-  rules,
-  board,
+  get map() { return map; },
+  get rules() { return rules; },
+  get board() { return board; },
   act,
   tap,
-  // start(['human', 'hard', …], speed, mode, seed): a game with these seats in this order.
-  start: (seats, speed = 'fast', mode = 'mission', seed) =>
-    startGame(seats.map((kind, i) => ({ kind, name: kind === 'human' ? 'Dig' : OPPONENTS[i], color: i })), speed, mode, seed),
+  // start(['human', 'hard', …], speed, mode, seed, map): a game with these seats in this order.
+  start: (seats, speed = 'fast', mode = 'mission', seed, mapId = 'world') =>
+    startGame(seats.map((kind, i) => ({ kind, name: kind === 'human' ? 'Dig' : OPPONENTS[i], color: i })), speed, mode, seed, mapId),
   startFromSettings,
   showIntro,
   openLuck,

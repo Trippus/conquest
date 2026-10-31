@@ -21,10 +21,7 @@ export const sealIcon = (i) =>
 
 const NS = 'http://www.w3.org/2000/svg';
 const INK = '#4a3726';
-const COMPASS = [91, 35.5]; // in the open sea between Africa and Australia
 const LAND = '#f4e8cc';
-// Region names sit in the sea next to their land (map units, see design/styles.js).
-const REGION_PLACES = { na: [10, 19], sa: [22, 33], eu: [57.5, 5], af: [55, 30], as: [84, 27], oc: [119, 30] };
 const TAP_SLOP = 8; // px a finger may move and still count as a tap
 
 const n = (v) => +v.toFixed(2);
@@ -44,6 +41,8 @@ export function createBoard(svg, grid, map, { onTap, insets = () => ({ top: 0, b
   const T = map.territories;
   const W = grid.WIDTH;
   const H = grid.HEIGHT;
+  // Region names sit in the sea next to their land (map units).
+  const { REGION_PLACES, COMPASS } = grid;
 
   /* ---------- drawing, once ---------- */
 
@@ -59,7 +58,7 @@ export function createBoard(svg, grid, map, { onTap, insets = () => ({ top: 0, b
   const clear = (x, y, w, h) => ({ x0: x - w, y0: y - h, x1: x + w, y1: y + h });
   const nameBox = (t) => {
     const half = t.name.length * 0.27 + 0.3;
-    const side = grid.WORLD.territories[t.id]?.label ?? 'below';
+    const side = grid.MAP.territories[t.id]?.label ?? 'below';
     if (side === 'above') return clear(t.x, t.y - 2, half, 0.8);
     if (side === 'left') return clear(t.x - 1.6 - half, t.y, half, 0.8);
     if (side === 'right') return clear(t.x + 1.6 + half, t.y, half, 0.8);
@@ -122,7 +121,7 @@ export function createBoard(svg, grid, map, { onTap, insets = () => ({ top: 0, b
     <g class="seals">${T.map(
       (t, i) => `<g class="seal" data-t="${i}" transform="translate(${n(t.x)} ${n(t.y)})">
         <circle r="1.35" class="wax"/><use class="emblem" x="-1.08" y="-1.08" width="2.16" height="2.16"/><circle r="1.08" class="rim"/>
-        <text class="count" dy=".4"></text><text class="name" ${NAME_AT[grid.WORLD.territories[t.id]?.label ?? 'below']}>${t.name}</text></g>`,
+        <text class="count" dy=".4"></text><text class="name" ${NAME_AT[grid.MAP.territories[t.id]?.label ?? 'below']}>${t.name}</text></g>`,
     ).join('')}</g>
     <g class="mirrors">${mirrors
       .map(

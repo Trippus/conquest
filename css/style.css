@@ -81,7 +81,7 @@ button.wide { width: 100%; }
 [data-plain~='bands'] #board .region-bands { display: none; }
 [data-plain~='sea'] #board .waves, [data-plain~='sea'] #board .deco { display: none; }
 /* while the map is dragged or zoomed the sea holds still, so the phone only redraws the map once */
-#board.moving .bob, #board.moving .waves { animation-play-state: paused; }
+#board.moving .bob { animation-play-state: paused; }
 /* A mirror seal: the territory across the edge of the map, in a dashed ring. */
 #board .mirror .ring { fill: #f4e8cc; stroke: #4a3726; stroke-width: .12; stroke-dasharray: .35 .25; opacity: .9; }
 #board .mirror .name { font-size: .85px; }
@@ -272,17 +272,16 @@ dialog .big { font-family: var(--title); font-size: 20px; margin: 8px 0; }
 #ladder span { padding: 2px 8px; border-radius: 6px; border: 1px solid var(--line); font-size: 14px; }
 #ladder span.next { background: var(--primary); border-color: transparent; font-weight: 700; color: var(--primary-ink); }
 
-/* a little life at sea: the ships rock, the waves drift */
+/* a little life at sea: the ships rock. (The waves stand still: moving them redrew the whole map
+   every frame, and the land flickered on a phone while zooming.) */
 #board .bob { transform-box: fill-box; transform-origin: 50% 85%; animation: bob 3.6s ease-in-out infinite; }
 @keyframes bob {
   0%, 100% { transform: translate(0, 0) rotate(-7deg); }
   50% { transform: translate(.5px, -.35px) rotate(7deg); }
 }
-#board .waves { animation: drift 5s ease-in-out infinite alternate; }
-@keyframes drift { from { transform: translateX(-.6px); opacity: .38; } to { transform: translateX(.6px); opacity: .55; } }
 
 @media (prefers-reduced-motion: reduce) {
-  #board .bob, #board .waves,
+  #board .bob,
   .steam, #luck-btn.ready, #dice.rolling .die, #board .seal .wax, #board .washes path, #board .mark.target { animation: none !important; }
 }
 

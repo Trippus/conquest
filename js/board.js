@@ -136,8 +136,9 @@ export function createBoard(svg, grid, map, { onTap, onRegion = () => {}, insets
       .map((r, i) => `<path data-region="${i}" d="${regionOutlines[r.id]}"/>`)
       .join('')}</g>
     <g class="art" pointer-events="none" opacity=".7">${art.land}</g>
-    <!-- Crumpled paper over land and sea alike (CC0 texture, see LICENSES.md). -->
-    <rect x="${n(-W)}" y="${n(-H)}" width="${n(3 * W)}" height="${n(3 * H)}" class="paper" fill="url(#paper)" pointer-events="none" style="mix-blend-mode: multiply" opacity=".75"/>
+    <!-- Crumpled paper over land and sea alike (CC0 texture, see LICENSES.md). Not blended
+         (multiply): blending made every redraw costlier, and the land flickered while zooming. -->
+    <rect x="${n(-W)}" y="${n(-H)}" width="${n(3 * W)}" height="${n(3 * H)}" class="paper" fill="url(#paper)" pointer-events="none" opacity=".18"/>
     <g class="ink" fill="none" stroke="${INK}" stroke-linejoin="round" filter="url(#ink)" pointer-events="none">
       <path d="${shapes.borders}" stroke-width=".13" stroke-dasharray=".45 .3"/>
       <path d="${shapes.regions}" stroke-width=".24"/>
@@ -170,16 +171,25 @@ export function createBoard(svg, grid, map, { onTap, onRegion = () => {}, insets
 
   // marks: { selected: Set, targets: Set, chosen: Set }. colors: each player's colour (an index
   // into PLAYER_COLORS), when it is not simply their seat number.
+  // Sets an attribute or text only when it changes: every change makes the phone redraw.
+  const set = (el, name, value) => {
+    if (value === null) {
+      if (el.hasAttribute(name)) el.removeAttribute(name);
+    } else if (el.getAttribute(name) !== value) el.setAttribute(name, value);
+  };
+  const text = (el, value) => {
+    if (el.textContent !== value) el.textContent = value;
+  };
+
   function update(s, { selected = new Set(), targets = new Set(), chosen = new Set() } = {}, colors = null) {
     T.forEach((t, i) => {
       const look = colors?.[s.owner[i]] ?? s.owner[i]; // colour and emblem number
       const color = PLAYER_COLORS[look] ?? 'transparent';
-      if (look >= 0) seals[i].querySelector('.emblem').setAttribute('href', `#emblem-${look}`);
-      else seals[i].querySelector('.emblem').removeAttribute('href');
-      washes[i].setAttribute('fill', color);
-      seals[i].querySelector('.wax').setAttribute('fill', s.owner[i] >= 0 ? color : '#b9a98a');
-      seals[i].querySelector('.count').textContent = s.owner[i] >= 0 ? s.armies[i] : '';
-      marks[i].setAttribute('class', `mark${selected.has(i) ? ' selected' : chosen.has(i) ? ' chosen' : targets.has(i) ? ' target' : ''}`);
+      set(seals[i].querySelector('.emblem'), 'href', look >= 0 ? `#emblem-${look}` : null);
+      set(washes[i], 'fill', color);
+      set(seals[i].querySelector('.wax'), 'fill', s.owner[i] >= 0 ? color : '#b9a98a');
+      text(seals[i].querySelector('.count'), s.owner[i] >= 0 ? String(s.armies[i]) : '');
+      set(marks[i], 'class', `mark${selected.has(i) ? ' selected' : chosen.has(i) ? ' chosen' : targets.has(i) ? ' target' : ''}`);
     });
     mirrorSeals.forEach((g) => {
       const i = +g.dataset.t;

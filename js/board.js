@@ -296,14 +296,7 @@ export function createBoard(svg, grid, map, { onTap, onRegion = () => {}, insets
   const pointers = new Map();
   let moved = 0;
   let pinch = null;
-  let still = 0;
-  const moving = (ms) => {
-    svg.classList.add('moving');
-    clearTimeout(still);
-    if (ms) still = setTimeout(() => svg.classList.remove('moving'), ms);
-  };
   svg.addEventListener('pointerdown', (e) => {
-    moving(0);
     cancelAnimationFrame(glide); // a finger on the map stops it gliding
     svg.setPointerCapture(e.pointerId);
     pointers.set(e.pointerId, [e.clientX, e.clientY]);
@@ -336,7 +329,6 @@ export function createBoard(svg, grid, map, { onTap, onRegion = () => {}, insets
     if (!pointers.has(e.pointerId)) return;
     pointers.delete(e.pointerId);
     if (pointers.size < 2) pinch = null;
-    if (!pointers.size) moving(200);
     if (e.type === 'pointerup' && !pointers.size && moved <= TAP_SLOP) {
       // The pointer is captured by the svg, so find what is under it by position.
       const under = document.elementFromPoint(e.clientX, e.clientY);
@@ -352,7 +344,6 @@ export function createBoard(svg, grid, map, { onTap, onRegion = () => {}, insets
     'wheel',
     (e) => {
       e.preventDefault();
-      moving(300);
       zoomAt(Math.exp(-e.deltaY * 0.0015), e.clientX, e.clientY);
     },
     { passive: false },

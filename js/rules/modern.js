@@ -31,4 +31,9 @@ export const MODERN = {
   maxRounds: 0, // 0: play until one player holds the world; otherwise most territories wins after this round
   // The share of the start armies an easy (novice) computer player goes without; a map may set more.
   noviceHandicap: 0,
+  // The share of extra start armies a hard computer player gets. On the small maps the hard bot's
+  // plan (build up, then take a region) barely beats the medium one before a mission is done, and a
+  // player who knows the game won by round 4. With +25% a hard bot standing in for the player wins
+  // 21–23% against two hard ones instead of 35–37% (Japan, Alexander, Napoleon).
+  hardBonus: 0.25,
 };

@@ -131,9 +131,10 @@ function startGame(order, speed, mode = 'mission', seed = (Math.random() * 2 ** 
   const humans = order.filter((x) => x.kind === 'human').length;
   $('intro').hidden = true;
   useMap(mapId);
-  // Easy computer players start weaker, by how much the map's rules say.
+  // Easy computer players start weaker, by how much the map's rules say; hard ones start stronger.
   const start = G.startArmies(rules, map.territories.length, order.length);
-  const handicap = order.map((x) => (x.kind === 'novice' ? -Math.round(start * rules.noviceHandicap) : 0));
+  const extra = { novice: -rules.noviceHandicap, hard: rules.hardBonus };
+  const handicap = order.map((x) => Math.round(start * (extra[x.kind] ?? 0)));
   game = {
     map: grid.id,
     setup: { players: order.map((x) => x.name), seed, mode, handicap },

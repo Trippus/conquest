@@ -31,6 +31,7 @@ export const CENTRES = [
   [35.95, 136.3, 'I'], [36.6, 136.7, 'Z'], [37.3, 138.4, 'E'],
   // Kanto
   [35.3, 139.15, 'D'], [35.75, 139.75, 'X'], [36.4, 140.3, 'T'],
+  [35.1, 140.0, 'X'], // Bōsō, Edo's side of the bay
   // Tohoku
   [37.5, 139.9, 'a'], [38.3, 140.9, 's'], [39.7, 141.1, 'r'],
   // Unexplored: Ezo, Oki, Gotō, Tsushima and Korea, Manchuria and the Russian coast, the China coast, the Ryukyu

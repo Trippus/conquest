@@ -19,7 +19,7 @@
 //   WRAPS         true when the left and right edges meet (the world: the Pacific is at both edges)
 //   RULES         optional rules that differ from the game's rules on this map
 //   LANDMARKS     optional names on unexplored land: [[x, y, name]], in map units
-//   SHIP          optional: the kind of ship by the sea routes ('ship', 'longship', 'galley'); SHIP_COUNT how many;
+//   SHIP          optional: the kind of ship by the sea routes ('ship', 'longship', 'galley', 'atakebune'); SHIP_COUNT how many;
 //                 OCEANS, [row, column] in open sea for the ships the routes have no room for
 //   RULERS, TITLE optional flavour: the computer players' names, and what the winner becomes
 //   NAMES         optional names in other languages: { en: { name, REGIONS, TERRITORIES, LANDMARKS, RULERS } },

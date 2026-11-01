@@ -85,6 +85,19 @@ export const artDefs = (quarters = 'NØSV') => `
     <path d="M-1.1.02L-1.35.6M-.7.05L-.9.65M-.3.07L-.45.68M.1.07L-.02.68M.5.06L.42.66M.9.04L.86.62" fill="none" opacity=".85"/>
     <path d="M-1.6.85q.3-.15.6 0t.6 0M.3.85q.3-.15.6 0t.6 0" fill="none" opacity=".6"/>
   </g>
+  <g id="art-atakebune" stroke="${INK}" stroke-width=".05" stroke-linejoin="round" stroke-linecap="round">
+    <path d="M1.25-1.05V-1.75" fill="none"/>
+    <path d="M1.25-1.75H1.6V-1.3H1.25" fill="#a3261b"/>
+    <path d="M-.4-1.05V-1.45H.35V-1.05Z" fill="#f6ecd4"/>
+    <path d="M-.62-1.4Q-.05-1.5.55-1.4Q.2-1.6-.05-1.78Q-.3-1.6-.62-1.4Z" fill="#3b2f2a"/>
+    <path d="M-1.45-.45V-1H1.4V-.45Z" fill="#8a6a4a"/>
+    <path d="M-1.62-.98Q0-1.12 1.58-.98Q0-1.02-1.62-.98Z" fill="#3b2f2a"/>
+    <path d="M-1.2-.78h.2M-.7-.78h.2M-.2-.78h.2M.3-.78h.2M.8-.78h.2" fill="none" stroke-width=".1"/>
+    <path d="M-1.75-.5Q-1.7-.05-1.45.08H1.45Q1.75-.1 1.85-.6L1.5-.45H-1.5Z" fill="#6b4a32"/>
+    <path d="M-1.3-.2H1.35" fill="none" opacity=".6"/>
+    <path d="M-1.1.05L-1.3.6M-.6.07L-.75.65M-.1.08L-.2.68M.4.08L.32.66M.9.06L.86.62" fill="none" opacity=".85"/>
+    <path d="M-1.6.85q.3-.15.6 0t.6 0M.3.85q.3-.15.6 0t.6 0" fill="none" opacity=".6"/>
+  </g>
   <g id="art-compass">${compassRose(quarters)}</g>`;
 
 // A fixed "random" number for a cell, so the map looks the same every time.
@@ -142,7 +155,7 @@ export function mapArt(grid, { keepClear = [], seaLines = [], compass = null } =
     take(compass[0], compass[1], 5.3 * size);
   }
   // Ships sail beside the longest sea routes (not those round the back of the map), a little to
-  // one side of the dashed line, on open sea. grid.SHIP names the kind ('ship' or 'longship'),
+  // one side of the dashed line, on open sea. grid.SHIP names the kind ('ship', 'longship', 'galley' or 'atakebune'),
   // grid.SHIP_COUNT how many (3).
   const seaCell = (x, y) => {
     const r = Math.round((y - 1) / 1.5);

@@ -1264,6 +1264,8 @@ document.addEventListener(
 document.addEventListener('visibilitychange', () => (document.hidden ? Music.pause() : Music.play()));
 Sound.enabled = loadSettings().sound !== false;
 Music.enabled = loadSettings().music !== false;
+// After an update, the newest files all together (sw.js).
+navigator.serviceWorker?.register('sw.js').catch(() => {});
 
 // The zoom buttons sit just above the turn panel, whatever its height.
 new ResizeObserver(() => document.documentElement.style.setProperty('--bar-h', `${$('bar').offsetHeight}px`)).observe($('bar'));

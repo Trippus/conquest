@@ -89,9 +89,12 @@ inddelingen: det er her de fleste ændringer kommer, og man går tilbage til tri
 1. **Pladser:** vinder alle pladser lige ofte med 2, 3 og 4 spillere? Ellers ret
    `RULES.laterSeatArmies` (ekstra starthære til senere pladser).
 2. **Missioner:** hver mission skal vinde 15–40 % af gangene. Ret ellers missionerne.
-3. **Let:** en Normal-computer (som stand-in for en spiller) skal vinde omkring 100 % mod 2 Let og
-   85–90 % mod 3, som på Italien, hvor Martin fandt det rigtigt (med 75–82 % var det for svært for ham).
-   Ret `RULES.noviceHandicap` (hvor mange færre starthære Let får på dette kort).
+3. **Let:** en Normal-computer (som stand-in for en spiller) skal vinde 90 %+ mod 2 Let og 75–82 % mod
+   3. Ret `RULES.noviceHandicap` (hvor mange færre starthære Let får på dette kort).
+
+   Undtagelse: et kort med mange små regioner (2–3 områder) giver hurtige bonusser, så modstandernes hære
+   vokser hurtigt, mere end målingen viser. Italien var for svært med 79 % og blev rigtigt med 88 %. Mål
+   sådan et kort til 85–90 % mod 3.
 
 Andre værdier kan prøves uden at ændre filen: `npm run balance -- <kort> seats=2:7,3:2 handicap=0.3`.
 

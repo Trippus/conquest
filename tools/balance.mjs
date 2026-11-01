@@ -4,8 +4,8 @@
 //      seats win too often, raise RULES.laterSeatArmies for that player count, and the other way.
 //   2. Missions: how often each mission wins with 3 and 4 players. Aim for 15–40%.
 //   3. Let: how often a medium bot, standing in for a player who knows the game, beats two and three
-//      easy (novice) bots. Aim for about 95%+ and 85–90%, as on Italy, which Martin found right
-//      (75–82% was too hard for him); tune RULES.noviceHandicap.
+//      easy (novice) bots. Aim for about 90%+ and 75–82%; tune RULES.noviceHandicap. A map with many
+//      small regions (2–3 territories) gives quick bonuses: aim for 85–90% there, as on Italy.
 //
 // Run: npm run balance -- <map> [games=600] [seats=2:7,3:2,4:1] [handicap=0.35]
 //   seats and handicap try other values than the map's RULES without changing the file.
@@ -82,7 +82,7 @@ for (const n of [3, 4]) {
     const handicap = levels.map((l) => (l === 'novice' ? -Math.round(start * rules.noviceHandicap) : 0));
     if (playBots(map, rules, { players: names.slice(0, n), seed: 3000 + g, mode: 'mission', handicap }, levels).state.winner === seat) wins++;
   }
-  const aim = n === 3 ? [0.95, 1] : [0.85, 0.9];
+  const aim = n === 3 ? [0.9, 1] : [0.75, 0.82];
   const rate = wins / games;
   console.log(`   against ${n - 1}: ${pct(wins, games)}   (aim ${pct(aim[0], 1)}${n === 3 ? '+' : `–${pct(aim[1], 1)}`})${rate < aim[0] - 0.03 ? '   ← too hard' : n === 4 && rate > aim[1] + 0.05 ? '   ← too easy' : ''}`);
 }

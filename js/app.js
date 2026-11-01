@@ -6,10 +6,11 @@
 
 import * as G from './engine.js';
 import { botAction } from './ai.js';
-import { MAPS, rulesFor } from './maps/index.js';
+import { MAPS, rulesFor, inLanguage } from './maps/index.js';
 import { MODERN } from './rules/modern.js';
 import { createBoard, PLAYER_COLORS as COLORS, sealIcon } from './board.js';
 import { Sound } from './audio.js';
+import { LANGUAGES, pickLanguage, stringsFor, translatePage } from './i18n.js';
 
 // Saves only replay on the map they were played on: v1 was the test map, v2 the 30-territory world.
 const KEY = 'conquest.v3';
@@ -19,9 +20,11 @@ const SETTINGS = 'conquest.settings';
 // (colour and emblem number); opponents: how many computer players.
 const DEFAULTS = { people: [{ name: '', look: 0 }], opponents: 2, level: 'medium', mode: 'mission', map: 'vikings', speed: 'normal', sound: true, theme: 'dark' };
 const NAME_LENGTH = 14;
-// The computer opponents. Made-up commanders, so the table has someone to play against; a map from
-// another age has its own (RULERS).
-const OPPONENTS = ['Grevinde Holm', 'Oberst Vind', 'Admiral Storm', 'Generalinde Ravn', 'Major Falk', 'Hertug Ulv'];
+// Every text in the chosen language (js/i18n.js). The computer opponents are made-up commanders
+// (L.opponents), so the table has someone to play against; a map from another age has its own (RULERS).
+let L = stringsFor(pickLanguage(savedLanguage()));
+// A map with its names in the chosen language.
+const mapIn = (id) => inLanguage(MAPS[id] ?? MAPS.world, L.lang);
 
 // The maps are listed in js/maps/index.js. A saved game names its map; older saves were all played
 // on the world.
@@ -34,9 +37,9 @@ let map = null; // the map the engine plays on
 let board = null;
 
 // Draws a map. The board is made anew on a fresh copy of the <svg>, so the old one's listeners go too.
-function useMap(id) {
-  if (grid?.id === id) return;
-  grid = MAPS[id] ?? MAPS.world;
+function useMap(id, again = false) {
+  if (grid?.id === id && !again) return;
+  grid = mapIn(id);
   map = G.prepareMap(grid.MAP);
   rules = rulesFor(grid, MODERN);
   const svg = $('board').cloneNode(false);
@@ -44,6 +47,7 @@ function useMap(id) {
   board = createBoard(svg, grid, map, {
     onTap: (t) => tap(t),
     onRegion: (r) => showRegion(r),
+    quarters: L.compass,
     // The players at the top and the turn panel at the bottom cover the map.
     insets: () => ({ top: $('hud').getBoundingClientRect().bottom, bottom: innerHeight - $('bar').getBoundingClientRect().top }),
   });
@@ -54,26 +58,18 @@ let s = null; // the current state
 let sel = { from: -1, to: -1, n: 0 }; // what the player has tapped
 let botTimer = 0;
 
-// The engine answers in English; the player reads Danish.
-const DANISH = {
-  'not your territory': 'Det område er ikke dit.',
-  'place all armies first': 'Placér alle nye hære først.',
-  'an attack needs at least 2 armies': 'Der skal være mindst 2 hære for at angribe.',
-  'not connected': 'Hærene kan kun flytte gennem dine egne områder.',
-};
-
 /* ---------- game flow ---------- */
 
 // A player's colour: alone you pick your own coat of arms; several people at the phone have the
 // first ones. The opponents take the rest, whatever order the turns come in.
 const lookOf = (p) => game?.colors?.[p] ?? p; // colour and emblem number
 const colorOf = (p) => COLORS[lookOf(p)];
-// With one person at the phone the texts speak to them: "Du" as subject, "dig" as object.
+// With one person at the phone the texts speak to them: "Du"/"You" as subject, "dig"/"you" as object.
 const soloYou = (p) => game.seats[p] === 'human' && game.seats.filter((x) => x === 'human').length === 1;
-const subject = (p) => (soloYou(p) ? 'Du' : s.players[p].name);
-const object = (p) => (soloYou(p) ? 'dig' : s.players[p].name);
+const subject = (p) => (soloYou(p) ? L.youSubject : s.players[p].name);
+const object = (p) => (soloYou(p) ? L.youObject : s.players[p].name);
 
-const personName = (x, i) => x.people[i].name.trim() || (x.people.length === 1 ? 'Dig' : `Spiller ${i + 1}`);
+const personName = (x, i) => x.people[i].name.trim() || (x.people.length === 1 ? L.you : L.player(i + 1));
 
 // The levels had other names before there were three: 'bot' and 'easy' are today's medium,
 // 'normal' is today's hard.
@@ -94,6 +90,14 @@ function loadSettings() {
     return { ...x, people: saved.people ?? oldPeople(saved), level: level(x.level) };
   } catch {
     return structuredClone(DEFAULTS); // a copy: the setup dialog changes the people in place
+  }
+}
+// The language is read before the rest of the settings can be (loadSettings needs what comes after).
+function savedLanguage() {
+  try {
+    return JSON.parse(localStorage.getItem(SETTINGS))?.lang;
+  } catch {
+    return undefined;
   }
 }
 function saveSettings(settings) {
@@ -117,7 +121,7 @@ function shuffled(arr) {
 function startFromSettings(settings = loadSettings()) {
   const people = settings.people.map((x, i) => ({ kind: 'human', name: personName(settings, i), color: x.look }));
   const free = COLORS.map((_, i) => i).filter((i) => !settings.people.some((x) => x.look === i));
-  const names = shuffled(MAPS[settings.map]?.RULERS ?? OPPONENTS);
+  const names = shuffled(mapIn(settings.map).RULERS ?? L.opponents);
   const bots = Array.from({ length: settings.opponents }, (_, i) => ({ kind: settings.level, name: names[i], color: free[i] }));
   startGame(shuffled([...people, ...bots]), settings.speed, settings.mode, undefined, settings.map);
 }
@@ -156,7 +160,7 @@ function focusOnPlayer() {
 function act(a) {
   const r = G.apply(map, rules, s, a);
   if (!r.ok) {
-    hint(DANISH[r.error] ?? r.error);
+    hint(L.errors[r.error] ?? r.error);
     return false;
   }
   s = r.state;
@@ -248,21 +252,21 @@ function tap(t) {
   const p = s.current;
   const mine = s.owner[t] === p;
   if (s.phase === 'reinforce') {
-    if (!mine) return hint('Placér hærene på dine egne områder.');
+    if (!mine) return hint(L.placeOwn);
     sel.from = t;
     act({ type: 'place', t, n: 1 });
   } else if (s.phase === 'attack') {
     if (mine) {
-      if (s.armies[t] < 2) return hint('Der skal være mindst 2 hære for at angribe herfra.');
+      if (s.armies[t] < 2) return hint(L.attackNeeds2);
       sel = { from: t, to: -1, n: 0 };
     } else if (sel.from >= 0 && map.territories[sel.from].adj.includes(t)) {
       sel.to = t;
     } else {
-      return hint(sel.from >= 0 ? 'Vælg en nabo, der ikke er din.' : 'Vælg først et af dine egne områder at angribe fra.');
+      return hint(sel.from >= 0 ? L.pickEnemy : L.pickOwnFirst);
     }
     render();
   } else if (s.phase === 'fortify') {
-    if (!mine) return hint('Du kan kun flytte mellem dine egne områder.');
+    if (!mine) return hint(L.moveOwnOnly);
     if (t === sel.from) {
       clearSel(); // tapping the start territory again lets you pick another
     } else if (sel.from >= 0 && G.fortifyTargets(map, rules, s, sel.from).includes(t)) {
@@ -271,7 +275,7 @@ function tap(t) {
     } else if (s.armies[t] > 1) {
       sel = { from: t, to: -1, n: 0 };
     } else {
-      return hint('Der skal blive mindst 1 hær tilbage. Vælg et område med flere hære.');
+      return hint(L.leaveOne);
     }
     render();
   }
@@ -304,7 +308,7 @@ function render() {
       const li = document.createElement('li');
       li.className = (i === p && s.phase !== 'over' ? 'current ' : '') + (pl.alive ? '' : 'out');
       const land = G.owned(s, i).length;
-      li.title = `${pl.name}: ${land} områder, ${pl.stars} ★ krigslykke`;
+      li.title = L.playerTitle(pl.name, land, pl.stars);
       li.innerHTML = `${sealIcon(lookOf(i))}${pl.name}
         <span class="stats">${land} · ${starsText(pl.stars)}</span>`;
       return li;
@@ -331,61 +335,63 @@ function renderBar() {
   let stepper = null; // [min, max] when the amount stepper is shown
   let shown = 0; // added to the number the stepper shows (moving in: the armies already there)
   let reserve = -1; // armies left to place, shown big while reinforcing
+  const turn = `${L.round(s.round)} · ${L.phases[s.phase]}`;
+  const names = (t) => map.territories[t].name;
 
   if (s.phase === 'over') {
-    phase = 'Spillet er slut';
-    text = `${subject(s.winner)} har vundet.`;
-    button('Til start', showIntro);
-    button('Spil igen', () => startFromSettings(), { primary: true });
+    phase = L.gameOver;
+    text = L.won(subject(s.winner), soloYou(s.winner));
+    button(L.toStart, showIntro);
+    button(L.playAgain, () => startFromSettings(), { primary: true });
   } else if (isBot()) {
-    phase = `Runde ${s.round} · ${PHASE_NAMES[s.phase]}`;
-    text = `${name} tænker …`;
+    phase = `${L.round(s.round)} · ${L.phaseNames[s.phase]}`;
+    text = L.thinking(name);
   } else if (s.phase === 'reinforce') {
-    phase = `Runde ${s.round} · Forstærk`;
+    phase = turn;
     reserve = s.reserve;
-    const lucky = lastLuck?.p === p && lastLuck.round === s.round ? ` (heraf ${lastLuck.armies} fra krigslykke)` : '';
-    if (s.reserve) text = `Tryk på dine områder for at placere hærene${lucky}.`;
-    else text = 'Alle hære er placeret.';
+    const lucky = lastLuck?.p === p && lastLuck.round === s.round ? L.fromLuck(lastLuck.armies) : '';
+    if (s.reserve) text = L.tapToPlace(lucky);
+    else text = L.allPlaced;
     const stars = s.players[p].stars;
     if (stars) {
-      text += ` Du har ${starCount(stars)}: indløs dem nu for ${armies(worth(stars))}, eller spar op (${starCount(stars + 1)} giver ${armies(worth(stars + 1))}).`;
-      button(`Indløs ${starCount(stars)} (+${armies(worth(stars))})`, () => act({ type: 'luck' }), { wide: true });
+      text += L.starsOffer(starCount(stars), armies(worth(stars)), starCount(stars + 1), armies(worth(stars + 1)));
+      button(L.cashStars(starCount(stars), armies(worth(stars))), () => act({ type: 'luck' }), { wide: true });
     }
     if (s.reserve && sel.from >= 0 && s.owner[sel.from] === p) {
-      button(`Resten på ${map.territories[sel.from].name}`, () => act({ type: 'place', t: sel.from, n: s.reserve }));
+      button(L.restOn(names(sel.from)), () => act({ type: 'place', t: sel.from, n: s.reserve }));
     }
-    button('Til angreb', () => act({ type: 'end' }), { primary: true, disabled: s.reserve > 0 });
+    button(L.toAttack, () => act({ type: 'end' }), { primary: true, disabled: s.reserve > 0 });
   } else if (s.phase === 'attack') {
-    phase = `Runde ${s.round} · Angrib`;
+    phase = turn;
     if (sel.from < 0) {
-      text = 'Vælg et af dine områder at angribe fra, eller gå videre.';
-      if (!s.conquered) text += ' Erobrer du mindst ét område i denne tur, får du en ★ krigslykke.';
-    } else if (sel.to < 0) text = `Angrib fra ${map.territories[sel.from].name}: vælg en nabo.`;
-    else text = `${map.territories[sel.from].name} (${s.armies[sel.from]}) mod ${map.territories[sel.to].name} (${s.armies[sel.to]}).`;
+      text = L.attackPick;
+      if (!s.conquered) text += L.attackStar;
+    } else if (sel.to < 0) text = L.attackFrom(names(sel.from));
+    else text = L.versus(names(sel.from), s.armies[sel.from], names(sel.to), s.armies[sel.to]);
     if (sel.to >= 0) {
-      button('Angrib', () => act({ type: 'attack', from: sel.from, to: sel.to }), { primary: true });
-      button('Kæmp til enden', () => act({ type: 'blitz', from: sel.from, to: sel.to }));
+      button(L.attack, () => act({ type: 'attack', from: sel.from, to: sel.to }), { primary: true });
+      button(L.blitz, () => act({ type: 'blitz', from: sel.from, to: sel.to }));
     }
-    button('Færdig med at angribe', () => act({ type: 'end' }));
+    button(L.endAttack, () => act({ type: 'end' }));
   } else if (s.phase === 'occupy') {
-    phase = `Runde ${s.round} · Erobret`;
+    phase = turn;
     const { from, to } = s.occupy;
     // The stepper shows how many stand in the new land; the old one keeps the rest.
-    text = `${map.territories[to].name} er din. Hvor mange hære skal stå der? ${map.territories[from].name} beholder ${s.armies[from] - sel.n}.`;
+    text = L.occupy(names(to), names(from), s.armies[from] - sel.n);
     stepper = [0, s.armies[from] - 1];
     shown = s.armies[to];
-    button('Flyt ind', () => act({ type: 'occupy', n: sel.n }), { primary: true });
+    button(L.moveIn, () => act({ type: 'occupy', n: sel.n }), { primary: true });
   } else if (s.phase === 'fortify') {
-    phase = `Runde ${s.round} · Flyt`;
-    if (sel.from < 0) text = 'Du må flytte hære én gang mellem dine egne områder. Vælg hvorfra.';
-    else if (sel.to < 0) text = `Flyt fra ${map.territories[sel.from].name}: vælg hvortil.`;
+    phase = turn;
+    if (sel.from < 0) text = L.fortifyPick;
+    else if (sel.to < 0) text = L.fortifyFrom(names(sel.from));
     else {
-      text = `Flyt fra ${map.territories[sel.from].name} til ${map.territories[sel.to].name}.`;
+      text = L.fortifyTo(names(sel.from), names(sel.to));
       stepper = [1, s.armies[sel.from] - 1];
-      button('Flyt', () => act({ type: 'fortify', from: sel.from, to: sel.to, n: sel.n }), { primary: true });
+      button(L.move, () => act({ type: 'fortify', from: sel.from, to: sel.to, n: sel.n }), { primary: true });
     }
-    if (sel.from >= 0) button('Vælg andet startområde', () => (clearSel(), render()));
-    button('Afslut tur', () => act({ type: 'end' }));
+    if (sel.from >= 0) button(L.otherStart, () => (clearSel(), render()));
+    button(L.endTurn, () => act({ type: 'end' }));
   }
 
   $('phase').textContent = phase;
@@ -393,7 +399,7 @@ function renderBar() {
   if (reserve >= 0) {
     const was = $('reserve').querySelector('b').textContent;
     $('reserve').querySelector('b').textContent = reserve;
-    $('reserve').querySelector('span').textContent = reserve === 1 ? 'hær at placere' : 'hære at placere';
+    $('reserve').querySelector('span').textContent = L.reserve(reserve);
     if (was !== String(reserve)) {
       $('reserve').classList.remove('bump');
       void $('reserve').offsetWidth;
@@ -413,8 +419,6 @@ function renderBar() {
     $('plus').onclick = () => ((sel.n = Math.min(hi, sel.n + 1)), render());
   }
 }
-
-const PHASE_NAMES = { reinforce: 'Forstærker', attack: 'Angriber', occupy: 'Angriber', fortify: 'Flytter' };
 
 const hint = (text) => ($('hint').textContent = text);
 
@@ -449,13 +453,13 @@ function showRegion(r) {
   const region = map.regions[r];
   const n = region.members.length;
   const names = region.members.map((t) => map.territories[t].name);
-  let text = `${region.name}: ${andList(names)}. Holder man alle ${n}, får man ${region.bonus} ekstra hære hver tur.`;
+  let text = L.regionText(region.name, andList(names), n, region.bonus);
   if (game) {
     const held = s.players
       .map((_, p) => [p, region.members.filter((t) => s.owner[t] === p).length])
       .filter(([, k]) => k)
       .sort((a, b) => b[1] - a[1]);
-    text += held.length === 1 ? ` ${subject(held[0][0])} har dem alle.` : ` ${held.map(([p, k]) => `${subject(p)} har ${k}`).join(', ')}.`;
+    text += held.length === 1 ? ` ${L.holdsAll(subject(held[0][0]), soloYou(held[0][0]))}` : ` ${held.map(([p, k]) => L.holds(subject(p), soloYou(p), k)).join(', ')}.`;
   }
   board.showRegion(r);
   toasts.length = 0; // the newest tap wins
@@ -509,9 +513,9 @@ function showDice(rolls, conquest, out) {
   box.innerHTML = `
     <div class="dice-row">${dice(last.a, colorOf(pa), (i) => i < pairs && last.a[i] <= last.d[i])}</div>
     <div class="dice-row">${dice(last.d, colorOf(pd), (i) => i < pairs && last.a[i] > last.d[i])}</div>
-    <div>${rolls.length > 1 ? `${rolls.length} slag · ` : ''}angriber −${lostA}, forsvarer −${lostD}</div>
-    ${conquest ? `<div><b>${map.territories[conquest.to].name} er erobret!</b></div>` : ''}
-    ${out ? `<div><b>${subject(out.p)} er slået ud.</b></div>` : ''}`;
+    <div>${rolls.length > 1 ? L.rolls(rolls.length) : ''}${L.losses(lostA, lostD)}</div>
+    ${conquest ? `<div><b>${L.conquered(map.territories[conquest.to].name)}</b></div>` : ''}
+    ${out ? `<div><b>${L.out(subject(out.p), soloYou(out.p))}</b></div>` : ''}`;
   box.hidden = false;
   const faces = [...box.querySelectorAll('.die')];
   const real = faces.map((d) => d.textContent);
@@ -529,7 +533,7 @@ function showDice(rolls, conquest, out) {
 /* ---------- dialogs ---------- */
 
 // The new game dialog: a summary of the last setup and Start. The choices sit folded away under
-// "Skift opsætning", since most of the time you just want another game like the last one.
+// "Change setup", since most of the time you just want another game like the last one.
 let draft = loadSettings();
 let lookOpen = 0; // whose coat-of-arms picker is open (-1: none)
 const MAX_PLAYERS = 6;
@@ -539,18 +543,17 @@ const fitBots = () => (draft.opponents = Math.max(fewestBots(), Math.min(MAX_PLA
 const CHOICES = {
   opponents: () =>
     Array.from({ length: MAX_PLAYERS - draft.people.length - fewestBots() + 1 }, (_, i) => [fewestBots() + i, String(fewestBots() + i)]),
-  level: () => [['novice', 'Let'], ['medium', 'Normal'], ['hard', 'Svær']],
-  map: () => Object.entries(MAPS).map(([id, g]) => [id, g.name]),
-  mode: () => [['mission', 'Hemmelig mission'], ['world', 'Erobr hele kortet']],
-  speed: () => [['normal', 'Roligt'], ['fast', 'Hurtigt']],
+  level: () => Object.entries(L.levels),
+  map: () => Object.keys(MAPS).map((id) => [id, mapIn(id).name]),
+  mode: () => Object.entries(L.modes),
+  speed: () => Object.entries(L.speeds),
 };
 
-const andList = (list) => (list.length > 1 ? `${list.slice(0, -1).join(', ')} og ${list.at(-1)}` : list[0]);
+const andList = (list) => (list.length > 1 ? `${list.slice(0, -1).join(', ')} ${L.and} ${list.at(-1)}` : list[0]);
 
 function summary(x) {
   const names = andList(x.people.map((_, i) => personName(x, i)));
-  const bots = `${x.opponents} ${x.opponents === 1 ? 'computerspiller' : 'computerspillere'} (${{ novice: 'lette', medium: 'normale', hard: 'svære' }[x.level]})`;
-  return `${x.opponents ? `${names} mod ${bots}` : `${names} mod hinanden`} · ${MAPS[x.map]?.name ?? 'Verden'} · ${x.mode === 'mission' ? 'hemmelig mission' : 'erobr hele kortet'}`;
+  return `${x.opponents ? L.against(names, L.bots(x.opponents, x.level)) : L.eachOther(names)} · ${mapIn(x.map).name} · ${L.modeShort[x.mode] ?? L.modeShort.world}`;
 }
 
 // One row per person: their coat of arms (tap to change it), their name, and × to remove them.
@@ -563,7 +566,7 @@ function renderPeople() {
     look.type = 'button';
     look.className = 'person-look';
     look.innerHTML = sealIcon(person.look);
-    look.setAttribute('aria-label', 'Skift våbenskjold');
+    look.setAttribute('aria-label', L.changeArms);
     look.setAttribute('aria-expanded', String(lookOpen === i));
     look.addEventListener('click', () => {
       lookOpen = lookOpen === i ? -1 : i;
@@ -571,13 +574,13 @@ function renderPeople() {
     });
     const input = document.createElement('input');
     Object.assign(input, { type: 'text', value: person.name, maxLength: NAME_LENGTH, spellcheck: false, enterKeyHint: 'done' });
-    input.placeholder = draft.people.length === 1 ? 'Dig' : `Spiller ${i + 1}`;
-    input.setAttribute('aria-label', `Navn på spiller ${i + 1}`);
+    input.placeholder = draft.people.length === 1 ? L.you : L.player(i + 1);
+    input.setAttribute('aria-label', L.nameOf(i + 1));
     input.addEventListener('input', () => {
       person.name = input.value;
       $('setup-summary').textContent = summary(draft);
     });
-    // Enter closes the keyboard instead of pressing the dialog's first button (Tilbage).
+    // Enter closes the keyboard instead of pressing the dialog's first button (Back).
     input.addEventListener('keydown', (e) => {
       if (e.key === 'Enter') {
         e.preventDefault();
@@ -590,7 +593,7 @@ function renderPeople() {
       remove.type = 'button';
       remove.className = 'person-remove';
       remove.textContent = '×';
-      remove.setAttribute('aria-label', `Fjern ${personName(draft, i)}`);
+      remove.setAttribute('aria-label', L.remove(personName(draft, i)));
       remove.addEventListener('click', () => {
         draft.people.splice(i, 1);
         lookOpen = -1;
@@ -607,7 +610,7 @@ function renderPeople() {
         const b = document.createElement('button');
         b.type = 'button';
         b.innerHTML = sealIcon(k);
-        b.setAttribute('aria-label', `Våbenskjold ${k + 1}`);
+        b.setAttribute('aria-label', L.arms(k + 1));
         b.setAttribute('aria-pressed', String(person.look === k));
         b.disabled = draft.people.some((other) => other !== person && other.look === k);
         b.addEventListener('click', () => {
@@ -675,22 +678,22 @@ $('new-game').addEventListener('close', () => {
 function openGameOver() {
   const w = s.players[s.winner];
   const how = {
-    world: `${subject(s.winner)} har erobret hele kortet i runde ${s.round}.`,
-    mission: `${subject(s.winner)} klarede ${soloYou(s.winner) ? 'din' : 'sin'} mission i runde ${s.round}:<br><i>${missionText(w.mission, soloYou(s.winner))}</i>`,
-    rounds: `${subject(s.winner)} havde flest områder, da runderne slap op.`,
-  }[s.won];
+    world: () => L.wonWorld(subject(s.winner), soloYou(s.winner), s.round),
+    mission: () => L.wonMission(subject(s.winner), soloYou(s.winner), s.round, missionText(w.mission, soloYou(s.winner))),
+    rounds: () => L.wonRounds(subject(s.winner), soloYou(s.winner)),
+  }[s.won]();
   // The winner, big: their coat of arms, their name and the title they have won.
   $('over-ruler').innerHTML = `${sealIcon(lookOf(s.winner))}<b>${w.name}</b><span>${grid.TITLE ?? 'Ruler of the Map'}</span>`;
   const place = G.standings(s);
   const rows = place.map((p, i) => {
     const pl = s.players[p];
-    const fate = p === s.winner ? 'vandt' : pl.alive ? `${G.owned(s, p).length} ${G.owned(s, p).length === 1 ? 'område' : 'områder'}` : `slået ud i runde ${pl.outRound}`;
+    const fate = p === s.winner ? L.winner : pl.alive ? L.territories(G.owned(s, p).length) : L.outIn(pl.outRound);
     const mission = s.mode === 'mission' && p !== s.winner ? `<small>${missionText(pl.mission, soloYou(p))}</small>` : '';
     return `<li class="${game.seats[p] === 'human' ? 'you' : ''}"><span class="place">${i + 1}.</span>
       ${sealIcon(lookOf(p))}<span class="who">${pl.name}<small>${fate}</small>${mission}</span></li>`;
   });
   const me = place.findIndex((p) => game.seats[p] === 'human');
-  const mine = me >= 0 && game.seats.filter((x) => x === 'human').length === 1 ? `<p class="your-place">Du blev nr. ${me + 1} af ${place.length}.</p>` : '';
+  const mine = me >= 0 && game.seats.filter((x) => x === 'human').length === 1 ? `<p class="your-place">${L.yourPlace(me + 1, place.length)}</p>` : '';
   $('over-text').innerHTML = `${how}${mine}<ol class="standings">${rows.join('')}</ol>`;
   setTimeout(() => {
     if ($('game-over').open) return;
@@ -715,16 +718,15 @@ function viewer() {
   return humans.length === 1 ? humans[0] : -1;
 }
 
-const regionNames = (list) => list.map((r) => map.regions[r].name).join(' og ');
+const regionNames = (list) => list.map((r) => map.regions[r].name).join(` ${L.and} `);
 
 // yours: the text speaks to you; otherwise it describes someone else's mission.
 function missionText(m, yours = true) {
   if (!m) return '';
-  if (m.type === 'regions') return `Erobr ${regionNames(m.regions)}${m.plusOne ? ', og ét kontinent mere efter eget valg' : ''}.`;
-  if (m.type === 'territories') return m.armies > 1 ? `Hold ${m.count} områder med mindst ${m.armies} hære i hvert.` : `Hold ${m.count} områder på én gang.`;
+  if (m.type === 'regions') return L.missionRegions(regionNames(m.regions), m.plusOne);
+  if (m.type === 'territories') return m.armies > 1 ? L.missionArmies(m.count, m.armies) : L.missionHold(m.count);
   const instead = G.fallback(map).count;
-  if (!yours) return `Slå ${object(m.target)} ud. Når en anden det først, gælder i stedet: hold ${instead} områder.`;
-  return `Slå ${object(m.target)} ud. Gør en anden det før dig, skal du i stedet holde ${instead} områder.`;
+  return (yours ? L.missionYours : L.missionTheirs)(object(m.target), instead);
 }
 
 function missionProgress(p) {
@@ -732,20 +734,20 @@ function missionProgress(p) {
   if (m.type === 'regions') {
     const parts = m.regions.map((r) => {
       const have = map.regions[r].members.filter((t) => s.owner[t] === p).length;
-      return `${map.regions[r].name}: ${have} af ${map.regions[r].members.length}`;
+      return L.regionProgress(map.regions[r].name, have, map.regions[r].members.length);
     });
     if (m.plusOne) {
       const extra = map.regions.filter((_, r) => !m.regions.includes(r) && G.holdsRegion(map, s, p, r)).map((r) => r.name);
-      parts.push(extra.length ? `Ét mere: ${extra.join(', ')} ✓` : 'Ét kontinent mere: ikke endnu');
+      parts.push(extra.length ? L.oneMore(extra.join(', ')) : L.oneMoreNot);
     }
     return parts.join(' · ');
   }
   if (m.type === 'territories') {
     const have = s.owner.filter((o, t) => o === p && s.armies[t] >= m.armies).length;
-    return `Du har ${have} af ${m.count}.`;
+    return L.youHave(have, m.count);
   }
   const left = G.owned(s, m.target).length;
-  return left ? `${subject(m.target)} har ${left} områder tilbage.` : `${subject(m.target)} er slået ud.`;
+  return left ? L.left(subject(m.target), soloYou(m.target), left) : L.out(subject(m.target), soloYou(m.target));
 }
 
 function openMission() {
@@ -764,9 +766,9 @@ $('mission-dialog').addEventListener('close', () => schedule());
 // Stars as ★★☆: filled for the ones you have, empty up to three; beyond three as ★★★+2.
 // Beyond three, the number: ★ 5. ("+" is only ever used for armies.)
 const starsText = (n) => (n > G.STARS ? `★ ${n}` : '★'.repeat(n) + '☆'.repeat(G.STARS - n));
-// In sentences: "1 ★", "4 ★"; and armies with their word: "5 hære".
+// In sentences: "1 ★", "4 ★"; and armies with their word: "5 hære", "5 armies".
 const starCount = (n) => `${n} ★`;
-const armies = (n) => `${n} ${n === 1 ? 'hær' : 'hære'}`;
+const armies = (n) => L.armies(n);
 const worth = (n) => G.starValue(rules, n);
 // Your stars can be cashed in now: your turn, reinforcing.
 const canCash = (p) => p === s.current && s.phase === 'reinforce' && s.players[p].stars > 0 && !isBot();
@@ -776,15 +778,14 @@ let lastLuck = null; // { p, round, armies }: war luck at the start of this turn
 function luckNews(e) {
   const you = (p) => game.seats[p] === 'human';
   if (e.type === 'star' && you(e.p)) {
-    toast(`★ for at erobre! ${subject(e.p)} har nu ${starCount(e.stars)}, som er ${armies(worth(e.stars))} værd. Indløs dem, når du forstærker, eller spar op.`);
+    toast(L.starNews(subject(e.p), soloYou(e.p), starCount(e.stars), armies(worth(e.stars))));
   }
   if (e.type === 'luck') {
     lastLuck = { p: e.p, round: s.round, armies: e.armies };
-    toast(you(e.p) ? `Krigslykke! ${starCount(e.stars)} blev til ${armies(e.armies)} mere at placere.` : `${s.players[e.p].name} indløste ${starCount(e.stars)} til ${armies(e.armies)}.`);
+    toast(you(e.p) ? L.luckYours(starCount(e.stars), armies(e.armies)) : L.luckTheirs(s.players[e.p].name, starCount(e.stars), armies(e.armies)));
   }
   if (e.type === 'eliminate' && e.stars > 0) {
-    const stars = e.stars === 1 ? (soloYou(e.p) ? 'din ★' : 'deres ★') : `${soloYou(e.p) ? 'dine' : 'deres'} ${e.stars} ★`;
-    toast(`${subject(e.by)} slog ${object(e.p)} ud og ${soloYou(e.by) ? 'fik' : 'overtog'} ${stars}.`);
+    toast(L.takesStars(subject(e.by), soloYou(e.by), object(e.p), soloYou(e.p), e.stars));
   }
 }
 
@@ -795,13 +796,13 @@ function openLuck() {
   $('luck-who').textContent = s.players.filter((_, i) => game.seats[i] === 'human').length > 1 ? s.players[p].name : '';
   $('luck-stars').textContent = starsText(stars);
   $('luck-text').textContent = !stars
-    ? 'Du har ingen ★ endnu.'
-    : `Du har ${starCount(stars)}. De er ${armies(worth(stars))} værd nu, og ${armies(worth(stars + 1))}, hvis du sparer én mere op.`;
+    ? L.noStars
+    : L.haveStars(starCount(stars), armies(worth(stars)), armies(worth(stars + 1)));
   $('ladder').innerHTML =
     [1, 2, 3].map((n) => `<span class="${Math.min(stars, G.STARS) === n ? 'next' : ''}">${starCount(n)} = ${armies(worth(n))}</span>`).join('') +
-    `<span class="${stars > G.STARS ? 'next' : ''}">hver ★ mere = ${armies(rules.extraStar)} mere</span>`;
+    `<span class="${stars > G.STARS ? 'next' : ''}">${L.eachMore(armies(rules.extraStar))}</span>`;
   $('cash-btn').hidden = !canCash(p);
-  $('cash-btn').textContent = `Indløs (+${armies(worth(stars))})`;
+  $('cash-btn').textContent = L.cashArmies(armies(worth(stars)));
   $('luck-dialog').showModal();
 }
 $('luck-dialog').addEventListener('close', () => $('luck-dialog').returnValue === 'luck' && act({ type: 'luck' }));
@@ -812,7 +813,7 @@ function renderHudButtons() {
   $('luck-btn').hidden = p < 0 || s.phase === 'over';
   if (p < 0) return;
   // The button shows your stars, and glows when three are ready to become armies.
-  $('luck-btn').textContent = `Krigslykke ${starsText(s.players[p].stars)}`;
+  $('luck-btn').textContent = L.luckButton(starsText(s.players[p].stars));
   $('luck-btn').classList.toggle('ready', canCash(p));
 }
 $('mission-btn').addEventListener('click', openMission);
@@ -852,7 +853,7 @@ $('intro-continue').addEventListener('click', hideIntro);
 $('intro-new').addEventListener('click', () => startFromSettings());
 $('intro-change').addEventListener('click', () => openNewGame(true));
 
-/* ---------- settings: sound and light or dark ---------- */
+/* ---------- settings: sound, light or dark, and language ---------- */
 
 // Dark is the game's own look; 'auto' follows the phone's light or dark setting.
 function applyTheme(theme) {
@@ -876,17 +877,35 @@ function pills(box, options, current, pick) {
 
 function renderSettings() {
   const x = loadSettings();
-  pills($('sound-pills'), [[true, 'Til'], [false, 'Fra']], Sound.enabled, (on) => {
+  pills($('sound-pills'), [[true, L.on], [false, L.off]], Sound.enabled, (on) => {
     Sound.enabled = on;
     saveSettings({ ...loadSettings(), sound: on });
     if (on) Sound.play('place');
     renderSettings();
   });
-  pills($('theme-pills'), [['auto', 'Som telefonen'], ['light', 'Lys'], ['dark', 'Mørk']], x.theme, (theme) => {
+  pills($('theme-pills'), Object.entries(L.themes), x.theme, (theme) => {
     saveSettings({ ...loadSettings(), theme });
     applyTheme(theme);
     renderSettings();
   });
+  pills($('lang-pills'), Object.entries(LANGUAGES), L.lang, (lang) => {
+    saveSettings({ ...loadSettings(), lang });
+    useLanguage(lang);
+    renderSettings();
+  });
+}
+
+// Every text changes at once: the page, the map's names (drawn anew) and the game's panels.
+function useLanguage(lang) {
+  L = stringsFor(lang);
+  translatePage(L);
+  fitTitle(true);
+  useMap(grid.id, true);
+  if (game) {
+    render();
+    focusOnPlayer();
+  } else showEmptyMap();
+  if (!$('intro').hidden) showIntro();
 }
 $('settings-btn').addEventListener('click', () => {
   renderSettings();
@@ -905,17 +924,22 @@ new ResizeObserver(() => document.documentElement.style.setProperty('--bar-h', `
 $('zoom-in').addEventListener('click', () => board.zoomIn());
 $('zoom-out').addEventListener('click', () => board.zoomOut());
 
+// An empty map behind the start screen until the first game starts.
+function showEmptyMap() {
+  s = G.newGame(map, rules, { players: ['', ''], seed: 1 });
+  game = null;
+  board.update({ ...s, owner: s.owner.map(() => -1) });
+  board.focus(null);
+}
+
+translatePage(L);
 if (load()) {
   if (s.phase === 'occupy') sel.n = s.armies[s.occupy.from] - 1;
   render();
   focusOnPlayer();
 } else {
-  // An empty map behind the start screen until the first game starts.
   useMap(loadSettings().map);
-  s = G.newGame(map, rules, { players: ['', ''], seed: 1 });
-  game = null;
-  board.update({ ...s, owner: s.owner.map(() => -1) });
-  board.focus(null);
+  showEmptyMap();
 }
 showIntro();
 
@@ -929,7 +953,8 @@ window.__conquest = {
   tap,
   // start(['human', 'hard', …], speed, mode, seed, map): a game with these seats in this order.
   start: (seats, speed = 'fast', mode = 'mission', seed, mapId = 'world') =>
-    startGame(seats.map((kind, i) => ({ kind, name: kind === 'human' ? 'Dig' : OPPONENTS[i], color: i })), speed, mode, seed, mapId),
+    startGame(seats.map((kind, i) => ({ kind, name: kind === 'human' ? L.you : L.opponents[i], color: i })), speed, mode, seed, mapId),
+  useLanguage,
   startFromSettings,
   showIntro,
   openLuck,

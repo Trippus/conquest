@@ -173,6 +173,19 @@ export const RULES = { laterSeatArmies: { 2: 7, 3: 2, 4: 1, 5: 0, 6: 0 }, novice
 export const RULERS = ['Hannibal Barkas', 'Pyrrhus af Epirus', 'Hieron af Syrakus', 'Brennus', 'Hamilkar Barkas', 'Gaius Pontius'];
 export const TITLE = 'Ruler of Rome';
 
+// The names in English, where they differ (see inLanguage in index.js).
+export const EN = {
+  name: 'Rome Unites Italy',
+  REGIONS: { um: 'Umbria', si: 'Sicily', sk: 'Sardinia and Corsica', ka: 'Africa' },
+  TERRITORIES: {
+    rom: 'Rome', etrurien: 'Etruria', campanien: 'Campania', apulien: 'Apulia', lucanien: 'Lucania', venetien: 'Venetia',
+    ligurien: 'Liguria', sabinerland: 'Sabine Land', syrakus: 'Syracuse', sardinien: 'Sardinia', korsika: 'Corsica',
+    karthago: 'Carthage', numidien: 'Numidia',
+  },
+  LANDMARKS: { Gallien: 'Gaul', Iberien: 'Iberia', Germanien: 'Germania', Illyrien: 'Illyria', Grækenland: 'Greece', Libyen: 'Libya', 'Egypten · Alexandria': 'Egypt · Alexandria' },
+  RULERS: ['Hannibal Barca', 'Pyrrhus of Epirus', 'Hiero of Syracuse', 'Brennus', 'Hamilcar Barca', 'Gaius Pontius'],
+};
+
 export const ITALY_GRID = hexMap({
   id: 'italy',
   name: 'Roms samling af Italien',
@@ -190,5 +203,6 @@ export const ITALY_GRID = hexMap({
   RULES,
   RULERS,
   TITLE,
+  NAMES: { en: EN },
 });
 export const ITALY = ITALY_GRID.MAP;

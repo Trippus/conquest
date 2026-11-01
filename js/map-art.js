@@ -6,8 +6,9 @@
 const INK = '#4a3726';
 
 // A compass rose like an old chart's: a ring with a scale, four long points and four short ones,
-// half dark and half light so they look raised, and the four quarters written in Danish.
-function compassRose() {
+// half dark and half light so they look raised, and the four quarters: north, east, south, west
+// in the player's language ('NØSV' in Danish).
+function compassRose(quarters) {
   const at = (deg, r) => {
     const a = ((deg - 90) * Math.PI) / 180;
     return `${(r * Math.cos(a)).toFixed(2)} ${(r * Math.sin(a)).toFixed(2)}`;
@@ -15,7 +16,7 @@ function compassRose() {
   const point = (deg, len, w) =>
     `<path d="M0 0L${at(deg, len)}L${at(deg - 90, w)}Z" fill="${INK}"/><path d="M0 0L${at(deg, len)}L${at(deg + 90, w)}Z" fill="#f6ecd4"/>`;
   const ticks = Array.from({ length: 64 }, (_, i) => `M${at(i * 5.625, 3.55)}L${at(i * 5.625, i % 8 ? 3.75 : 3.95)}`).join('');
-  const letters = [['N', 0], ['Ø', 90], ['S', 180], ['V', 270]]
+  const letters = [...quarters].map((l, i) => [l, i * 90])
     .map(([l, deg]) => {
       const [x, y] = at(deg, 4.75).split(' ');
       return `<text x="${x}" y="${(+y + 0.4).toFixed(2)}">${l}</text>`;
@@ -33,7 +34,7 @@ function compassRose() {
 }
 
 // The drawings, in map units (a hex is about 1.7 wide). Used with <use href="#…">.
-export const ART_DEFS = `
+export const artDefs = (quarters = 'NØSV') => `
   <g id="art-mountain">
     <path d="M-.8 .35L-.22-.55L.02-.2L.3-.5L.85.35Z" fill="#efe1c0" stroke="${INK}" stroke-width=".07" stroke-linejoin="round"/>
     <path d="M-.22-.55L-.12.3M.3-.5L.38.3" fill="none" stroke="${INK}" stroke-width=".04" opacity=".55"/>
@@ -84,7 +85,7 @@ export const ART_DEFS = `
     <path d="M-1.1.02L-1.35.6M-.7.05L-.9.65M-.3.07L-.45.68M.1.07L-.02.68M.5.06L.42.66M.9.04L.86.62" fill="none" opacity=".85"/>
     <path d="M-1.6.85q.3-.15.6 0t.6 0M.3.85q.3-.15.6 0t.6 0" fill="none" opacity=".6"/>
   </g>
-  <g id="art-compass">${compassRose()}</g>`;
+  <g id="art-compass">${compassRose(quarters)}</g>`;
 
 // A fixed "random" number for a cell, so the map looks the same every time.
 const hash = (row, col, salt = 0) => {

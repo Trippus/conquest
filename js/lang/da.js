@@ -1,0 +1,176 @@
+// Every text the player sees, in Danish. The English table (en.js) has the same keys.
+// who: a player's name, or "Du"/"dig" when the text speaks to the one person at the phone; you is
+// then true (Danish verbs do not care, English ones do).
+
+const plural = (n, one, more) => `${n} ${n === 1 ? one : more}`;
+
+export const DA = {
+  lang: 'da',
+
+  /* ---------- index.html ---------- */
+  board: 'Kortet',
+  home: 'Til startskærmen',
+  players: 'Spillere',
+  zoomIn: 'Zoom ind',
+  zoomOut: 'Zoom ud',
+  mission: 'Mission',
+  fewer: 'Færre',
+  more: 'Flere',
+  startScreen: 'Startskærm',
+  tagline: 'Erobr verden, eller klar din hemmelige mission før de andre.',
+  continue: 'Fortsæt spillet',
+  newGame: 'Nyt spil',
+  change: 'Skift',
+  howToPlay: 'Sådan spiller du',
+  rules: `<li><b>Forstærk:</b> du får nye hære hver tur, flere jo flere områder og hele kontinenter du har. Tryk på dine områder for at sætte dem ud.</li>
+    <li><b>Angrib:</b> vælg et af dine områder og en nabo. Terningerne afgør det, og den største hær har oftest held med sig.</li>
+    <li><b>Flyt:</b> til sidst må du flytte hære én gang mellem dine egne områder.</li>
+    <li><b>Krigslykke:</b> erobr mindst ét område i din tur, så får du en ★. Indløs stjernerne til ekstra hære, når du vil. Jo flere du sparer op, jo flere hære.</li>
+    <li><b>Sejr:</b> klar din hemmelige mission, eller erobr hele kortet.</li>`,
+  credits: `Tak til: emblemer af Lorc, <a href="https://game-icons.net" target="_blank" rel="noopener">game-icons.net</a> (CC BY 3.0) ·
+    papir fra <a href="https://ambientcg.com" target="_blank" rel="noopener">ambientCG</a> (CC0)`,
+  settings: 'Indstillinger',
+  gameBy: 'et spil fra',
+  changeSetup: 'Skift opsætning',
+  participants: 'Deltagere',
+  peopleHere: 'Spillere på denne enhed',
+  addPerson: '+ Tilføj spiller',
+  computerPlayers: 'Computerspillere',
+  computerLevel: 'Computerens sværhedsgrad',
+  computerSpeed: 'Computerens tempo',
+  theGame: 'Spillet',
+  map: 'Kort',
+  victory: 'Sejr',
+  fairStart: 'Turrækkefølgen trækkes ved start, og starthærene er justeret, så alle pladser har lige gode chancer.',
+  back: 'Tilbage',
+  start: 'Start',
+  sound: 'Lyd',
+  look: 'Udseende',
+  language: 'Sprog',
+  ok: 'OK',
+  yourMission: 'Din mission',
+  missionSecret: 'Missionen er hemmelig. Klarer du den i din egen tur, vinder du med det samme.',
+  luck: 'Krigslykke',
+  luckRule1: 'Erobr mindst ét område i din tur, så får du en ★.',
+  luckRule2: 'Indløs dine stjerner til ekstra hære, når du forstærker. Du kan også spare op, for jo flere, jo mere:',
+  luckRule3: 'Slår du en spiller ud, får du deres stjerner.',
+  cashIn: 'Indløs',
+  gameOver: 'Spillet er slut',
+  toStart: 'Til start',
+  playAgain: 'Spil igen',
+
+  /* ---------- the engine's errors ---------- */
+  errors: {
+    'not your territory': 'Det område er ikke dit.',
+    'place all armies first': 'Placér alle nye hære først.',
+    'an attack needs at least 2 armies': 'Der skal være mindst 2 hære for at angribe.',
+    'not connected': 'Hærene kan kun flytte gennem dine egne områder.',
+  },
+
+  /* ---------- players ---------- */
+  // The computer opponents on a map without its own (RULERS): made-up commanders.
+  opponents: ['Grevinde Holm', 'Oberst Vind', 'Admiral Storm', 'Generalinde Ravn', 'Major Falk', 'Hertug Ulv'],
+  youSubject: 'Du',
+  youObject: 'dig',
+  you: 'Dig', // the one person's name when they give none
+  player: (i) => `Spiller ${i}`,
+  and: 'og',
+  compass: 'NØSV', // north, east, south, west
+  changeArms: 'Skift våbenskjold',
+  arms: (k) => `Våbenskjold ${k}`,
+  nameOf: (i) => `Navn på spiller ${i}`,
+  remove: (name) => `Fjern ${name}`,
+  playerTitle: (name, land, stars) => `${name}: ${land} områder, ${stars} ★ krigslykke`,
+
+  /* ---------- the setup ---------- */
+  levels: { novice: 'Let', medium: 'Normal', hard: 'Svær' },
+  modes: { mission: 'Hemmelig mission', world: 'Erobr hele kortet' },
+  speeds: { normal: 'Roligt', fast: 'Hurtigt' },
+  bots: (n, level) => `${plural(n, 'computerspiller', 'computerspillere')} (${{ novice: 'lette', medium: 'normale', hard: 'svære' }[level]})`,
+  against: (names, bots) => `${names} mod ${bots}`,
+  eachOther: (names) => `${names} mod hinanden`,
+  modeShort: { mission: 'hemmelig mission', world: 'erobr hele kortet' },
+  on: 'Til',
+  off: 'Fra',
+  themes: { auto: 'Som telefonen', light: 'Lys', dark: 'Mørk' },
+
+  /* ---------- the turn ---------- */
+  round: (n) => `Runde ${n}`,
+  phaseNames: { reinforce: 'Forstærker', attack: 'Angriber', occupy: 'Angriber', fortify: 'Flytter' },
+  phases: { reinforce: 'Forstærk', attack: 'Angrib', occupy: 'Erobret', fortify: 'Flyt' },
+  thinking: (name) => `${name} tænker …`,
+  won: (who) => `${who} har vundet.`,
+  placeOwn: 'Placér hærene på dine egne områder.',
+  fromLuck: (n) => ` (heraf ${n} fra krigslykke)`,
+  tapToPlace: (lucky) => `Tryk på dine områder for at placere hærene${lucky}.`,
+  allPlaced: 'Alle hære er placeret.',
+  starsOffer: (stars, now, more, then) => ` Du har ${stars}: indløs dem nu for ${now}, eller spar op (${more} giver ${then}).`,
+  cashStars: (stars, armies) => `Indløs ${stars} (+${armies})`,
+  restOn: (name) => `Resten på ${name}`,
+  toAttack: 'Til angreb',
+  reserve: (n) => (n === 1 ? 'hær at placere' : 'hære at placere'),
+  attackNeeds2: 'Der skal være mindst 2 hære for at angribe herfra.',
+  pickEnemy: 'Vælg en nabo, der ikke er din.',
+  pickOwnFirst: 'Vælg først et af dine egne områder at angribe fra.',
+  attackPick: 'Vælg et af dine områder at angribe fra, eller gå videre.',
+  attackStar: ' Erobrer du mindst ét område i denne tur, får du en ★ krigslykke.',
+  attackFrom: (name) => `Angrib fra ${name}: vælg en nabo.`,
+  versus: (a, na, b, nb) => `${a} (${na}) mod ${b} (${nb}).`,
+  attack: 'Angrib',
+  blitz: 'Kæmp til enden',
+  endAttack: 'Færdig med at angribe',
+  occupy: (to, from, keeps) => `${to} er din. Hvor mange hære skal stå der? ${from} beholder ${keeps}.`,
+  moveIn: 'Flyt ind',
+  moveOwnOnly: 'Du kan kun flytte mellem dine egne områder.',
+  leaveOne: 'Der skal blive mindst 1 hær tilbage. Vælg et område med flere hære.',
+  fortifyPick: 'Du må flytte hære én gang mellem dine egne områder. Vælg hvorfra.',
+  fortifyFrom: (name) => `Flyt fra ${name}: vælg hvortil.`,
+  fortifyTo: (a, b) => `Flyt fra ${a} til ${b}.`,
+  move: 'Flyt',
+  otherStart: 'Vælg andet startområde',
+  endTurn: 'Afslut tur',
+
+  /* ---------- regions, dice, the end ---------- */
+  regionText: (name, list, n, bonus) => `${name}: ${list}. Holder man alle ${n}, får man ${bonus} ekstra hære hver tur.`,
+  holdsAll: (who) => `${who} har dem alle.`,
+  holds: (who, you, k) => `${who} har ${k}`,
+  rolls: (n) => `${n} slag · `,
+  losses: (a, d) => `angriber −${a}, forsvarer −${d}`,
+  conquered: (name) => `${name} er erobret!`,
+  out: (who) => `${who} er slået ud.`,
+  wonWorld: (who, you, round) => `${who} har erobret hele kortet i runde ${round}.`,
+  wonMission: (who, you, round, text) => `${who} klarede ${you ? 'din' : 'sin'} mission i runde ${round}:<br><i>${text}</i>`,
+  wonRounds: (who) => `${who} havde flest områder, da runderne slap op.`,
+  winner: 'vandt',
+  territories: (n) => plural(n, 'område', 'områder'),
+  outIn: (round) => `slået ud i runde ${round}`,
+  yourPlace: (place, of) => `Du blev nr. ${place} af ${of}.`,
+
+  /* ---------- missions ---------- */
+  missionRegions: (names, plusOne) => `Erobr ${names}${plusOne ? ', og ét kontinent mere efter eget valg' : ''}.`,
+  missionArmies: (count, armies) => `Hold ${count} områder med mindst ${armies} hære i hvert.`,
+  missionHold: (count) => `Hold ${count} områder på én gang.`,
+  missionTheirs: (who, instead) => `Slå ${who} ud. Når en anden det først, gælder i stedet: hold ${instead} områder.`,
+  missionYours: (who, instead) => `Slå ${who} ud. Gør en anden det før dig, skal du i stedet holde ${instead} områder.`,
+  regionProgress: (name, have, all) => `${name}: ${have} af ${all}`,
+  oneMore: (list) => `Ét mere: ${list} ✓`,
+  oneMoreNot: 'Ét kontinent mere: ikke endnu',
+  youHave: (have, count) => `Du har ${have} af ${count}.`,
+  left: (who, you, n) => `${who} har ${n} områder tilbage.`,
+
+  /* ---------- war luck ---------- */
+  armies: (n) => plural(n, 'hær', 'hære'),
+  starNews: (who, you, stars, worth) => `★ for at erobre! ${who} har nu ${stars}, som er ${worth} værd. Indløs dem, når du forstærker, eller spar op.`,
+  luckYours: (stars, armies) => `Krigslykke! ${stars} blev til ${armies} mere at placere.`,
+  luckTheirs: (name, stars, armies) => `${name} indløste ${stars} til ${armies}.`,
+  // by knocked out (who) and took their stars; byYou/outYou: that player is "Du"/"dig".
+  takesStars: (by, byYou, who, outYou, n) => {
+    const stars = n === 1 ? (outYou ? 'din ★' : 'deres ★') : `${outYou ? 'dine' : 'deres'} ${n} ★`;
+    return `${by} slog ${who} ud og ${byYou ? 'fik' : 'overtog'} ${stars}.`;
+  },
+  noStars: 'Du har ingen ★ endnu.',
+  haveStars: (stars, now, next) => `Du har ${stars}. De er ${now} værd nu, og ${next}, hvis du sparer én mere op.`,
+  eachMore: (armies) => `hver ★ mere = ${armies} mere`,
+  cashArmies: (armies) => `Indløs (+${armies})`,
+  luckButton: (stars) => `Krigslykke ${stars}`,
+};

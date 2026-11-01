@@ -10,3 +10,20 @@ export const MAPS = { vikings: VIKINGS_GRID, england: ENGLAND_GRID, italy: ITALY
 
 // A map's rules: the game's rules with the map's own changes (seat compensation, handicap for Let).
 export const rulesFor = (grid, base) => ({ ...base, ...grid.RULES });
+
+// A map with its names in another language. A map file gives them as NAMES: { en: { name,
+// REGIONS: { id: name }, TERRITORIES: { id: name }, LANDMARKS: { name: name }, RULERS: [...] } },
+// only the names that differ; the rest keep the map's own (Danish) names.
+export function inLanguage(grid, lang) {
+  const names = grid.NAMES?.[lang];
+  if (!names) return grid;
+  const rename = (list, own = {}) => Object.fromEntries(Object.entries(list).map(([id, x]) => [id, { ...x, name: own[id] ?? x.name }]));
+  const name = names.name ?? grid.name;
+  return {
+    ...grid,
+    name,
+    MAP: { ...grid.MAP, name, regions: rename(grid.MAP.regions, names.REGIONS), territories: rename(grid.MAP.territories, names.TERRITORIES) },
+    LANDMARKS: grid.LANDMARKS?.map(([x, y, n]) => [x, y, names.LANDMARKS?.[n] ?? n]),
+    RULERS: names.RULERS ?? grid.RULERS,
+  };
+}

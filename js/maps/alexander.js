@@ -176,6 +176,19 @@ export const RULES = { laterSeatArmies: { 2: 7, 3: 1, 4: 0, 5: 0, 6: 0 }, novice
 export const RULERS = ['Dareios III', 'Memnon af Rhodos', 'Bessos', 'Spitamenes', 'Poros', 'Demosthenes'];
 export const TITLE = 'King of Asia';
 
+// The names in English, where they differ (see inLanguage in index.js).
+export const EN = {
+  name: 'Alexander the Great',
+  REGIONS: { la: 'Asia Minor', le: 'The Levant', eg: 'Egypt', me: 'Mesopotamia', ba: 'Bactria', in: 'India' },
+  TERRITORIES: {
+    athen: 'Athens', kreta: 'Crete', halikarnassos: 'Halicarnassus', gordion: 'Gordium', tarsos: 'Tarsus', armenien: 'Armenia',
+    tyros: 'Tyre', damaskus: 'Damascus', nabataea: 'Nabataea', memfis: 'Memphis', theben: 'Thebes', kyrenaika: 'Cyrenaica',
+    ekbatana: 'Ecbatana', baktra: 'Bactra', chorasmien: 'Chorasmia',
+  },
+  LANDMARKS: { Italien: 'Italy', Illyrien: 'Illyria', Skythien: 'Scythia', Kaukasus: 'Caucasus', Arabien: 'Arabia', Libyen: 'Libya', Nubien: 'Nubia' },
+  RULERS: ['Darius III', 'Memnon of Rhodes', 'Bessus', 'Spitamenes', 'Porus', 'Demosthenes'],
+};
+
 export const ALEXANDER_GRID = hexMap({
   id: 'alexander',
   name: 'Alexander den Store',
@@ -192,5 +205,6 @@ export const ALEXANDER_GRID = hexMap({
   RULES,
   RULERS,
   TITLE,
+  NAMES: { en: EN },
 });
 export const ALEXANDER = ALEXANDER_GRID.MAP;

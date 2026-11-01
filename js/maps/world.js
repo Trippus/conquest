@@ -160,6 +160,22 @@ export const COMPASS = [91, 35.5]; // in the open sea between Africa and Austral
 // The world's sea routes are short, so most ships sail the great oceans: [row, column].
 export const OCEANS = [[17, 5], [9, 68], [13, 26]];
 
-export const WORLD_GRID = hexMap({ id: 'world', name: 'Verden', GRID, REGIONS, TERRITORIES, TERRAIN, PLACES, MISSIONS, SEA, REGION_PLACES, COMPASS, OCEANS, SHIP_COUNT: 4, WRAPS: true, TITLE: 'Ruler of the World' });
+// The names in English, where they differ (see inLanguage in index.js).
+export const EN = {
+  name: 'The World',
+  REGIONS: { na: 'North America', sa: 'South America', eu: 'Europe', af: 'Africa', as: 'Asia', oc: 'Oceania' },
+  TERRITORIES: {
+    nordcanada: 'North Canada', oestcanada: 'East Canada', groenland: 'Greenland', vestkysten: 'West Coast', praerien: 'Prairies',
+    oestkysten: 'East Coast', mellemamerika: 'Central America', caribien: 'Caribbean Coast', amazonas: 'Amazon', hoejlandet: 'Highlands',
+    'britiske-oeer': 'British Isles', skandinavien: 'Scandinavia', iberien: 'Iberia', vesteuropa: 'West Europe',
+    centraleuropa: 'Central Europe', oesteuropa: 'East Europe', sydeuropa: 'Southern Europe', nilen: 'The Nile',
+    vestafrika: 'West Africa', centralafrika: 'Central Africa', 'afrikas-horn': 'Horn of Africa', 'sydlige-afrika': 'Southern Africa',
+    mellemoesten: 'Middle East', arabien: 'Arabia', centralasien: 'Central Asia', vestsibirien: 'West Siberia', oestsibirien: 'East Siberia',
+    steppen: 'The Steppe', sydasien: 'South Asia', oestasien: 'East Asia', sydoestasien: 'Southeast Asia', sundaoeerne: 'Sunda Islands',
+    'ny-guinea': 'New Guinea', vestaustralien: 'West Australia', oestaustralien: 'East Australia',
+  },
+};
+
+export const WORLD_GRID = hexMap({ id: 'world', name: 'Verden', GRID, REGIONS, TERRITORIES, TERRAIN, PLACES, MISSIONS, SEA, REGION_PLACES, COMPASS, OCEANS, SHIP_COUNT: 4, WRAPS: true, TITLE: 'Ruler of the World', NAMES: { en: EN } });
 export const { hexCenter, hexCorners, hexNeighbours, cellAt, WIDTH, HEIGHT, WRAPS } = WORLD_GRID;
 export const WORLD = WORLD_GRID.MAP;

@@ -167,6 +167,15 @@ export const RULES = { laterSeatArmies: { 2: 7, 3: 2, 4: 1, 5: 0, 6: 0 }, novice
 export const RULERS = ['Vilhelm Erobreren', 'Harold Godwinson', 'Harald Hårderåde', 'Edgar Ætheling', 'Malcolm af Skotland', 'Svend Estridsen'];
 export const TITLE = 'King of England';
 
+// The names in English, where they differ (see inLanguage in index.js).
+export const EN = {
+  name: 'The Battle for England',
+  REGIONS: { sc: 'Scotland', ir: 'Ireland', nm: 'Normandy' },
+  TERRITORIES: { hoejlandet: 'Highlands', bretagne: 'Brittany', flandern: 'Flanders' },
+  LANDMARKS: { Norge: 'Norway', 'Det Tyske Rige': 'The German Kingdom', 'Frankernes Rige': 'Kingdom of the Franks' },
+  RULERS: ['William the Conqueror', 'Harold Godwinson', 'Harald Hardrada', 'Edgar Ætheling', 'Malcolm of Scotland', 'Sweyn Estridsson'],
+};
+
 export const ENGLAND_GRID = hexMap({
   id: 'england',
   name: 'Kampen om England',
@@ -184,5 +193,6 @@ export const ENGLAND_GRID = hexMap({
   RULES,
   RULERS,
   TITLE,
+  NAMES: { en: EN },
 });
 export const ENGLAND = ENGLAND_GRID.MAP;

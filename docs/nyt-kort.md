@@ -42,6 +42,11 @@ Kopiér `js/maps/england.js` til `js/maps/<kort>.js` og ret: regioner, områder,
 (`SEA`), missioner, `RULERS`, `TITLE`, `SHIP`, `LANDMARKS` (navne på uudforsket land). Tilføj kortet i
 `js/maps/index.js`, så kommer det med i appen, simulatoren og værktøjerne.
 
+Spillet findes også på engelsk. Giv derfor kortet engelske navne i `EN` (kortets navn, regioner,
+områder, `LANDMARKS` og `RULERS`), og send dem med som `NAMES: { en: EN }`. Kun de navne, der er
+anderledes på engelsk; resten bruger de danske. `TITLE` er allerede engelsk. `npm test` tjekker, at
+de engelske navne hører til noget på kortet.
+
 ## 5. Kortrapport (Claude)
 
 `npm run map-report -- <kort>` viser hvert område med størrelse og naboer, regionsbonusser, advarsler

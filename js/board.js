@@ -7,7 +7,7 @@
 // on a territory and goes to onTap(territory index).
 
 import { mapShapes, regionShapes } from './map-shapes.js';
-import { mapArt, ART_DEFS } from './map-art.js';
+import { mapArt, artDefs } from './map-art.js';
 import { EMBLEMS } from './emblems.js';
 
 // Ink-friendly player colours: red, blue, green, ochre, purple, teal. Design item 4 will settle
@@ -35,8 +35,8 @@ const NAME_AT = {
 
 // insets(): how many pixels at the top and bottom of the screen are covered by panels, so the map
 // can be moved out from under them and is centred in what is left.
-// onRegion(r): a region's name was tapped.
-export function createBoard(svg, grid, map, { onTap, onRegion = () => {}, insets = () => ({ top: 0, bottom: 0 }) }) {
+// onRegion(r): a region's name was tapped. quarters: the compass rose's N, E, S, W in the player's language.
+export function createBoard(svg, grid, map, { onTap, onRegion = () => {}, insets = () => ({ top: 0, bottom: 0 }), quarters }) {
   const shapes = mapShapes(grid);
   const regionOutlines = regionShapes(grid);
   const letterOf = Object.fromEntries(Object.entries(grid.TERRITORIES).map(([l, [id]]) => [id, l]));
@@ -110,7 +110,7 @@ export function createBoard(svg, grid, map, { onTap, onRegion = () => {}, insets
         <image href="assets/paper.jpg" width="22" height="22" preserveAspectRatio="none"/>
       </pattern>
       ${EMBLEMS.map((d, i) => `<symbol id="emblem-${i}" viewBox="0 0 512 512"><path d="${d}"/></symbol>`).join('')}
-      ${ART_DEFS}
+      ${artDefs(quarters)}
       <clipPath id="unexplored"><path d="${unexplored}" clip-rule="evenodd"/></clipPath>
       <filter id="ink"><feTurbulence type="fractalNoise" baseFrequency="1.4" numOctaves="2" seed="8" result="t"/>
         <feDisplacementMap in="SourceGraphic" in2="t" scale=".35"/></filter>

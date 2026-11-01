@@ -193,6 +193,19 @@ export const RULES = { laterSeatArmies: { 2: 8, 3: 2, 4: 0, 5: 0, 6: 0 }, novice
 export const RULERS = ['Jarl Ragnar', 'Dronning Gunhild', 'Erik Blodøkse', 'Harald Hårderåde', 'Skjoldmø Lagertha', 'Knud den Store'];
 export const TITLE = 'Ruler of the North';
 
+// The names in English, where they differ (see inLanguage in index.js).
+export const EN = {
+  name: 'The Viking Raids',
+  REGIONS: { dk: 'Denmark', no: 'Norway', oe: 'The East Way', br: 'Britain', ve: 'The West Way', fr: 'Francia', vn: 'Wendland' },
+  TERRITORIES: {
+    jylland: 'Jutland', oeerne: 'Zealand', skaane: 'Scania', kurland: 'Courland', estland: 'Estonia', skotland: 'Scotland',
+    irland: 'Ireland', faeroeerne: 'Faroes', island: 'Iceland', groenland: 'Greenland', frisland: 'Frisia', flandern: 'Flanders',
+    normandiet: 'Normandy', bretagne: 'Brittany', holsten: 'Holstein', pommern: 'Pomerania', proejsen: 'Prussia',
+  },
+  LANDMARKS: { Ubygderne: 'The Wilds' },
+  RULERS: ['Jarl Ragnar', 'Queen Gunnhild', 'Eric Bloodaxe', 'Harald Hardrada', 'Shieldmaiden Lagertha', 'Cnut the Great'],
+};
+
 export const VIKINGS_GRID = hexMap({
   id: 'vikings',
   name: 'Vikingetogtet',
@@ -209,5 +222,6 @@ export const VIKINGS_GRID = hexMap({
   RULES,
   RULERS,
   TITLE,
+  NAMES: { en: EN },
 });
 export const VIKINGS = VIKINGS_GRID.MAP;

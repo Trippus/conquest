@@ -27,7 +27,8 @@ npm run design-shots                          # stilprøverne som PNG (kræver n
 | `js/rules/*.js` | Regelsæt som data: starthære, terninger, kort-bytte, rundegrænse |
 | `js/app.js` | Brugerfladen: velkomst, startskærm, togternes indledning og afslutning, tryk → handlinger, bots spiller, terninger, lyd, gem/indlæs. `window.__conquest` er debug-hooket |
 | `js/togter.js` | Togterne i rækkefølge (ældst først), og hvad en sejr åbner: næste togt og kortet i Frit spil. Teksterne står i `js/lang/*.js` |
-| `js/audio.js` | Syntetiserede lyde (terninger, laksegl, horn, kort), ingen lydfiler |
+| `js/audio.js` | Syntetiserede lyde (terninger, laksegl, horn, kort) og temamusikken, der går i løkke med en blød overgang |
+| `assets/music/`, `assets/togter/` | Temamusikken og billederne bag togternes årstal, lavet med AI (se `LICENSES.md`) |
 | `js/map-art.js` | Kortsymboler i blæk: bjerge, skove, klitter, bølger, skibe, kompasrose, placeret ud fra gitteret |
 | `js/emblems.js` | Spillernes emblemer, lavet af `tools/make-emblems.mjs` fra `assets/emblems` (se `LICENSES.md`) |
 | `js/board.js` | Verdenskortet i papirkort-stil: farver, laksegl med hære, markeringer, træk og zoom (knib, hjul, +/−) |

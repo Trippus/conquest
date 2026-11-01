@@ -9,7 +9,7 @@ import { botAction } from './ai.js';
 import { MAPS, rulesFor, inLanguage } from './maps/index.js';
 import { MODERN } from './rules/modern.js';
 import { createBoard, PLAYER_COLORS as COLORS, sealIcon } from './board.js';
-import { Sound } from './audio.js';
+import { Sound, Music } from './audio.js';
 import { LANGUAGES, pickLanguage, stringsFor, translatePage } from './i18n.js';
 import { TOGTER, newProgress, isOpen, nextTogt, freeMaps, record, offerEasy, togtStart } from './togter.js';
 
@@ -21,7 +21,7 @@ const PROGRESS = 'conquest.progress';
 // people: the players at this device, each with a name (empty: a default) and a coat of arms
 // (colour and emblem number); opponents: how many computer players; togtLevel: the opponents'
 // level in the togter (the free game has its own).
-const DEFAULTS = { people: [{ name: '', look: 0 }], opponents: 2, level: 'medium', mode: 'mission', map: 'world', speed: 'normal', sound: true, theme: 'dark', togtLevel: 'novice' };
+const DEFAULTS = { people: [{ name: '', look: 0 }], opponents: 2, level: 'medium', mode: 'mission', map: 'world', speed: 'normal', sound: true, music: true, theme: 'dark', togtLevel: 'novice' };
 const NAME_LENGTH = 14;
 // Every text in the chosen language (js/i18n.js). The computer opponents are made-up commanders
 // (L.opponents), so the table has someone to play against; a map from another age has its own (RULERS).
@@ -220,11 +220,27 @@ function showChapter(id) {
   const you = game.seats.indexOf('human');
   const home = togtOf(id).home && map.regions.find((r) => r.id === togtOf(id).home).name;
   $('ch-goal').innerHTML = `<b>${text.goal}</b> ${goalText(s.players[you].mission)}${home ? ` ${L.startsIn(home)}` : ''}`;
+  showChapterArt(togtOf(id).art);
   const box = $('chapter');
   box.classList.remove('now', 'leave');
   box.hidden = false;
   document.body.classList.add('telling'); // the players and the turn panel wait out of sight
   $('ch-go').focus({ preventScroll: true });
+}
+// The togt's picture behind the card, faded in once it has loaded; the card is the same without it.
+function showChapterArt(src) {
+  const art = $('ch-art');
+  if (src && art.dataset.src === src) return;
+  art.classList.remove('shown');
+  art.dataset.src = src ?? '';
+  if (!src) return;
+  const img = new Image();
+  img.onload = () => {
+    if (art.dataset.src !== src) return;
+    art.style.backgroundImage = `url("${src}")`;
+    art.classList.add('shown');
+  };
+  img.src = src;
 }
 $('chapter').addEventListener('click', (e) => {
   if (e.target.closest('#ch-go')) return;
@@ -1151,6 +1167,13 @@ function renderSettings() {
     if (on) Sound.play('place');
     renderSettings();
   });
+  pills($('music-pills'), [[true, L.on], [false, L.off]], Music.enabled, (on) => {
+    Music.enabled = on;
+    saveSettings({ ...loadSettings(), music: on });
+    if (on) Music.play();
+    else Music.pause();
+    renderSettings();
+  });
   pills($('theme-pills'), Object.entries(L.themes), x.theme, (theme) => {
     saveSettings({ ...loadSettings(), theme });
     applyTheme(theme);
@@ -1183,9 +1206,18 @@ $('settings-btn').addEventListener('click', () => {
   $('settings').showModal();
 });
 applyTheme(loadSettings().theme);
-// Audio may only start from a tap.
-document.addEventListener('pointerdown', () => Sound.unlock(), { capture: true });
+// Audio may only start from a tap. The music rests while the game is out of sight.
+document.addEventListener(
+  'pointerdown',
+  () => {
+    Sound.unlock();
+    Music.play();
+  },
+  { capture: true },
+);
+document.addEventListener('visibilitychange', () => (document.hidden ? Music.pause() : Music.play()));
 Sound.enabled = loadSettings().sound !== false;
+Music.enabled = loadSettings().music !== false;
 
 // The zoom buttons sit just above the turn panel, whatever its height.
 new ResizeObserver(() => document.documentElement.style.setProperty('--bar-h', `${$('bar').offsetHeight}px`)).observe($('bar'));

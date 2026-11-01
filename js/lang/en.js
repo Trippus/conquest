@@ -46,6 +46,7 @@ export const EN = {
   back: 'Back',
   start: 'Start',
   sound: 'Sound',
+  music: 'Music',
   look: 'Appearance',
   language: 'Language',
   ok: 'OK',

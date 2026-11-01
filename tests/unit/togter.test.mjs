@@ -1,10 +1,15 @@
 // The togter (js/togter.js): their order, what opens what, and what a win or a loss counts. Run: npm test
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
+import { existsSync } from 'node:fs';
 import { TOGTER, newProgress, isOpen, nextTogt, freeMaps, record, offerEasy } from '../../js/togter.js';
 import { MAPS } from '../../js/maps/index.js';
 import { DA } from '../../js/lang/da.js';
 import { EN } from '../../js/lang/en.js';
+
+test('every togt picture is there', () => {
+  for (const t of TOGTER) if (t.art) assert.ok(existsSync(new URL(`../../${t.art}`, import.meta.url)), t.art);
+});
 
 test('every togt is a map, once, with its texts in both languages', () => {
   assert.equal(new Set(TOGTER.map((t) => t.map)).size, TOGTER.length);

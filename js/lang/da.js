@@ -45,6 +45,7 @@ export const DA = {
   back: 'Tilbage',
   start: 'Start',
   sound: 'Lyd',
+  music: 'Musik',
   look: 'Udseende',
   language: 'Sprog',
   ok: 'OK',

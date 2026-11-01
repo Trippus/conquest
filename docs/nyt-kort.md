@@ -62,6 +62,11 @@ antal modstandere, og giv det tekster i `togter` i `js/lang/da.js` og `en.js`: �
 listen, historien før spillet (2–3 sætninger) og hvordan det gik i virkeligheden. Martin godkender
 teksterne.
 
+Et billede bag årstallet kan undværes. Vil vi have et, laver vi det med Abracadabrax (Seedream 4.5, 30
+credits) i samme stil som de andre: et gammelt kort over togtets egn på et bord i stearinlys, lysene i
+venstre side, ting fra tiden på kortet. Gør det 960 px kvadratisk (omkring 100 KB), læg det i
+`assets/togter/<kort>.jpg`, sæt `art` i `TOGTER`, og skriv det i `LICENSES.md`.
+
 Spillet findes også på engelsk. Giv derfor kortet engelske navne i `EN` (kortets navn, regioner,
 områder, `LANDMARKS` og `RULERS`), og send dem med som `NAMES: { en: EN }`. Kun de navne, der er
 anderledes på engelsk; resten bruger de danske. `TITLE` er allerede engelsk. `npm test` tjekker, at

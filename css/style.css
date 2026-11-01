@@ -343,7 +343,26 @@ dialog .big { font-family: var(--title); font-size: 20px; margin: 8px 0; }
   background: radial-gradient(ellipse at center, rgb(26 18 11 / 0.8), rgb(10 6 3 / 0.95));
   color: #f1e6d0; text-align: center; overflow-y: auto;
 }
-.ch-card { margin: auto; width: min(460px, 100%); display: flex; flex-direction: column; align-items: center; }
+/* The togt's picture: an old map by candlelight, soft and dark under the text (its AI-drawn lettering
+   is not meant to be read), drifting slowly, the candles flickering from the left. */
+.ch-art {
+  position: fixed; inset: -30px; pointer-events: none;
+  background: 15% 50% / cover no-repeat;
+  filter: blur(2.5px) brightness(.62) saturate(.95);
+  opacity: 0; transition: opacity 1.8s;
+}
+.ch-art.shown { opacity: 1; animation: drift 26s ease-in-out infinite alternate; }
+.ch-art::before {
+  content: ''; position: absolute; inset: 0; mix-blend-mode: screen; animation: flicker 3.7s infinite;
+  background: radial-gradient(ellipse 50% 60% at 6% 45%, rgb(255 166 77 / .4), transparent 70%);
+}
+.ch-art::after { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse 75% 60% at 50% 50%, rgb(12 7 3 / .62), rgb(12 7 3 / .25)); }
+@keyframes drift { from { transform: scale(1.03); } to { transform: scale(1.1) translate(-1.5%, -1%); } }
+@keyframes flicker {
+  0%, 100% { opacity: .8; } 9% { opacity: 1; } 21% { opacity: .68; } 33% { opacity: .95; }
+  47% { opacity: .74; } 61% { opacity: 1; } 74% { opacity: .82; } 88% { opacity: .93; }
+}
+.ch-card { position: relative; margin: auto; width: min(460px, 100%); display: flex; flex-direction: column; align-items: center; text-shadow: 0 1px 10px rgb(0 0 0 / .75); }
 .ch-step { margin: 0 0 6px; font-size: 13px; letter-spacing: .22em; text-transform: uppercase; color: #b8a58c; }
 .ch-year { margin: 0; font: 700 min(76px, 19vw)/1.05 var(--title); letter-spacing: .06em; color: #e8c27a; }
 .ch-rule { width: 200px; height: 12px; margin: 12px 0 10px; overflow: visible; }
@@ -351,7 +370,7 @@ dialog .big { font-family: var(--title); font-size: 20px; margin: 8px 0; }
 .ch-title { margin: 0 0 14px; font: 700 26px/1.2 var(--title); color: #f6ecd4; }
 .ch-story { margin: 0 0 18px; font: 18px/1.55 var(--title); color: #e6d8bd; max-width: 30em; }
 .ch-goal-h { margin: 0 0 4px; font-size: 12px; letter-spacing: .22em; text-transform: uppercase; color: #b8a58c; }
-.ch-goal { margin: 0 0 24px; padding: 10px 14px; border: 1px solid rgb(232 194 122 / .45); border-radius: 12px; font-size: 16px; line-height: 1.45; color: #f1e6d0; max-width: 30em; }
+.ch-goal { margin: 0 0 24px; padding: 10px 14px; border: 1px solid rgb(232 194 122 / .45); border-radius: 12px; background: rgb(16 10 5 / .45); font-size: 16px; line-height: 1.45; color: #f1e6d0; max-width: 30em; }
 .ch-goal b { color: #e8c27a; }
 #ch-go { min-width: 180px; }
 /* in one after another */
@@ -366,11 +385,11 @@ dialog .big { font-family: var(--title); font-size: 20px; margin: 8px 0; }
 @keyframes year { from { opacity: 0; transform: scale(1.18); letter-spacing: .3em; } }
 @keyframes draw { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
 /* a tap shows it all at once */
-#chapter.now * { animation-delay: 0s !important; animation-duration: .2s !important; }
+#chapter.now .ch-card * { animation-delay: 0s !important; animation-duration: .2s !important; }
 #chapter.leave { animation: leave .45s both; }
 @keyframes leave { to { opacity: 0; } }
 @media (prefers-reduced-motion: reduce) {
-  #chapter *, #chapter.leave { animation: none !important; }
+  #chapter *, #chapter .ch-art::before, #chapter.leave { animation: none !important; }
 }
 
 /* ---------- the end of a togt ---------- */

@@ -5,15 +5,16 @@
 
 // map: the map's id (js/maps/index.js); opponents: how many computer players; home: the region you
 // start with, where history began; goal: the regions to hold, what history's winner took (plusOne:
-// and any one more); bonus: the share of start armies you get extra. The opponents keep secret
-// missions, so it is a race.
+// and any one more); bonus: the share of start armies you get extra; art: the picture behind the
+// year card, where there is one (assets/togter, see LICENSES.md). The opponents keep secret missions,
+// so it is a race.
 //
 // Measured with npm run togt-balance (a hard bot for the player, 400 games): Let 91–100%, Normal
 // 50–63%, Svær 19–42%. Svær is meant for players who beat Normal easily.
 export const TOGTER = [
-  { map: 'italy', opponents: 2, home: 'la', goal: ['la', 'sa', 'mg', 'um'], bonus: 0.5 },
-  { map: 'alexander', opponents: 2, home: 'hl', goal: ['la', 'me', 'pe'] },
-  { map: 'vikings', opponents: 2, home: 'dk', goal: ['dk', 'br', 'no'], bonus: 0.2 },
+  { map: 'italy', opponents: 2, home: 'la', goal: ['la', 'sa', 'mg', 'um'], bonus: 0.5, art: 'assets/togter/italy.jpg' },
+  { map: 'alexander', opponents: 2, home: 'hl', goal: ['la', 'me', 'pe'], art: 'assets/togter/alexander.jpg' },
+  { map: 'vikings', opponents: 2, home: 'dk', goal: ['dk', 'br', 'no'], bonus: 0.2, art: 'assets/togter/vikings.jpg' },
   { map: 'england', opponents: 3, home: 'nm', goal: ['wx', 'me', 'ea'] },
   { map: 'japan', opponents: 3, home: 'to', goal: ['to', 'ks', 'ki'], bonus: 0.5 },
   { map: 'napoleon', opponents: 3, home: 'fr', goal: ['fr', 'os', 'pr'], bonus: 0.6 },

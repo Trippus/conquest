@@ -16,6 +16,8 @@ const types = {
   '.json': 'application/json',
   '.webmanifest': 'application/manifest+json',
   '.png': 'image/png',
+  '.jpg': 'image/jpeg',
+  '.mp3': 'audio/mpeg',
   '.svg': 'image/svg+xml',
 };
 
@@ -30,7 +32,21 @@ http
     }
     try {
       const data = await readFile(file);
-      res.writeHead(200, { 'content-type': types[path.extname(file)] || 'application/octet-stream', 'cache-control': 'no-cache' });
+      const head = { 'content-type': types[path.extname(file)] || 'application/octet-stream', 'cache-control': 'no-cache', 'accept-ranges': 'bytes' };
+      // Byte ranges, as GitHub Pages serves them: the music seeks and loops with them.
+      const range = /^bytes=(\d*)-(\d*)$/.exec(req.headers.range ?? '');
+      if (range && (range[1] || range[2])) {
+        const start = range[1] ? Number(range[1]) : Math.max(0, data.length - Number(range[2]));
+        const end = range[1] && range[2] ? Math.min(Number(range[2]), data.length - 1) : data.length - 1;
+        if (start > end) {
+          res.writeHead(416, { 'content-range': `bytes */${data.length}` }).end();
+          return;
+        }
+        res.writeHead(206, { ...head, 'content-range': `bytes ${start}-${end}/${data.length}` });
+        res.end(data.subarray(start, end + 1));
+        return;
+      }
+      res.writeHead(200, head);
       res.end(data);
     } catch {
       res.writeHead(404).end('Not found');

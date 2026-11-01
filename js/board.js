@@ -235,8 +235,11 @@ export function createBoard(svg, grid, map, { onTap, onRegion = () => {}, insets
     const { top, bottom } = insets();
     const clamp = (v, lo, hi) => (lo > hi ? (lo + hi) / 2 : Math.min(hi, Math.max(lo, v)));
     const side = 3; // room beyond the left and right edge for the mirror seals
-    view = { x: clamp(x, -pad - side, W - w + pad + side), y: clamp(y, -top * k - pad, H - h + bottom * k + pad), w, h };
-    svg.setAttribute('viewBox', `${n(view.x)} ${n(view.y)} ${n(view.w)} ${n(view.h)}`);
+    show({ x: clamp(x, -pad - side, W - w + pad + side), y: clamp(y, -top * k - pad, H - h + bottom * k + pad), w, h });
+  }
+  function show(v) {
+    view = v;
+    svg.setAttribute('viewBox', `${n(v.x)} ${n(v.y)} ${n(v.w)} ${n(v.h)}`);
   }
   // Zoom by `factor` (> 1 zooms in) keeping the map point under (px, py) in place.
   function zoomAt(factor, px, py) {
@@ -288,16 +291,19 @@ export function createBoard(svg, grid, map, { onTap, onRegion = () => {}, insets
     glideFrom(from, 380, (p) => 1 - (1 - p) ** 3);
   }
 
-  // Glides from an earlier view to the view now set, in ms, with the easing ease(0..1).
+  // Glides from an earlier view to the view now set, in ms, with the easing ease(0..1). Both ends are
+  // views setView allowed, so the way between is not held back at the map's edges: that held the map
+  // still for a moment halfway through the zoom at the start of a togt, and it seemed to stutter.
   function glideFrom(from, ms, ease) {
     const to = { ...view };
-    setView(from.x, from.y, from.w);
+    show(from);
     cancelAnimationFrame(glide);
     const start = performance.now();
     const step = (now) => {
       const p = Math.min(1, (now - start) / ms);
       const e = ease(p);
-      setView(from.x + (to.x - from.x) * e, from.y + (to.y - from.y) * e, from.w + (to.w - from.w) * e);
+      const at = (k) => from[k] + (to[k] - from[k]) * e;
+      show({ x: at('x'), y: at('y'), w: at('w'), h: at('h') });
       if (p < 1) glide = requestAnimationFrame(step);
     };
     glide = requestAnimationFrame(step);

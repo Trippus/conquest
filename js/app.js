@@ -210,7 +210,7 @@ function startGame(order, speed, mode = 'mission', seed = (Math.random() * 2 ** 
 
 /* ---------- a togt begins ---------- */
 
-// The year, the war and the story come in one after another; a tap shows them all at once. "To
+// The year, the war and the story come in one after another; a tap hurries the rest along. "To
 // battle" lets the map come into view, glides to your lands and shows your mission.
 function showChapter(id) {
   const i = TOGTER.findIndex((t) => t.map === id);
@@ -224,7 +224,7 @@ function showChapter(id) {
   $('ch-goal').innerHTML = `<b>${text.goal}</b> ${goalText(s.players[you].mission)}${home ? ` ${L.startsIn(home)}` : ''}`;
   showChapterArt(togtOf(id).art);
   const box = $('chapter');
-  box.classList.remove('now', 'leave');
+  box.classList.remove('leave');
   box.hidden = false;
   document.body.classList.add('telling'); // the players and the turn panel wait out of sight
   $('ch-go').focus({ preventScroll: true });
@@ -254,12 +254,16 @@ function preloadArt(src) {
 }
 $('chapter').addEventListener('click', (e) => {
   if (e.target.closest('#ch-go')) return;
-  $('chapter').classList.add('now');
+  // What is still to come plays out ten times as fast, without a jump; the picture's slow drift and
+  // the candles keep their pace.
+  for (const a of $('chapter').getAnimations({ subtree: true })) {
+    if (a.effect.getTiming().iterations !== Infinity) a.playbackRate = 10;
+  }
 });
 $('ch-home').addEventListener('click', home);
 $('ch-go').addEventListener('click', () => {
   const box = $('chapter');
-  box.classList.add('now', 'leave');
+  box.classList.add('leave');
   game.told = true;
   save();
   setTimeout(() => {

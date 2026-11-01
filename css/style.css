@@ -388,10 +388,9 @@ dialog .big { font-family: var(--title); font-size: 20px; margin: 8px 0; }
 #chapter .ch-goal-h, #chapter .ch-goal { animation: rise .7s 2.9s both; }
 #chapter #ch-go { animation: rise .6s 3.5s both; }
 @keyframes rise { from { opacity: 0; transform: translateY(10px); } }
-@keyframes year { from { opacity: 0; transform: scale(1.18); letter-spacing: .3em; } }
+/* only a zoom: wider letters would wrap the year anew while it comes in */
+@keyframes year { from { opacity: 0; transform: scale(1.18); } }
 @keyframes draw { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
-/* a tap shows it all at once */
-#chapter.now .ch-card * { animation-delay: 0s !important; animation-duration: .2s !important; }
 #chapter.leave { animation: leave .45s both; }
 @keyframes leave { to { opacity: 0; } }
 @media (prefers-reduced-motion: reduce) {

@@ -9,23 +9,30 @@ import { MODERN } from '../../js/rules/modern.js';
 
 const rules = { ...MODERN, ...E.RULES };
 
-test('the Alexander map is valid: 26 territories in 8 regions, every letter on the grid', () => {
+test('the Alexander map is valid: 31 territories in 8 regions, every letter on the grid', () => {
   assert.deepEqual(G.validateMap(E.ALEXANDER), []);
-  assert.equal(Object.keys(E.ALEXANDER.territories).length, 26);
+  assert.equal(Object.keys(E.ALEXANDER.territories).length, 31);
   assert.equal(Object.keys(E.ALEXANDER.regions).length, 8);
   const used = new Set(E.GRID.join('').replace(/[.#]/g, ''));
   assert.deepEqual([...used].sort(), Object.keys(E.TERRITORIES).sort());
   assert.ok(E.GRID.every((row) => row.length === E.GRID[0].length), 'all rows equally long');
 });
 
-test('the road east: over the Hellespont, through Persia to Bactria, and back by sea from the Indus', () => {
+test('the road east: over the Hellespont, through Persia to Bactria and on to the Indus', () => {
   const t = E.ALEXANDER.territories;
-  assert.ok(t.byzantion.adj.includes('sardes'));
+  assert.ok(t.byzantion.adj.includes('sardes') && t.athen.adj.includes('sardes'));
   assert.ok(t.ekbatana.adj.includes('areia'));
   assert.ok(t.baktra.adj.includes('taxila'));
-  assert.ok(t.patala.adj.includes('persepolis') && t.athen.adj.includes('sardes'));
-  assert.deepEqual(t.siwa.adj.sort(), ['memfis', 'theben']);
+  assert.ok(t.patala.adj.includes('persepolis'));
   assert.ok(mapShapes(E.ALEXANDER_GRID).sea.every((r) => !r.wraps));
+});
+
+test('the other ways: Crete between three coasts, the desert road, and over the Caspian', () => {
+  const t = E.ALEXANDER.territories;
+  assert.deepEqual(t.kreta.adj.sort(), ['halikarnassos', 'kyrenaika', 'sparta']);
+  assert.deepEqual(t.kyrenaika.adj.sort(), ['kreta', 'siwa']);
+  assert.ok(t.nabataea.adj.includes('gaza') && t.nabataea.adj.includes('babylon'));
+  assert.ok(t.armenien.adj.includes('chorasmien') && t.armenien.adj.includes('tarsos'));
 });
 
 test('every region has a name place and a bonus of at least 2', () => {

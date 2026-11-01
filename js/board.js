@@ -248,15 +248,20 @@ export function createBoard(svg, grid, map, { onTap, onRegion = () => {}, insets
     setView(mx - ((px - b.left) / b.width) * w, my - ((py - b.top) / b.height) * h, w);
   }
   // On a wide screen: the whole map. On a phone: zoomed in to where the given territories lie
-  // closest together, so names and numbers are readable; the rest is a drag away.
-  function focus(list) {
+  // closest together, so names and numbers are readable; the rest is a drag away. glide: the time
+  // in ms to glide there from where the map is now (a togt begins with it).
+  function focus(list, { glide: ms = 0 } = {}) {
+    const from = { ...view };
     const b = box();
-    if (!list?.length || b.width > 1.6 * b.height) return setView(0, 0, maxW());
-    const near = (i) => list.filter((j) => Math.hypot(T[i].x - T[j].x, T[i].y - T[j].y) < 16).length;
-    const centre = list.reduce((best, i) => (near(i) > near(best) ? i : best));
-    const { top, bottom } = insets();
-    const w = Math.min(36, (H * b.width) / (b.height - top - bottom)); // close, but the map fills the free height
-    centreOn(T[centre].x, T[centre].y, w);
+    if (!list?.length || b.width > 1.6 * b.height) setView(0, 0, maxW());
+    else {
+      const near = (i) => list.filter((j) => Math.hypot(T[i].x - T[j].x, T[i].y - T[j].y) < 16).length;
+      const centre = list.reduce((best, i) => (near(i) > near(best) ? i : best));
+      const { top, bottom } = insets();
+      const w = Math.min(36, (H * b.width) / (b.height - top - bottom)); // close, but the map fills the free height
+      centreOn(T[centre].x, T[centre].y, w);
+    }
+    if (ms) glideFrom(from, ms, (p) => (p < 0.5 ? 4 * p ** 3 : 1 - (2 - 2 * p) ** 3 / 2));
   }
 
   // Puts map point (x, y) in the middle of the part of the screen the panels leave free.
@@ -280,14 +285,19 @@ export function createBoard(svg, grid, map, { onTap, onRegion = () => {}, insets
     if (inside) return;
     const from = { ...view };
     centreOn(t.x, t.y);
+    glideFrom(from, 380, (p) => 1 - (1 - p) ** 3);
+  }
+
+  // Glides from an earlier view to the view now set, in ms, with the easing ease(0..1).
+  function glideFrom(from, ms, ease) {
     const to = { ...view };
     setView(from.x, from.y, from.w);
     cancelAnimationFrame(glide);
     const start = performance.now();
     const step = (now) => {
-      const p = Math.min(1, (now - start) / 380);
-      const e = 1 - (1 - p) ** 3;
-      setView(from.x + (to.x - from.x) * e, from.y + (to.y - from.y) * e, view.w);
+      const p = Math.min(1, (now - start) / ms);
+      const e = ease(p);
+      setView(from.x + (to.x - from.x) * e, from.y + (to.y - from.y) * e, from.w + (to.w - from.w) * e);
       if (p < 1) glide = requestAnimationFrame(step);
     };
     glide = requestAnimationFrame(step);

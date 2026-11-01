@@ -57,6 +57,11 @@ Kopiér `js/maps/england.js` til `js/maps/<kort>.js` og ret: regioner, områder,
 Terræn (`TERRAIN`) følger sted og tid: `spruce` (gran) mod nord, `oak` (eg, også regnskov) mod syd,
 `forest` (blandet) imellem, `mountains` og `desert` (klitter og en palme ind imellem).
 
+Kortet bliver et togt: sæt det ind i `TOGTER` i `js/togter.js` på sin plads i tiden (ældst først) med
+antal modstandere, og giv det tekster i `togter` i `js/lang/da.js` og `en.js`: årstal, en linje til
+listen, historien før spillet (2–3 sætninger) og hvordan det gik i virkeligheden. Martin godkender
+teksterne.
+
 Spillet findes også på engelsk. Giv derfor kortet engelske navne i `EN` (kortets navn, regioner,
 områder, `LANDMARKS` og `RULERS`), og send dem med som `NAMES: { en: EN }`. Kun de navne, der er
 anderledes på engelsk; resten bruger de danske. `TITLE` er allerede engelsk. `npm test` tjekker, at
@@ -117,10 +122,11 @@ mønstre gav flimmer.
 
 Commit og push; GitHub Pages har det oppe efter et par minutter. Martin prøver det på telefonen.
 
-## Ikke besluttet endnu
+## Togter og Frit spil (besluttet 1/11-2026)
 
-Tages op, når der er flere togter at se dem i sammenhæng med:
-
-- Oplåsning og togter i rækkefølge (et kort åbner det næste), og om verdenskortet skal være det sidste.
-- Om hvert togt skal have en historie: en kort indledning til perioden (fx "Det er 1066. Kong Edvard
-  er død, og tre mænd gør krav på tronen …"), og måske en afslutning, når man vinder.
+- Togterne spilles i rækkefølge, ældst først, og verdenskortet er det sidste. Vinder man et togt, åbner
+  det næste, og kortet kommer med i Frit spil. Verden er åben i Frit spil fra start, og spillere fra før
+  togterne har alle kort åbne.
+- Hvert togt har en indledning med årstal og historie, og en afslutning om hvordan det gik.
+- Næste fase: man fører den historiske side, starter i dens hjemregion og har et synligt mål fra
+  historien i stedet for en hemmelig mission.

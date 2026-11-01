@@ -11,6 +11,7 @@
     "sim": "node tools/simulate.mjs",
     "design-shots": "node tools/design-shots.mjs",
     "map-report": "node tools/map-report.mjs",
-    "balance": "node tools/balance.mjs"
+    "balance": "node tools/balance.mjs",
+    "togt-balance": "node tools/togt-balance.mjs"
   }
 }

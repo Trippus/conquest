@@ -224,7 +224,10 @@ export function fortifyTargets(map, rules, s, from) {
 // mode: 'world' (hold every territory) or 'mission' (each player gets a secret mission).
 // handicap: start armies to add (or, negative, take away) per player; the easy computer players
 // start weaker this way.
-export function newGame(map, rules, { players, seed = 1, mode = 'world', handicap = [] }) {
+// home: per player, territories they start with (a togt starts you where history did); the rest
+// are dealt so everyone has as many as can be. goals: per player, a mission they get instead of a
+// dealt one (a togt's goal from history).
+export function newGame(map, rules, { players, seed = 1, mode = 'world', handicap = [], home = [], goals = [] }) {
   const n = players.length;
   if (n < 2 || n > 6) throw new Error('A game needs 2–6 players');
   const T = map.territories.length;
@@ -246,10 +249,13 @@ export function newGame(map, rules, { players, seed = 1, mode = 'world', handica
     winner: -1,
     won: '', // how: 'world', 'mission' or 'rounds'
   };
-  shuffle(s, [...Array(T).keys()]).forEach((t, i) => {
-    s.owner[t] = n - 1 - (i % n);
-    s.armies[t] = 1;
-  });
+  if (home.some((list) => list?.length)) deal(s, n, T, home);
+  else {
+    shuffle(s, [...Array(T).keys()]).forEach((t, i) => {
+      s.owner[t] = n - 1 - (i % n);
+      s.armies[t] = 1;
+    });
+  }
   const start = startArmies(rules, T, n);
   for (let p = 0; p < n; p++) {
     const own = owned(s, p);
@@ -260,12 +266,33 @@ export function newGame(map, rules, { players, seed = 1, mode = 'world', handica
   if (mode === 'mission') {
     const pool = shuffle(s, missionPool(map, n));
     s.players.forEach((pl, p) => {
+      if (goals[p]) return (pl.mission = { ...goals[p] });
       const i = pool.findIndex((m) => !(m.type === 'eliminate' && m.target === p));
       pl.mission = pool.splice(i, 1)[0];
     });
   }
   s.reserve = reinforcements(map, rules, s, 0);
   return s;
+}
+
+// Deals the territories when some players start at home: those first, then each of the rest to
+// whoever has fewest so far (on a tie the later seat, as without homes the later seats get the spare).
+function deal(s, n, T, home) {
+  const count = Array(n).fill(0);
+  home.forEach((list, p) =>
+    list?.forEach((t) => {
+      s.owner[t] = p;
+      s.armies[t] = 1;
+      count[p]++;
+    }),
+  );
+  for (const t of shuffle(s, [...Array(T).keys()].filter((t) => s.owner[t] < 0))) {
+    let p = n - 1;
+    for (let q = n - 2; q >= 0; q--) if (count[q] < count[p]) p = q;
+    s.owner[t] = p;
+    s.armies[t] = 1;
+    count[p]++;
+  }
 }
 
 /* ---------- actions ---------- */

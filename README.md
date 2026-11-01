@@ -25,7 +25,8 @@ npm run design-shots                          # stilprøverne som PNG (kræver n
 | `js/map-shapes.js` | Gør sekskantgitteret til tegnbare former: udjævnede omrids, grænser, kyst, havruter |
 | `design/` | Stilprøver til kortet (`stilproever.html`, `stil-*.png`) |
 | `js/rules/*.js` | Regelsæt som data: starthære, terninger, kort-bytte, rundegrænse |
-| `js/app.js` | Brugerfladen: startskærm, tryk → handlinger, bots spiller, terninger, lyd, gem/indlæs. `window.__conquest` er debug-hooket |
+| `js/app.js` | Brugerfladen: velkomst, startskærm, togternes indledning og afslutning, tryk → handlinger, bots spiller, terninger, lyd, gem/indlæs. `window.__conquest` er debug-hooket |
+| `js/togter.js` | Togterne i rækkefølge (ældst først), og hvad en sejr åbner: næste togt og kortet i Frit spil. Teksterne står i `js/lang/*.js` |
 | `js/audio.js` | Syntetiserede lyde (terninger, laksegl, horn, kort), ingen lydfiler |
 | `js/map-art.js` | Kortsymboler i blæk: bjerge, skove, klitter, bølger, skibe, kompasrose, placeret ud fra gitteret |
 | `js/emblems.js` | Spillernes emblemer, lavet af `tools/make-emblems.mjs` fra `assets/emblems` (se `LICENSES.md`) |

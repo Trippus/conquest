@@ -49,17 +49,41 @@
     <div class="intro-card"><div class="intro-scroll">
       <h1 id="intro-title"><span>Rulers</span> <span>of the Map</span></h1>
       <p class="intro-sub" data-t="tagline"></p>
-      <div class="intro-buttons">
-        <button type="button" class="primary wide" id="intro-continue" hidden data-t="continue"></button>
-        <button type="button" class="wide" id="intro-new" data-t="newGame"></button>
-        <p class="intro-setup"><span id="intro-summary"></span> · <button type="button" class="link" id="intro-change" data-t="change"></button></p>
+      <!-- The first time: a name and a coat of arms, then the two ways to play. -->
+      <div id="welcome" hidden>
+        <div id="welcome-name">
+          <h2 class="welcome-h" data-t="welcome"></h2>
+          <p data-t="whatName"></p>
+          <div class="person welcome-person">
+            <button type="button" class="person-look" id="welcome-look" data-label="changeArms" aria-expanded="false"></button>
+            <input type="text" id="welcome-input" maxlength="14" spellcheck="false" enterkeyhint="done" data-label="yourName">
+          </div>
+          <div class="looks" id="welcome-looks" hidden></div>
+          <button type="button" class="primary wide" id="welcome-next" data-t="next"></button>
+        </div>
+        <div id="welcome-ways" hidden>
+          <h2 class="welcome-h" id="welcome-hello"></h2>
+          <p data-t="howPlay"></p>
+          <button type="button" class="choice" id="choose-togter"><b data-t="togterTitle"></b><span data-t="togterPitch"></span></button>
+          <button type="button" class="choice" id="choose-free"><b data-t="freeGame"></b><span data-t="freePitch"></span></button>
+          <p class="sub" data-t="switchLater"></p>
+        </div>
       </div>
-      <details class="fold intro-rules" id="intro-rules">
-        <summary data-t="howToPlay"></summary>
-        <ul data-html="rules"></ul>
-        <p class="credits" data-html="credits"></p>
-      </details>
-      <button type="button" class="link" id="settings-btn" data-t="settings"></button>
+      <div id="menu">
+        <div class="intro-buttons">
+          <button type="button" class="primary wide" id="intro-continue" hidden data-t="continue"></button>
+          <button type="button" class="wide" id="intro-togter" data-t="togterTitle"></button>
+          <p class="intro-setup" id="togt-summary"></p>
+          <button type="button" class="wide" id="intro-new" data-t="freeGame"></button>
+          <p class="intro-setup"><span id="intro-summary"></span> · <button type="button" class="link" id="intro-change" data-t="change"></button></p>
+        </div>
+        <details class="fold intro-rules" id="intro-rules">
+          <summary data-t="howToPlay"></summary>
+          <ul data-html="rules"></ul>
+          <p class="credits" data-html="credits"></p>
+        </details>
+        <button type="button" class="link" id="settings-btn" data-t="settings"></button>
+      </div>
       <div class="publisher">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="64 24 424 432" class="pub-logo" aria-hidden="true">
           <ellipse cx="256" cy="412" rx="170" ry="34" fill="#F7ECD6" stroke="#123D30" stroke-width="14"/>
@@ -85,9 +109,36 @@
     </div></div>
   </section>
 
+  <!-- A togt begins: the year, the war and the story, before the map comes into view. -->
+  <section id="chapter" hidden>
+    <div class="ch-card">
+      <p class="ch-step" id="ch-step"></p>
+      <p class="ch-year" id="ch-year"></p>
+      <svg class="ch-rule" viewBox="0 0 220 12" aria-hidden="true">
+        <path d="M2 6H96M124 6H218" pathLength="1"/>
+        <path d="M110 1L116 6L110 11L104 6Z" pathLength="1"/>
+      </svg>
+      <h2 class="ch-title" id="ch-title"></h2>
+      <p class="ch-story" id="ch-story"></p>
+      <p class="ch-goal-h" data-t="yourGoal"></p>
+      <p class="ch-goal" id="ch-goal"></p>
+      <button type="button" class="primary" id="ch-go" data-t="toBattle"></button>
+    </div>
+  </section>
+
+  <dialog id="togter">
+    <form method="dialog">
+      <h2 data-t="togterTitle"></h2>
+      <p class="sub" data-t="togterLead"></p>
+      <div class="field"><span data-t="togtLevel"></span><div class="pills" id="togt-level"></div></div>
+      <ol class="togt-list" id="togt-list"></ol>
+      <div class="buttons"><button value="cancel" data-t="back"></button></div>
+    </form>
+  </dialog>
+
   <dialog id="new-game">
     <form method="dialog">
-      <h2 data-t="newGame"></h2>
+      <h2 data-t="freeGame"></h2>
       <p id="setup-summary" class="summary"></p>
       <details class="fold" id="setup-details">
         <summary data-t="changeSetup"></summary>
@@ -105,7 +156,8 @@
         </section>
         <section class="group">
           <h3 data-t="theGame"></h3>
-          <div class="field"><span data-t="map"></span><div class="pills" data-name="map"></div></div>
+          <div class="field"><span data-t="map"></span><div class="pills" data-name="map"></div>
+            <p class="sub locked-note" id="locked-note" data-t="lockedMaps"></p></div>
           <div class="field"><span data-t="victory"></span><div class="pills" data-name="mode"></div></div>
         </section>
         <p class="sub" data-t="fairStart"></p>
@@ -129,11 +181,11 @@
 
   <dialog id="mission-dialog">
     <form method="dialog">
-      <h2 data-t="yourMission"></h2>
+      <h2 id="mission-title" data-t="yourMission"></h2>
       <p class="sub" id="mission-who"></p>
       <p id="mission-text" class="big"></p>
       <p id="mission-progress"></p>
-      <p class="sub" data-t="missionSecret"></p>
+      <p class="sub" id="mission-note" data-t="missionSecret"></p>
       <div class="buttons"><button value="ok" class="primary" data-t="ok">OK</button></div>
     </form>
   </dialog>
@@ -162,10 +214,10 @@
   <dialog id="game-over" data-label="gameOver">
     <form method="dialog">
       <div class="ruler" id="over-ruler"></div>
-      <p id="over-text"></p>
+      <div id="over-text"></div>
       <div class="buttons">
         <button value="home" data-t="toStart"></button>
-        <button value="again" class="primary" data-t="playAgain"></button>
+        <button value="again" class="primary" id="over-again"></button>
       </div>
     </form>
   </dialog>

@@ -411,3 +411,19 @@ test('a conquest moves one army in by itself; with occupyMin dice, as many as at
     if (three.owner[at('w3')] === 0) assert.equal(three.armies[at('w3')], 3);
   }
 });
+
+test('a home start and a fixed goal: the home is yours, the rest is dealt evenly, the goal replaces a mission', () => {
+  const rules = MODERN;
+  const home = [null, [0, 1, 2], null];
+  const goal = { type: 'regions', regions: [0] };
+  for (let seed = 1; seed <= 20; seed++) {
+    const s = G.newGame(map, rules, { players: ['A', 'B', 'C'], seed, mode: 'mission', home, goals: [null, goal, null] });
+    assert.deepEqual([0, 1, 2].map((t) => s.owner[t]), [1, 1, 1]);
+    const counts = [0, 1, 2].map((p) => G.owned(s, p).length);
+    assert.ok(Math.max(...counts) - Math.min(...counts) <= 1, `seed ${seed}: ${counts}`);
+    assert.ok(s.owner.every((o) => o >= 0));
+    assert.deepEqual(s.players[1].mission, goal);
+    assert.notEqual(s.players[0].mission, null);
+    assert.deepEqual(G.replay(map, rules, { players: ['A', 'B', 'C'], seed, mode: 'mission', home, goals: [null, goal, null] }, []), s);
+  }
+});

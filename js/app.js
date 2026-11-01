@@ -11,14 +11,17 @@ import { MODERN } from './rules/modern.js';
 import { createBoard, PLAYER_COLORS as COLORS, sealIcon } from './board.js';
 import { Sound } from './audio.js';
 import { LANGUAGES, pickLanguage, stringsFor, translatePage } from './i18n.js';
+import { TOGTER, newProgress, isOpen, nextTogt, freeMaps, record, offerEasy, togtStart } from './togter.js';
 
 // Saves only replay on the map they were played on: v1 was the test map, v2 the 30-territory world.
 const KEY = 'conquest.v3';
 const DELAY = { normal: 650, fast: 140 };
 const SETTINGS = 'conquest.settings';
+const PROGRESS = 'conquest.progress';
 // people: the players at this device, each with a name (empty: a default) and a coat of arms
-// (colour and emblem number); opponents: how many computer players.
-const DEFAULTS = { people: [{ name: '', look: 0 }], opponents: 2, level: 'medium', mode: 'mission', map: 'vikings', speed: 'normal', sound: true, theme: 'dark' };
+// (colour and emblem number); opponents: how many computer players; togtLevel: the opponents'
+// level in the togter (the free game has its own).
+const DEFAULTS = { people: [{ name: '', look: 0 }], opponents: 2, level: 'medium', mode: 'mission', map: 'world', speed: 'normal', sound: true, theme: 'dark', togtLevel: 'novice' };
 const NAME_LENGTH = 14;
 // Every text in the chosen language (js/i18n.js). The computer opponents are made-up commanders
 // (L.opponents), so the table has someone to play against; a map from another age has its own (RULERS).
@@ -87,7 +90,7 @@ function loadSettings() {
   try {
     const saved = JSON.parse(localStorage.getItem(SETTINGS)) ?? {};
     const { humans, name, look, ...x } = { ...DEFAULTS, ...saved };
-    return { ...x, people: saved.people ?? oldPeople(saved), level: level(x.level) };
+    return { ...x, people: saved.people ?? oldPeople(saved), level: level(x.level), map: isFree(x.map) ? x.map : DEFAULTS.map };
   } catch {
     return structuredClone(DEFAULTS); // a copy: the setup dialog changes the people in place
   }
@@ -105,6 +108,31 @@ function saveSettings(settings) {
     localStorage.setItem(SETTINGS, JSON.stringify(settings));
   } catch {}
 }
+
+// The togter won and lost (js/togter.js). Someone with settings or a game saved from before there
+// were togter is a veteran: every map stays open in the free game.
+function loadProgress() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(PROGRESS));
+    if (saved) return { ...newProgress(), ...saved };
+    return newProgress(!!(localStorage.getItem(SETTINGS) || localStorage.getItem(KEY)));
+  } catch {
+    return newProgress();
+  }
+}
+function saveProgress(progress) {
+  try {
+    localStorage.setItem(PROGRESS, JSON.stringify(progress));
+  } catch {}
+}
+let progress = loadProgress();
+saveProgress(progress); // so a veteran is known as one after the first game saves settings too
+// A map in the free game: open, or still to be won in the togter.
+function isFree(id) {
+  return freeMaps(progress, Object.keys(MAPS)).includes(id);
+}
+const togtOf = (id) => TOGTER.find((t) => t.map === id);
+const togtText = (id) => L.togter[id];
 
 // A fair shuffle. Sorting by a random comparison is not: it left the first player (you) first or
 // last far more often than in the middle.
@@ -126,31 +154,95 @@ function startFromSettings(settings = loadSettings()) {
   startGame(shuffled([...people, ...bots]), settings.speed, settings.mode, undefined, settings.map);
 }
 
+// A togt: the one person at the phone against the togt's opponents, on the togter's level, starting
+// at home with history's goal (js/togter.js). With intro, the year and the story come first
+// (showChapter); a retry goes straight to the map.
+function startTogt(id, { intro = true } = {}) {
+  const settings = loadSettings();
+  const person = settings.people[0];
+  const togt = togtOf(id);
+  const names = shuffled(mapIn(id).RULERS ?? L.opponents);
+  const free = COLORS.map((_, i) => i).filter((i) => i !== person.look);
+  const you = { kind: 'human', name: person.name.trim() || L.you, color: person.look };
+  const bots = Array.from({ length: togt.opponents }, (_, i) => ({ kind: settings.togtLevel, name: names[i], color: free[i] }));
+  const order = shuffled([you, ...bots]);
+  useMap(id);
+  const start = togtStart(map, togt, order.indexOf(you), order.length);
+  startGame(order, settings.speed, 'mission', undefined, id, { togt: id, quiet: intro, ...start, bonus: togt.bonus ?? 0 });
+  if (intro) showChapter(id);
+}
+
 // order: [{ kind: 'human' | 'novice' | 'medium' | 'hard', name, color }] in turn order.
-function startGame(order, speed, mode = 'mission', seed = (Math.random() * 2 ** 31) | 0, mapId = 'world') {
+// togt: the togt this game is (js/togter.js), with the start at home, the goals and the bonus for
+// the person playing it; quiet: the game waits, showing the whole map, while the story is told.
+function startGame(order, speed, mode = 'mission', seed = (Math.random() * 2 ** 31) | 0, mapId = 'world', { togt, quiet = false, home, goals, bonus = 0 } = {}) {
   const humans = order.filter((x) => x.kind === 'human').length;
   $('intro').hidden = true;
   useMap(mapId);
   // Easy computer players start weaker, by how much the map's rules say; hard ones start stronger.
   const start = G.startArmies(rules, map.territories.length, order.length);
-  const extra = { novice: -rules.noviceHandicap, hard: rules.hardBonus };
+  const extra = { novice: -rules.noviceHandicap, hard: rules.hardBonus, human: bonus };
   const handicap = order.map((x) => Math.round(start * (extra[x.kind] ?? 0)));
   game = {
     map: grid.id,
-    setup: { players: order.map((x) => x.name), seed, mode, handicap },
+    setup: { players: order.map((x) => x.name), seed, mode, handicap, ...(home ? { home, goals } : {}) },
     seats: order.map((x) => x.kind),
     colors: order.map((x) => x.color),
     speed,
     actions: [],
+    ...(togt ? { togt } : {}),
   };
   s = G.newGame(map, rules, game.setup);
   clearSel();
+  // Nothing from the last game lingers: its messages and dice.
+  toasts.length = 0;
+  $('toast').hidden = true;
+  $('dice').hidden = true;
   save();
   render();
+  if (quiet) return board.focus(null);
   focusOnPlayer();
   if (mode === 'mission' && humans === 1) openMission();
   else schedule();
 }
+
+/* ---------- a togt begins ---------- */
+
+// The year, the war and the story come in one after another; a tap shows them all at once. "To
+// battle" lets the map come into view, glides to your lands and shows your mission.
+function showChapter(id) {
+  const i = TOGTER.findIndex((t) => t.map === id);
+  const text = togtText(id);
+  $('ch-step').textContent = L.chapterStep(i + 1, TOGTER.length);
+  $('ch-year').textContent = text.year;
+  $('ch-title').textContent = mapIn(id).name;
+  $('ch-story').textContent = text.story;
+  const you = game.seats.indexOf('human');
+  const home = togtOf(id).home && map.regions.find((r) => r.id === togtOf(id).home).name;
+  $('ch-goal').innerHTML = `<b>${text.goal}</b> ${goalText(s.players[you].mission)}${home ? ` ${L.startsIn(home)}` : ''}`;
+  const box = $('chapter');
+  box.classList.remove('now', 'leave');
+  box.hidden = false;
+  document.body.classList.add('telling'); // the players and the turn panel wait out of sight
+  $('ch-go').focus({ preventScroll: true });
+}
+$('chapter').addEventListener('click', (e) => {
+  if (e.target.closest('#ch-go')) return;
+  $('chapter').classList.add('now');
+});
+$('ch-go').addEventListener('click', () => {
+  const box = $('chapter');
+  box.classList.add('now', 'leave');
+  setTimeout(() => {
+    box.hidden = true;
+    document.body.classList.remove('telling');
+    const glide = matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 1500;
+    const you = game.seats.indexOf('human');
+    board.focus(G.owned(s, you), { glide });
+    // The goal was told with the story; the game begins when the map is there.
+    setTimeout(schedule, glide + 150);
+  }, 450);
+});
 
 // Start zoomed in on the (first) human player's territories, or the whole map when only bots play.
 function focusOnPlayer() {
@@ -217,7 +309,7 @@ const isBot = () => game.seats[s.current] !== 'human';
 // Bots play one action at a time, with a pause so you can follow them.
 function schedule() {
   clearTimeout(botTimer);
-  if (s.phase === 'over' || !isBot() || !$('intro').hidden) return;
+  if (s.phase === 'over' || !isBot() || !$('intro').hidden || !$('chapter').hidden) return;
   botTimer = setTimeout(() => act(botAction(map, rules, s, level(game.seats[s.current]))), DELAY[game.speed]);
 }
 
@@ -343,7 +435,8 @@ function renderBar() {
     phase = L.gameOver;
     text = L.won(subject(s.winner), soloYou(s.winner));
     button(L.toStart, showIntro);
-    button(L.playAgain, () => startFromSettings(), { primary: true });
+    const after = afterGame();
+    if (after) button(after.label, () => goOn(after.value), { primary: true });
   } else if (isBot()) {
     phase = `${L.round(s.round)} · ${L.phaseNames[s.phase]}`;
     text = L.thinking(name);
@@ -545,7 +638,8 @@ const CHOICES = {
   opponents: () =>
     Array.from({ length: MAX_PLAYERS - draft.people.length - fewestBots() + 1 }, (_, i) => [fewestBots() + i, String(fewestBots() + i)]),
   level: () => Object.entries(L.levels),
-  map: () => Object.keys(MAPS).map((id) => [id, mapIn(id).name]),
+  // A map still to be won in the togter is shown locked.
+  map: () => Object.keys(MAPS).map((id) => [id, mapIn(id).name, !isFree(id)]),
   mode: () => Object.entries(L.modes),
   speed: () => Object.entries(L.speeds),
 };
@@ -643,10 +737,11 @@ function renderSetup() {
   document.querySelectorAll('#new-game .pills').forEach((box) => {
     const name = box.dataset.name;
     box.replaceChildren(
-      ...CHOICES[name]().map(([value, label]) => {
+      ...CHOICES[name]().map(([value, label, locked]) => {
         const b = document.createElement('button');
         b.type = 'button';
-        b.textContent = label;
+        b.textContent = locked ? `🔒 ${label}` : label;
+        b.disabled = !!locked;
         b.setAttribute('aria-pressed', String(draft[name] === value));
         b.addEventListener('click', () => {
           draft[name] = value;
@@ -657,6 +752,7 @@ function renderSetup() {
       }),
     );
   });
+  $('locked-note').hidden = Object.keys(MAPS).every(isFree);
 }
 
 function openNewGame(change = false) {
@@ -680,7 +776,8 @@ function openGameOver() {
   const w = s.players[s.winner];
   const how = {
     world: () => L.wonWorld(subject(s.winner), soloYou(s.winner), s.round),
-    mission: () => L.wonMission(subject(s.winner), soloYou(s.winner), s.round, missionText(w.mission, soloYou(s.winner))),
+    mission: () =>
+      isGoal(s.winner) ? L.wonGoal(s.round, goalText(w.mission)) : L.wonMission(subject(s.winner), soloYou(s.winner), s.round, missionText(w.mission, soloYou(s.winner))),
     rounds: () => L.wonRounds(subject(s.winner), soloYou(s.winner)),
   }[s.won]();
   // The winner, big: their coat of arms, their name and the title they have won.
@@ -689,13 +786,16 @@ function openGameOver() {
   const rows = place.map((p, i) => {
     const pl = s.players[p];
     const fate = p === s.winner ? L.winner : pl.alive ? L.territories(G.owned(s, p).length) : L.outIn(pl.outRound);
-    const mission = s.mode === 'mission' && p !== s.winner ? `<small>${missionText(pl.mission, soloYou(p))}</small>` : '';
+    const mission = s.mode === 'mission' && p !== s.winner ? `<small>${isGoal(p) ? goalText(pl.mission) : missionText(pl.mission, soloYou(p))}</small>` : '';
     return `<li class="${game.seats[p] === 'human' ? 'you' : ''}"><span class="place">${i + 1}.</span>
       ${sealIcon(lookOf(p))}<span class="who">${pl.name}<small>${fate}</small>${mission}</span></li>`;
   });
   const me = place.findIndex((p) => game.seats[p] === 'human');
   const mine = me >= 0 && game.seats.filter((x) => x === 'human').length === 1 ? `<p class="your-place">${L.yourPlace(me + 1, place.length)}</p>` : '';
-  $('over-text').innerHTML = `${how}${mine}<ol class="standings">${rows.join('')}</ol>`;
+  $('over-text').innerHTML = `<p>${how}</p>${mine}${game.togt ? togtOver() : ''}<ol class="standings">${rows.join('')}</ol>`;
+  const after = afterGame();
+  $('over-again').hidden = !after;
+  if (after) Object.assign($('over-again'), { value: after.value, textContent: after.label });
   setTimeout(() => {
     if ($('game-over').open) return;
     // The bar says the same with the same buttons; it waits until the winner screen is closed.
@@ -705,9 +805,48 @@ function openGameOver() {
 }
 $('game-over').addEventListener('close', () => {
   $('bar').hidden = false;
-  if ($('game-over').returnValue === 'again') startFromSettings();
-  else if ($('game-over').returnValue === 'home') showIntro();
+  goOn($('game-over').returnValue);
 });
+
+// A finished togt is counted once (the game remembers it has been), and the end tells what really
+// happened, what the win opened, or offers easier opponents after two lost tries.
+function togtOver() {
+  const won = game.seats[s.winner] === 'human';
+  const level = game.seats.find((x) => x !== 'human');
+  const wasFree = freeMaps(progress, Object.keys(MAPS)).includes(game.togt);
+  if (!game.counted) {
+    progress = record(progress, game.togt, won, level);
+    saveProgress(progress);
+    game.counted = true;
+    save();
+  }
+  if (!won) {
+    return offerEasy(progress, game.togt, level) ? `<p class="togt-end"><button value="easy" class="link">${L.tryEasy}</button></p>` : '';
+  }
+  const next = nextTogt(game.togt);
+  const news = [
+    !wasFree && L.newFreeMap(mapIn(game.togt).name),
+    next ? L.nextUp(togtText(next.map).year, mapIn(next.map).name) : L.allTogterWon,
+  ].filter(Boolean);
+  return `<div class="togt-end"><h3>${L.history}</h3><p>${togtText(game.togt).epilogue}</p><p class="news">${news.join(' ')}</p></div>`;
+}
+
+// What comes after a finished game: a togt won goes on to the next, a togt lost is tried again, a
+// free game is played again with the same setup. Nothing after the last togt.
+function afterGame() {
+  if (!game.togt) return { value: 'again', label: L.playAgain };
+  if (game.seats[s.winner] !== 'human') return { value: 'again', label: L.tryAgain };
+  return nextTogt(game.togt) ? { value: 'next', label: L.nextTogt } : null;
+}
+function goOn(value) {
+  if (value === 'home') showIntro();
+  else if (value === 'next') startTogt(nextTogt(game.togt).map);
+  else if (value === 'again') game.togt ? startTogt(game.togt, { intro: false }) : startFromSettings();
+  else if (value === 'easy') {
+    saveSettings({ ...loadSettings(), togtLevel: 'novice' });
+    startTogt(game.togt, { intro: false });
+  }
+}
 
 /* ---------- missions and cards ---------- */
 
@@ -719,7 +858,10 @@ function viewer() {
   return humans.length === 1 ? humans[0] : -1;
 }
 
-const regionNames = (list) => list.map((r) => map.regions[r].name).join(` ${L.and} `);
+const regionNames = (list) => andList(list.map((r) => map.regions[r].name));
+// In a togt the person playing has history's goal instead of a secret mission (js/togter.js).
+const isGoal = (p) => !!game?.togt && game.seats[p] === 'human';
+const goalText = (m) => L.goalRegions(regionNames(m.regions), m.plusOne);
 
 // yours: the text speaks to you; otherwise it describes someone else's mission.
 function missionText(m, yours = true) {
@@ -755,8 +897,11 @@ function openMission() {
   const p = viewer();
   if (p < 0 || !s.players[p].mission) return;
   $('mission-who').textContent = s.players.filter((_, i) => game.seats[i] === 'human').length > 1 ? s.players[p].name : '';
-  $('mission-text').textContent = missionText(s.players[p].mission);
+  const goal = isGoal(p);
+  $('mission-title').textContent = goal ? L.yourGoal : L.yourMission;
+  $('mission-text').textContent = goal ? `${togtText(game.togt).goal} ${goalText(s.players[p].mission)}` : missionText(s.players[p].mission);
   $('mission-progress').textContent = missionProgress(p);
+  $('mission-note').textContent = goal ? L.goalNote : L.missionSecret;
   $('mission-dialog').showModal();
 }
 // The game waits while the mission is shown at the start.
@@ -811,6 +956,7 @@ $('luck-dialog').addEventListener('close', () => $('luck-dialog').returnValue ==
 function renderHudButtons() {
   const p = viewer();
   $('mission-btn').hidden = p < 0 || s.phase === 'over' || s.mode !== 'mission' || !s.players[p]?.mission;
+  $('mission-btn').textContent = p >= 0 && isGoal(p) ? L.goalButton : L.mission;
   $('luck-btn').hidden = p < 0 || s.phase === 'over';
   if (p < 0) return;
   // The button shows your stars, and glows when three are ready to become armies.
@@ -823,16 +969,136 @@ $('home-btn').addEventListener('click', showIntro);
 
 /* ---------- start screen ---------- */
 
-// The start screen is the menu: continue, a new game like the last one, change the setup, the
-// rules and the sound. The game behind it waits.
+// The start screen is the menu: continue, the togter, a free game like the last one, change the
+// setup, the rules and the settings. The game behind it waits. The very first time it welcomes
+// you instead.
 function showIntro() {
   clearTimeout(botTimer);
   const going = game && s.phase !== 'over';
+  $('welcome').hidden = progress.welcomed;
+  $('menu').hidden = !progress.welcomed;
+  if (!progress.welcomed) return showWelcome();
   $('intro-continue').hidden = !going;
-  $('intro-new').classList.toggle('primary', !going);
+  // With no game going, the togter come first until every one is won.
+  const won = TOGTER.filter((t) => progress.won[t.map]).length;
+  const next = TOGTER.find((t, i) => !progress.won[t.map] && isOpen(progress, i));
+  $('intro-togter').classList.toggle('primary', !going && !!next);
+  $('intro-new').classList.toggle('primary', !going && !next);
+  $('togt-summary').textContent = next
+    ? `${L.togtProgress(won, TOGTER.length)} · ${L.togtUpNext(togtText(next.map).year, mapIn(next.map).name)}`
+    : L.togtAllWon;
   $('intro-summary').textContent = summary(loadSettings());
   $('intro').hidden = false;
 }
+
+/* ---------- welcome ---------- */
+
+// Two steps: your name and coat of arms, then the two ways to play. The name is the first person's
+// in the free game's setup too.
+let welcomeLooks = false;
+function showWelcome() {
+  const person = loadSettings().people[0];
+  $('welcome-name').hidden = false;
+  $('welcome-ways').hidden = true;
+  $('welcome-input').value = person.name;
+  $('welcome-input').placeholder = L.yourName;
+  renderWelcomeLook();
+  $('intro').hidden = false;
+}
+function renderWelcomeLook() {
+  const person = loadSettings().people[0];
+  $('welcome-look').innerHTML = sealIcon(person.look);
+  $('welcome-look').setAttribute('aria-expanded', String(welcomeLooks));
+  $('welcome-looks').hidden = !welcomeLooks;
+  $('welcome-looks').replaceChildren(
+    ...COLORS.map((_, k) => {
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.innerHTML = sealIcon(k);
+      b.setAttribute('aria-label', L.arms(k + 1));
+      b.setAttribute('aria-pressed', String(person.look === k));
+      b.addEventListener('click', () => {
+        setPerson({ look: k });
+        welcomeLooks = false;
+        renderWelcomeLook();
+      });
+      return b;
+    }),
+  );
+}
+// Changes the first person at the phone and saves it.
+function setPerson(change) {
+  const settings = loadSettings();
+  settings.people[0] = { ...settings.people[0], ...change };
+  saveSettings(settings);
+}
+$('welcome-look').addEventListener('click', () => {
+  welcomeLooks = !welcomeLooks;
+  renderWelcomeLook();
+});
+$('welcome-input').addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') {
+    e.preventDefault();
+    $('welcome-input').blur();
+  }
+});
+$('welcome-next').addEventListener('click', () => {
+  const name = $('welcome-input').value.trim().slice(0, NAME_LENGTH);
+  setPerson({ name });
+  $('welcome-hello').textContent = L.hello(name);
+  $('welcome-name').hidden = true;
+  $('welcome-ways').hidden = false;
+});
+function welcomed() {
+  progress = { ...progress, welcomed: true };
+  saveProgress(progress);
+  showIntro();
+}
+$('choose-togter').addEventListener('click', () => {
+  welcomed();
+  openTogter();
+});
+$('choose-free').addEventListener('click', () => {
+  welcomed();
+  openNewGame(true);
+});
+
+/* ---------- the togter ---------- */
+
+// The togter as a line of years, oldest first: won, the next one, or locked until the one before is
+// won. The opponents' level is chosen here, once for all of them.
+function openTogter() {
+  renderTogter();
+  $('togter').showModal();
+}
+function renderTogter() {
+  const settings = loadSettings();
+  pills($('togt-level'), Object.entries(L.levels), settings.togtLevel, (lvl) => {
+    saveSettings({ ...loadSettings(), togtLevel: lvl });
+    renderTogter();
+  });
+  $('togt-list').replaceChildren(
+    ...TOGTER.map((t, i) => {
+      const open = isOpen(progress, i);
+      const won = progress.won[t.map];
+      const li = document.createElement('li');
+      li.className = won ? 'won' : open ? 'next' : 'locked';
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.disabled = !open;
+      const text = togtText(t.map);
+      const state = won ? L.togtWon(L.levels[won]) : open ? L.togtNext : `🔒 ${L.togtLocked}`;
+      b.innerHTML = `<span class="togt-year">${text.year}</span><span class="togt-body"><b>${mapIn(t.map).name}</b><small>${text.teaser}</small><small class="togt-state">${state}</small></span>`;
+      b.addEventListener('click', () => {
+        $('togter').close();
+        startTogt(t.map);
+      });
+      li.append(b);
+      return li;
+    }),
+  );
+}
+$('intro-togter').addEventListener('click', openTogter);
 // The title is two lines that never wrap: shrink it when a line is wider than the card, which
 // happens on narrow phones and with large text.
 let titleWidth = 0;
@@ -906,7 +1172,10 @@ function useLanguage(lang) {
     render();
     focusOnPlayer();
   } else showEmptyMap();
-  if (!$('intro').hidden) showIntro();
+  if (!$('intro').hidden && progress.welcomed) showIntro();
+  if (!$('intro').hidden && !progress.welcomed) $('welcome-input').placeholder = L.yourName;
+  if ($('togter').open) renderTogter();
+  if (!$('chapter').hidden && game?.togt) showChapter(game.togt);
 }
 $('settings-btn').addEventListener('click', () => {
   renderSettings();
@@ -957,6 +1226,8 @@ window.__conquest = {
     startGame(seats.map((kind, i) => ({ kind, name: kind === 'human' ? L.you : L.opponents[i], color: i })), speed, mode, seed, mapId),
   useLanguage,
   startFromSettings,
+  startTogt,
+  get progress() { return progress; },
   showIntro,
   openLuck,
   openMission,

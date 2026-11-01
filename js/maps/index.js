@@ -5,9 +5,10 @@ import { ENGLAND_GRID } from './england.js';
 import { ITALY_GRID } from './italy.js';
 import { ALEXANDER_GRID } from './alexander.js';
 import { JAPAN_GRID } from './japan.js';
+import { NAPOLEON_GRID } from './napoleon.js';
 import { WORLD_GRID } from './world.js';
 
-export const MAPS = { vikings: VIKINGS_GRID, england: ENGLAND_GRID, italy: ITALY_GRID, alexander: ALEXANDER_GRID, japan: JAPAN_GRID, world: WORLD_GRID };
+export const MAPS = { vikings: VIKINGS_GRID, england: ENGLAND_GRID, italy: ITALY_GRID, alexander: ALEXANDER_GRID, japan: JAPAN_GRID, napoleon: NAPOLEON_GRID, world: WORLD_GRID };
 
 // A map's rules: the game's rules with the map's own changes (seat compensation, handicap for Let).
 export const rulesFor = (grid, base) => ({ ...base, ...grid.RULES });

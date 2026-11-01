@@ -127,6 +127,18 @@ export const artDefs = (quarters = 'NØSV') => `
     <path d="M-1.1.05L-1.3.6M-.6.07L-.75.65M-.1.08L-.2.68M.4.08L.32.66M.9.06L.86.62" fill="none" opacity=".85"/>
     <path d="M-1.6.85q.3-.15.6 0t.6 0M.3.85q.3-.15.6 0t.6 0" fill="none" opacity=".6"/>
   </g>
+  <g id="art-lineship" stroke="${INK}" stroke-width=".05" stroke-linejoin="round" stroke-linecap="round">
+    <path d="M1.15-.3L1.85-.68M.72-.32L1.72-.62L.74-1.25Z" fill="#f6ecd4"/>
+    <path d="M-.75-.3V-1.75M0-.3V-2.05M.68-.3V-1.6" fill="none"/>
+    <path d="M-1.12-1.62Q-.75-1.5-.38-1.62L-.42-1.15Q-.75-1.04-1.08-1.15Z M-1.1-1.02Q-.75-.9-.4-1.02L-.44-.5Q-.75-.4-1.06-.5Z" fill="#f6ecd4"/>
+    <path d="M-.4-1.92Q0-1.8.4-1.92L.36-1.42Q0-1.3-.36-1.42Z M-.42-1.3Q0-1.18.42-1.3L.38-.72Q0-.6-.38-.72Z" fill="#f6ecd4"/>
+    <path d="M.36-1.5Q.68-1.4 1-1.5L.97-1.02Q.68-.94.39-1.02Z M.38-.92Q.68-.82.98-.92L.95-.48Q.68-.4.41-.48Z" fill="#f6ecd4"/>
+    <path d="M0-2.05h.34v.08H0Z" fill="#2a4f8a" stroke="none"/><path d="M0-1.97h.34v.08H0Z" fill="#f6ecd4" stroke="none"/><path d="M0-1.89h.34v.08H0Z" fill="#a3261b" stroke="none"/>
+    <path d="M-1.6-.55H-1.05V-.3H1.2L1.15.15Q1-.6.6.68H-1.1Q-1.5.5-1.6-.55Z" fill="#3b2f2a"/>
+    <path d="M-1.48-.12H1.17M-1.42.25H1.08" fill="none" stroke="#d9b45a" stroke-width=".13"/>
+    <path d="M-1.2-.17h.1v.1h-.1zM-.85-.17h.1v.1h-.1zM-.5-.17h.1v.1h-.1zM-.15-.17h.1v.1h-.1zM.2-.17h.1v.1h-.1zM.55-.17h.1v.1h-.1zM.9-.17h.1v.1h-.1zM-1.1.2h.1v.1h-.1zM-.75.2h.1v.1h-.1zM-.4.2h.1v.1h-.1zM-.05.2h.1v.1h-.1zM.3.2h.1v.1h-.1zM.65.2h.1v.1h-.1z" fill="${INK}" stroke="none"/>
+    <path d="M-1.55.95q.3-.15.6 0t.6 0M.3.95q.3-.15.6 0t.6 0" fill="none" opacity=".6"/>
+  </g>
   <g id="art-compass">${compassRose(quarters)}</g>`;
 
 // A fixed "random" number for a cell, so the map looks the same every time.
@@ -193,7 +205,7 @@ export function mapArt(grid, { keepClear = [], seaLines = [], compass = null } =
     take(compass[0], compass[1], 5.3 * size);
   }
   // Ships sail beside the longest sea routes (not those round the back of the map), a little to
-  // one side of the dashed line, on open sea. grid.SHIP names the kind ('ship', 'longship', 'galley' or 'atakebune'),
+  // one side of the dashed line, on open sea. grid.SHIP names the kind ('ship', 'longship', 'galley', 'atakebune' or 'lineship'),
   // grid.SHIP_COUNT how many (3).
   const seaCell = (x, y) => {
     const r = Math.round((y - 1) / 1.5);

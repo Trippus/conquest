@@ -14,6 +14,7 @@ export const CENTRES = [
   // France
   [48.85, 2.35, 'P'], [52.2, 5.3, 'A'], [50.8, 4.3, 'A'], [45.8, 4.9, 'L'], [44.8, -0.6, 'B'],
   [47.8, -2.5, 'B'], // Brittany and the Loire, Bordeaux's side
+  [49.8, 2.2, 'P'], // Picardy to Paris: a border that bends
   [43.6, 5.4, 'M'], [42.1, 9.1, 'M'], // Provence and Corsica, Napoleon's island
   // Iberia
   [40.4, -3.7, 'D'], [42.6, -5.5, 'D'], [39.0, -8.5, 'l'], [41.2, -8.2, 'l'], [37.3, -5.6, 'C'], [41.6, 1.5, 'b'],
@@ -23,6 +24,7 @@ export const CENTRES = [
   [51.0, 9.5, 'K'], [53.2, 9.5, 'K'], [48.3, 11.5, 'U'], [51.0, 13.5, 'd'],
   // Prussia
   [52.6, 13.4, 'E'], [54.0, 12.6, 'E'], // and the coast at Rostock
+  [51.8, 14.3, 'E'], [51.75, 13.2, 'E'], [51.7, 12.1, 'd'], // Lusatia to Berlin, Leipzig to Dresden: a border that bends
   [54.3, 16.5, 'k'], // Pomerania to Danzig, Königsberg's coast
   [54.5, 21.0, 'k'], [52.2, 21.0, 'W'],
   // Austria

@@ -185,7 +185,7 @@ export function mapArt(grid, { keepClear = [], seaLines = [], compass = null } =
   const use = (id, x, y, scale = 1) => `<use href="#art-${id}" transform="translate(${x.toFixed(2)} ${y.toFixed(2)}) scale(${scale})"/>`;
   const ship = (x, y) => use(grid.SHIP ?? 'ship', x, y, 1.5);
   const jitter = (h, shift) => (((h >>> shift) % 100) / 100 - 0.5) * 0.5;
-  const DENSITY = { mountains: 2, forest: 2, spruce: 2, oak: 2, desert: 3 }; // one cell in this many gets a drawing
+  const DENSITY = { mountains: 3, forest: 4, spruce: 4, oak: 4, desert: 3 }; // one cell in this many gets a drawing
   // Each kind has a few drawings, chosen by the cell: ranges and single peaks; spruce in the north, oak
   // (and the broadleaf of the rainforest) in the south, and between them forest, the three mixed; dunes,
   // now and then a palm.

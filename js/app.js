@@ -178,6 +178,7 @@ function startTogt(id, { intro = true } = {}) {
 function startGame(order, speed, mode = 'mission', seed = (Math.random() * 2 ** 31) | 0, mapId = 'world', { togt, quiet = false, home, goals, bonus = 0 } = {}) {
   const humans = order.filter((x) => x.kind === 'human').length;
   $('intro').hidden = true;
+  stepAway();
   useMap(mapId);
   // Easy computer players start weaker, by how much the map's rules say; hard ones start stronger.
   const start = G.startArmies(rules, map.territories.length, order.length);
@@ -190,7 +191,8 @@ function startGame(order, speed, mode = 'mission', seed = (Math.random() * 2 ** 
     colors: order.map((x) => x.color),
     speed,
     actions: [],
-    ...(togt ? { togt } : {}),
+    // told: the togt's year card has been read (or skipped); until then, continuing shows it again
+    ...(togt ? { togt, told: !quiet } : {}),
   };
   s = G.newGame(map, rules, game.setup);
   clearSel();
@@ -227,28 +229,39 @@ function showChapter(id) {
   document.body.classList.add('telling'); // the players and the turn panel wait out of sight
   $('ch-go').focus({ preventScroll: true });
 }
-// The togt's picture behind the card, faded in once it has loaded; the card is the same without it.
+// The togt's picture behind the card. With one, the card is dark all through (the game's map does not
+// show), and the picture comes up out of the dark; it is fetched early, while the togter are listed
+// (preloadArt). The card is the same without one.
 function showChapterArt(src) {
   const art = $('ch-art');
+  $('chapter').classList.toggle('has-art', !!src);
   if (src && art.dataset.src === src) return;
   art.classList.remove('shown');
   art.dataset.src = src ?? '';
   if (!src) return;
-  const img = new Image();
-  img.onload = () => {
+  preloadArt(src).then(() => {
     if (art.dataset.src !== src) return;
     art.style.backgroundImage = `url("${src}")`;
     art.classList.add('shown');
-  };
-  img.src = src;
+  });
+}
+const artLoads = new Map(); // src → when it has loaded (or failed)
+function preloadArt(src) {
+  if (src && !artLoads.has(src)) {
+    artLoads.set(src, new Promise((done) => Object.assign(new Image(), { onload: done, onerror: done, src })));
+  }
+  return artLoads.get(src);
 }
 $('chapter').addEventListener('click', (e) => {
   if (e.target.closest('#ch-go')) return;
   $('chapter').classList.add('now');
 });
+$('ch-home').addEventListener('click', home);
 $('ch-go').addEventListener('click', () => {
   const box = $('chapter');
   box.classList.add('now', 'leave');
+  game.told = true;
+  save();
   setTimeout(() => {
     box.hidden = true;
     document.body.classList.remove('telling');
@@ -841,6 +854,7 @@ function togtOver() {
     return offerEasy(progress, game.togt, level) ? `<p class="togt-end"><button value="easy" class="link">${L.tryEasy}</button></p>` : '';
   }
   const next = nextTogt(game.togt);
+  preloadArt(next?.art);
   const news = [
     !wasFree && L.newFreeMap(mapIn(game.togt).name),
     next ? L.nextUp(togtText(next.map).year, mapIn(next.map).name) : L.allTogterWon,
@@ -856,7 +870,7 @@ function afterGame() {
   return nextTogt(game.togt) ? { value: 'next', label: L.nextTogt } : null;
 }
 function goOn(value) {
-  if (value === 'home') showIntro();
+  if (value === 'home') home();
   else if (value === 'next') startTogt(nextTogt(game.togt).map);
   else if (value === 'again') game.togt ? startTogt(game.togt, { intro: false }) : startFromSettings();
   else if (value === 'easy') {
@@ -982,7 +996,7 @@ function renderHudButtons() {
 }
 $('mission-btn').addEventListener('click', openMission);
 $('luck-btn').addEventListener('click', openLuck);
-$('home-btn').addEventListener('click', showIntro);
+$('home-btn').addEventListener('click', home);
 
 /* ---------- start screen ---------- */
 
@@ -1098,6 +1112,7 @@ function renderTogter() {
     ...TOGTER.map((t, i) => {
       const open = isOpen(progress, i);
       const won = progress.won[t.map];
+      if (open) preloadArt(t.art);
       const li = document.createElement('li');
       li.className = won ? 'won' : open ? 'next' : 'locked';
       const b = document.createElement('button');
@@ -1131,8 +1146,39 @@ new ResizeObserver(fitTitle).observe($('intro-title'));
 document.fonts.ready.then(() => fitTitle(true));
 function hideIntro() {
   $('intro').hidden = true;
+  stepAway();
+  if (game?.told === false) return showChapter(game.togt);
   schedule();
 }
+
+// Up to the start screen: the flag, and the phone's back button. A togt's year card that was left
+// waits there; Continue brings it back.
+function goHome() {
+  if (!$('chapter').hidden) {
+    $('chapter').hidden = true;
+    document.body.classList.remove('telling');
+  }
+  showIntro();
+}
+// Leaving the start screen leaves a step in the history, so the back button comes up to it instead of
+// leaving the page; on the start screen, back leaves as on any page. The flag takes that step back.
+function stepAway() {
+  if (!history.state?.away) history.pushState({ away: true }, '');
+}
+function home() {
+  if (history.state?.away) history.back();
+  else goHome();
+}
+addEventListener('popstate', () => {
+  // A browser that takes back to close a dialog by going back: close it, and stay in the game.
+  const open = [...document.querySelectorAll('dialog[open]')].at(-1);
+  if (open) {
+    open.close('');
+    if (game && $('intro').hidden) stepAway();
+    return;
+  }
+  if ($('intro').hidden) goHome();
+});
 $('intro-continue').addEventListener('click', hideIntro);
 $('intro-new').addEventListener('click', () => startFromSettings());
 $('intro-change').addEventListener('click', () => openNewGame(true));

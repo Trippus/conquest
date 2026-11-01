@@ -119,8 +119,29 @@ export function mapShapes(grid, { smooth = 4 } = {}) {
     paths[kind].push(d);
   }
 
-  // Sea routes: a straight dashed line between the two closest cells of the territories.
-  const cellsOf = (l) => GRID.flatMap((line, row) => [...line].flatMap((c, col) => (c === l ? [hexCenter(row, col)] : [])));
+  // Sea routes: a straight dashed line between the two closest cells of the territories, on each
+  // one's largest piece of land, so a route never ends on a speck of an island off the coast.
+  const cellsOf = (l) => {
+    const seen = new Set();
+    let best = [];
+    GRID.forEach((line, row) =>
+      [...line].forEach((c, col) => {
+        if (c !== l || seen.has(`${row},${col}`)) return;
+        const piece = [];
+        const stack = [[row, col]];
+        seen.add(`${row},${col}`);
+        while (stack.length) {
+          const [r, k] = stack.pop();
+          piece.push(hexCenter(r, k));
+          for (const [nr, nk] of hexNeighbours(r, k)) {
+            if (cellAt(nr, nk) === l && !seen.has(`${nr},${nk}`)) seen.add(`${nr},${nk}`), stack.push([nr, nk]);
+          }
+        }
+        if (piece.length > best.length) best = piece;
+      }),
+    );
+    return best;
+  };
   const sea = SEA.map(([a, b]) => {
     let best = null;
     for (const p of cellsOf(a)) {

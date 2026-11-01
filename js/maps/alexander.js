@@ -1,67 +1,84 @@
 // Alexander den Store, 334–323 BC: from Macedonia over the Hellespont, through Asia Minor, the Levant
-// and Egypt, into the Persian empire and on to Bactria and the Indus. 26 territories in 8 regions,
-// drawn as a hex grid (see hex.js for what each part means). The coastlines are real
+// and Egypt, into the Persian empire and on to Bactria and the Indus. The map shows Italy, Libya,
+// the steppe and Arabia round it so you can see where it lies. 26 territories in 8 regions, drawn
+// as a hex grid (see hex.js for what each part means). The coastlines are real
 // (tools/make-grid.mjs); land outside the campaign is '#', drawn as unexplored.
 
 import { hexMap } from './hex.js';
 
 export const GRID = [
-  '#####################.......###...##################.....#.##############################################',
-  '###################........##......################.......###############################################',
-  '###################..................###############.......##############################################',
-  '###################...................##############.......##############################################',
-  '##################......................#############.......#############################################',
-  '#################........................############.......#############################################',
-  '#################.........................############........###########################################',
-  '.###PPPPPPPBBBBBB.........................############.......############################################',
-  '...PPPPPPPPBBBBBBB........ggggg............############.......#..########################################',
-  '..PPPPPPPPPBBBBBBB......gggggggg.........##############..........######################mmmm##############',
-  '...PPPPPPPPPBBBBBB.Brrggggggggggg###.##.################..........##################mmmmmmmm#############',
-  '..PPPPPPPP.B...B...rrggggggggggg########################......##################mmmmmmmmmmmm#############',
-  '#..PPPPP.......BBrrrrrggggggggggg########################.....##################mmmmmmmmmmmmm############',
-  '...PPPPP......Brrrrrrrgggggggggtt#######################.......################mmmmmmmmmmmmmm############',
-  '....PPPPA.......rrrrrrgggggggggttt######################.......################mmmmmmmmmmmmmmm###########',
-  '.....AAAA.....rrrrrrrrgggggggtttttt####################.........###########iiimmmmmmmmmmmmmmmm###########',
-  '.....SAAAAA.....rrrrrrhggggggttttttt###################.........kiiiiiiiiiiiiiiimmmmmmmmmmmmmmm##########',
-  '......S.AA.....rrrrhhhhggggttttttttt######aaa########kk.........kiiiiiiiiiiiiiiixxxxmmmmmmmmmmm##########',
-  '......SSA.A.A...rrhhhhhhhgttttttttttt####aaaaaaaaaa##kkk........kiiiiiiiiiiiiiiiixxxxxxxxxxxxxxXX########',
-  '......SS........hhhhhhhhhtttttttttttDDDDaaaaaaaaaaaakkkkk.......kiiiiiiiiiiiiiiixxxxxxxxxxxxxxXXX########',
-  '.......SS....A....hhhhhhhttttttttttDDDDDaaaaaaaaaaaakkkkkk.......iiiiiiiiiiiiiiiixxxxxxxxxxxxxXXXX#######',
-  '.......SS..........hhh..htttt...ttDDDDDDaaaaaaaaaaakkkkkkkkkkkkkkiiiiiiiiiiiiiiiixxxxxxxxxxxxXXXXX#######',
-  '..........................tt....ttDDDDDDDaaaaaaaaaakkkkkkkkkkkkkkiiiiiiiiiiiiiiiiixxxxxxxxxxxXXXXXX######',
-  '...............................tDDDDDDDDDaaaaaaaaakkkkkkkkkkkkkkkiiiiiiiiiiiiiiiiixxxxxxxxxxXXXXXXX######',
-  '..........S.S...............T...TDDDDDDDDaaaaaaaaakkkkkkkkkkkkkkkiiiiiiiiiiiiiiiiixxxxxxxxxxXXXXXXX######',
-  '............S............TTT....TDDDDDDDDaaaaaaaaakkkkkkkkkkkkkkkiiiiiiiiiiiiiiiiixxxxxxxxXXXXXXXXX######',
-  '................................TTDDDDDDDDaaaaaaaakkkkkkkkkkkkkkkpiiiiiiiiiiiiiiiiixxxxxxxXXXXXXXXXX#####',
-  '...............................TTTDDDDDDD#bbbbbbbbkkkkkkkkkkkkkkp###iiiiiiiiiiiiiiixxxxxxXXXXXXXXXXX#####',
-  '...............................TTTTDDDDD###bbbbbbbbkkkkkkkkkkkkppp#####iiiiiiiiiiiixxxxxxXXXXXXXXXXXX####',
-  '..............................TTTTDDD#####bbbbbbbbbzzzzzzzzzzppppp#######iiiiiiiiiixxxxxXXXXXXXXXXXHHH###',
-  '...............................TTTTD#######bbbbbbbbzzzzzzzzzzpppppp########iiiiiiiiixxxxXXXXXXXXXXHHHHHHH',
-  '....#####.....................TTTTT########bbbbbbbbzzzzzzzzzpppppp###########iiiiiiixxxXXXXXXXXXXHHHHHHHH',
-  '....######....................GGGTT########bbbbbbbuuzzzzzzzzppppppp#############iiiiixxXXXXXXXXXHHHHHHHHH',
-  '...########w.................GGGGG#########bbbbbbuuuzzzzzzzpppppppp###############iixxXXXXXXXXHHHHHHHHHHH',
-  '....#######wwwww......MMM....GGGGGG########bbbbbuuuuuzzzzzzppppppppp#################XXXXXXXXHHHHHHHHHHHH',
-  '...#######wwwwwwwMM.MMMMMMGGGGGGGG#########bbbbuuuuuuzzzzzppppppppp##################XXXXXXXHHHHHHHHHHHH#',
-  '#..#######wwwwwwwwMMMMMMMMMGGGGGGGG##########buuuuuuuuzzzzpppppppppp#################LXXXXXHHHHHHHHHHHH##',
-  '##########wwwwwwwwMMMMMMMMGGGGGGGGG##########uuuuuuuuuz.zppppppppppp################LLLLLHHHHHHHHHHHH####',
-  '##########wwwwwwwwMMMMMMMMMGGGGGGGG###########uuuuuuuu....pppppppppp################LLLLLLLHHHHHHHHHH####',
-  '#########wwwwwwwwwMMMMMMMMMGGGGGGGG###########uuuuuuu.....pppppppppp###############LLLLLLLLLHHHHHHH######',
-  '#########wwwwwwwwwwMMMMMMM.MGGGGGGG############uuuuuuu.....pppppppppp##############LLLLLLLLLLHHHHHH######',
-  '#########wwwwwwwwwMMMMMMMM.MGGGGGG#############uuuuuuu.....pppppppppp#############LLLLLLLLLLLLHHH########',
-  '##########wwwwwwwwwMMMMMMMM.eeGGGG##############uuuuuuu.....ppppppppp#############LLLLLLLLLLLLLLH########',
-  '##########wwwwwwwwwMMMMMeee.e..eG######################......pppppppp############LLLLLLLLLLLLLLL#########',
-  '###########wwwwwwwwMMMeeeeee....ee######################......pppppppp##########LLLLLLLLLLLLLLLLL########',
-  '############wwwwwwweeeeeeeee....ee######################.......ppppp.##########LLLLLLLLLLLLLLLLL#########',
-  '#############wwwww#eeeeeeeeee....e#######################.............#########LLLLLLLLLLLLLLLLL#########',
-  '#############wwww###eeeeeeeee....########################.............#########LLLLLLLLLLLLLLLLL#########',
-  '##############ww#####eeeeeeeee....########################.#........#..#########LLLLLLLLLLLLLLLL#########',
-  '######################eeeeeee.....##########################.......#.......####LLLLLL..LLLLLLLL##########',
-  '#######################eeeeee#.....#########################......###..................LLLLLLLL##########',
-  '#######################eeee###....#########################......####...................LLLLLL###########',
-  '#########################e#####.....#########################....#####...................LLLLLL##########',
-  '###############################.....###################################..................LLLLL###########',
-  '###############################......####################################..................LLL###########',
-  '###############################......####################################..................LL############',
+  '###########################################################################################################################',
+  '###########################################################################################################################',
+  '###########################################################################################################################',
+  '################################################...#####################.....##############################################',
+  '#####################################...######....####################.......##############################################',
+  '####################################......##......###################........##############################################',
+  '#####.#############################......####.....#################..........##############################################',
+  '####..#.###########################......##########################.......#################################################',
+  '####....###########################.......##.....#################........#################################################',
+  '####.....########################.........#.......################......###################################################',
+  '#####....########################...................###############......##################################################',
+  '######....#######################....................##############......##################################################',
+  '.######....#.###################.......................############.......#################################################',
+  '.######.......##################........................###########.........###############################################',
+  '..######.......#########PBBBBBBB.........................###########........###############################################',
+  '...#####........###PPPPPPBBBBBBB.........g..g...........############........#.#############################################',
+  '....#######......###PPPPPPBBBBBBB.......ggggggg..........#############......#..#########################mm#################',
+  '......#####......##PPPPPPBBBBBBBBBB...ggggggggg#.......###############..........####################mmmmmm#################',
+  '........######...###PPPPPP...BB....rggggggggggg########################......#..#################mmmmmmmmmm################',
+  '........####.#..###PPP.PP....BBB.rrrggggggggggg#########################....##################mmmmmmmmmmmmm################',
+  '..........##..#...##PPP......BBrrrrrgggggggggggt#######################......#################mmmmmmmmmmmmmm###############',
+  '..........##.....##PPPP.....Brrrrrrrgggggggggttt######################.......################mmmmmmmmmmmmmmm###############',
+  '...........##......#PAA.....rrrrrrrrrggggggggtttt#####################........k##############mmmmmmmmmmmmmmmm##############',
+  '..........#........SAAAA......rrrrrrhggggggtttttt####################.........kk##########iiimmmmmmmmmmmmmmm###############',
+  '..........##........SAAAA....rrrrrrhhhggggtttttttt####################.........kk#iiiiiiiiiiiimmmmmmmmmmmmmmm##############',
+  '....######..........SSAAAA....rrrhhhhhgggtttttttttt#####aaaaaa#####kk.........kkiiiiiiiiiiiiiixxxxxxxxxxxxxxxX#############',
+  '.....####............SSA.......rhhhhhhhgtttttttttttDD##aaaaaaaaaaaakkk.........kkiiiiiiiiiiiiiixxxxxxxxxxxxxxXX############',
+  '......###...........SSS..A.....hhhhhhhhtttttttttttDDDDaaaaaaaaaaaakkkkkk......kkiiiiiiiiiiiiiiixxxxxxxxxxxxxXXX############',
+  '##.#....#.............S.........hhhhh.hhtttttt.ttDDDDDDaaaaaaaaaaakkkkkkkk...kkkkiiiiiiiiiiiiiiixxxxxxxxxxxxXXXXX##########',
+  '#.................................hh...tttt...ttDDDDDDDaaaaaaaaaakkkkkkkkkkkkkkkiiiiiiiiiiiiiiiixxxxxxxxxxxXXXXX###########',
+  '#..............................................tDDDDDDDaaaaaaaaaaakkkkkkkkkkkkkkkiiiiiiiiiiiiiiiixxxxxxxxxxXXXXXX##########',
+  '#.............................................TDDDDDDDDaaaaaaaaaakkkkkkkkkkkkkkkiiiiiiiiiiiiiiiixxxxxxxxxxXXXXXXX##########',
+  '##.......................SSSS............TT....TDDDDDDDDaaaaaaaaakkkkkkkkkkkkkkkkiiiiiiiiiiiiiiiixxxxxxxxxXXXXXXXX#########',
+  '#.......................................TT....TDDDDDDDDDaaaaaaaakkkkkkkkkkkkkkkkiiiiiiiiiiiiiiiiixxxxxxxxXXXXXXXXX#########',
+  '#.............................................TTDDDDDDDDaaaaabbbbkkkkkkkkkkkkkkkpiiiiiiiiiiiiiiiiixxxxxxXXXXXXXXXXX########',
+  '.............................................TTTDDDDDD##bbbbbbbbbkkkkkkkkkkkkkppppiiiiiiiiiiiiiiiixxxxxXXXXXXXXXXXX########',
+  '##............................................TTTDDDD####bbbbbbbbbzzkkkkkkkkkkpppppiiiiiiiiiiiiiiiixxxxXXXXXXXXXXXHH#######',
+  '##...........................................TTTTDD######bbbbbbbbzzzzzzzzkkkpppppppiiiiiiiiiiiiiiiixxxXXXXXXXXXXXHHHHH#####',
+  '#######..............#.......................TTTTT#######bbbbbbbbzzzzzzzzzzzppppppppiiiiiiiiiiiiiiixxxXXXXXXXXXXHHHHHHHH###',
+  '#########.........#####.....................GGTTT########bbbbbbbbzzzzzzzzzzpppppppppiiiiiiiiiiiiiiixxXXXXXXXXXHHHHHHHHHHHH#',
+  '##########........########w.................GGGGG#########bbbbbbuuzzzzzzzzzpppppppppppiiiiiiiiiiiiiixXXXXXXXXXHHHHHHHHHHH##',
+  '#########........########ww................GGGGG#########bbbbbbuuuzzzzzzzzppppppppppppiiiiiiiiiiiiiiXXXXXXXXHHHHHHHHHHH####',
+  '############......#######wwwwwww....MMMM...GGGGGG#########bbbbuuuuuuzzzzzzpppppppppppppiiiiiiiiiiiiiLXXXXXXHHHHHHHHHHHH####',
+  '##############...########wwwwwwwMMMMMMMMGGGGGGGGG#########bbbuuuuuuuzzzzzppppppppppppppiiiiiiiiiLLLLLXXXXHHHHHHHHHHHH######',
+  '################.########wwwwwwwMMMMMMMMMGGGGGGGG###########uuuuuuuuuzzzzppppppppppppppppiiiiiLLLLLLLLLXXHHHHHHHHHHHH######',
+  '########################wwwwwwwwMMMMMMMMMGGGGGGGG###########uuuuuuuuu...pppppppppppppppppiLLLLLLLLLLLLLLHHHHHHHHHHH########',
+  '########################wwwwwwwwwMMMMMMM.MGGGGGGGG###########uuuuuuu.....ppppppppppppppppLLLLLLLLLLLLLLLLLHHHHHHHHH########',
+  '#######################wwwwwwwwwMMMMMMMM.MGGGGGGG############uuuuuuu....ppppppppppppppppLLLLLLLLLLLLLLLLLLLHHHHHH##########',
+  '########################wwwwwwwwwMMMMMMMM.GGGGGGG#############uuuuuuu.....ppppppppppppppLLLLLLLLLLLLLLLLLLLLHHHHH##########',
+  '########################wwwwwwwwwMMMMMMMM.G.GGGG##############uuuuuuu....pppppppppppppppLLLLLLLLLLLLLLLLLLLLLHH############',
+  '#########################wwwwwwwwMMMMMMMee.e.eGG###############uuuuuuu....ppppppppppppppLLLLLLLLLLLLLLLLLLLLLLL############',
+  '#########################wwwwwwwwMMMMeeeee...eee#####################.......pppppppppppLLLLLLLLLLLLLLLLLLLLLLLL############',
+  '##########################wwwwwwwwMeeeeeeee...ee#######################......ppppppppp#LLLLLLLLLLLLLLLLLLLLLLLL############',
+  '##########################wwwwwwweeeeeeeee....ee#######################.......ppp...###LLLLLLLLLLLLLLLLLLLLLLL#############',
+  '###########################wwwww##eeeeeeeee....e########################.............####LLLLLLLLLLLLLLLLLLLLLL############',
+  '############################ww#####eeeeeeee....########################..#........#.#####LLLLLLLLLLLLLLLLLLLLL#############',
+  '####################################eeeeeeee....########################.#........#...####LLLLLLLLLLLLLLLLLLLL#############',
+  '####################################eeeeeeee....########################.#.......##........LLL.......LLLLLLLL##############',
+  '######################################eeeee##....#########################......###...................LLLLLLL##############',
+  '######################################eee####....#########################.....####...................LLLLLLL##############',
+  '##############################################.....########################.#########..................LLLLLL##############',
+  '#############################################......####################################.................LLLL###############',
+  '##############################################......####################################.................LL################',
+  '##############################################.....#####################################..................#.###############',
+  '###############################################.....#####################################..................################',
+  '################################################....#####################################.................#####.###########',
+  '################################################....#####################################..................################',
+  '################################################....###################################....................####.###########',
+  '#################################################....##################################......................#...##########',
+  '################################################.....#################################..........................###########',
+  '#################################################......###############################...........................##########',
+  '################################################.......##############################...........................###########',
 ];
 
 export const REGIONS = {
@@ -118,8 +135,6 @@ export const TERRAIN = {
 
 export const SEA = [
   ['A', 'r'], // over the Aegean
-  ['S', 'h'], // from Crete to Rhodes
-  ['L', 'p'], // Nearchus' voyage from the Indus to the Persian Gulf
 ];
 
 // Region missions: about 7–9 territories each; the small ones need one more region of your choice.
@@ -127,21 +142,21 @@ export const MISSIONS = [
   { type: 'regions', regions: ['hl', 'la'] },
   { type: 'regions', regions: ['le', 'eg'], plusOne: true },
   { type: 'regions', regions: ['me', 'pe'], plusOne: true },
-  { type: 'regions', regions: ['ba', 'in'], plusOne: true },
+  { type: 'regions', regions: ['pe', 'ba', 'in'] },
   { type: 'regions', regions: ['eg', 'me', 'pe'] },
   { type: 'regions', regions: ['hl', 'le'], plusOne: true },
-  { type: 'regions', regions: ['pe', 'ba'], plusOne: true },
+  { type: 'regions', regions: ['la', 'le'], plusOne: true },
 ];
 
 // Where the region names and the compass go. A name may sit on unexplored land.
-export const REGION_PLACES = { hl: [17.05, 8.5], la: [35.25, 36], le: [45.15, 43], eg: [31.6, 76.5], me: [71.35, 63], pe: [100.05, 67.5], ba: [137.65, 14.5], in: [175.55, 64.5] };
-export const COMPASS = [140, 80, 1.4]; // in the Arabian Sea
+export const REGION_PLACES = { hl: [46.55, 45], la: [61.25, 48], le: [70.15, 56.5], eg: [55.1, 87], me: [96.35, 73.5], pe: [128, 78], ba: [166.15, 25], in: [200.55, 76.5] };
+export const COMPASS = [175, 100, 1.4]; // in the Arabian Sea
 export const SHIP = 'galley';
-export const LANDMARKS = [[10, 3, 'Illyrien'], [130, 5, 'Skythien'], [72, 17, 'Armenien'], [85, 75, 'Arabien'], [8, 70, 'Libyen']];
+export const LANDMARKS = [[18.7, 27, 'Italien'], [29.5, 18, 'Illyrien'], [71.5, 6, 'Skythien'], [107, 20.5, 'Kaukasus'], [98, 32, 'Armenien'], [155.5, 23.5, 'Chorasmien'], [208, 48, 'Himalaya'], [108.8, 87, 'Arabien'], [25, 76, 'Libyen'], [35.8, 61, 'Kyrenaika'], [65.3, 100, 'Nubien']];
 
 // Rules that differ from the modern rules on this map, measured with npm run balance -- alexander:
-// seats 48/52, 32/35/32 and 25/27/24/24 with 2, 3 and 4 players; easy computer players start with 40%
-// fewer armies, so a medium bot standing in for a player wins 99%/89% against two/three of them, as on
+// seats 52/48, 34/33/33 and 25/28/21/27 with 2, 3 and 4 players; easy computer players start with 40%
+// fewer armies, so a medium bot standing in for a player wins 98%/88% against two/three of them, as on
 // Italy, which Martin found right (85% with 30%).
 export const RULES = { laterSeatArmies: { 2: 7, 3: 2, 4: 1, 5: 0, 6: 0 }, noviceHandicap: 0.4 };
 

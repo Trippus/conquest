@@ -23,8 +23,9 @@
 //   SHIP          optional: the kind of ship by the sea routes ('ship', 'longship', 'galley', 'atakebune',
 //                 'lineship'); SHIP_COUNT how many;
 //                 OCEANS, [row, column] in open sea for the ships the routes have no room for
-//   RULERS, TITLE optional flavour: the computer players' names, and what the winner becomes
-//   NAMES         optional names in other languages: { en: { name, REGIONS, TERRITORIES, LANDMARKS, RULERS } },
+//   RULERS, TITLE optional flavour: the computer players' names, and what the winner becomes;
+//                 EPITHET instead of a title, what follows the winner's name ('den Store')
+//   NAMES         optional names in other languages: { en: { name, REGIONS, TERRITORIES, LANDMARKS, RULERS, EPITHET } },
 //                 only those that differ (see inLanguage in index.js)
 //
 // Region bonus, unless BONUS says otherwise: how many of the region's territories can be attacked

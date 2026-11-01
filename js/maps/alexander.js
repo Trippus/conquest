@@ -172,9 +172,9 @@ export const LANDMARKS = [[18.7, 27, 'Italien'], [29.5, 18, 'Illyrien'], [71.5, 
 // Italy, which Martin found right.
 export const RULES = { laterSeatArmies: { 2: 7, 3: 1, 4: 0, 5: 0, 6: 0 }, noviceHandicap: 0.35 };
 
-// The flavour of the age: the computer players' names and what the winner becomes.
+// The flavour of the age: the computer players' names, and the winner becomes Alexander's equal.
 export const RULERS = ['Dareios III', 'Memnon af Rhodos', 'Bessos', 'Spitamenes', 'Poros', 'Demosthenes'];
-export const TITLE = 'King of Asia';
+export const EPITHET = 'den Store';
 
 // The names in English, where they differ (see inLanguage in index.js).
 export const EN = {
@@ -187,6 +187,7 @@ export const EN = {
   },
   LANDMARKS: { Italien: 'Italy', Illyrien: 'Illyria', Skythien: 'Scythia', Kaukasus: 'Caucasus', Arabien: 'Arabia', Libyen: 'Libya', Nubien: 'Nubia' },
   RULERS: ['Darius III', 'Memnon of Rhodes', 'Bessus', 'Spitamenes', 'Porus', 'Demosthenes'],
+  EPITHET: 'the Great',
 };
 
 export const ALEXANDER_GRID = hexMap({
@@ -204,7 +205,7 @@ export const ALEXANDER_GRID = hexMap({
   LANDMARKS,
   RULES,
   RULERS,
-  TITLE,
+  EPITHET,
   NAMES: { en: EN },
 });
 export const ALEXANDER = ALEXANDER_GRID.MAP;

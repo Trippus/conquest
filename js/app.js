@@ -780,8 +780,9 @@ function openGameOver() {
       isGoal(s.winner) ? L.wonGoal(s.round, goalText(w.mission)) : L.wonMission(subject(s.winner), soloYou(s.winner), s.round, missionText(w.mission, soloYou(s.winner))),
     rounds: () => L.wonRounds(subject(s.winner), soloYou(s.winner)),
   }[s.won]();
-  // The winner, big: their coat of arms, their name and the title they have won.
-  $('over-ruler').innerHTML = `${sealIcon(lookOf(s.winner))}<b>${w.name}</b><span>${grid.TITLE ?? 'Ruler of the Map'}</span>`;
+  // The winner, big: their coat of arms, their name and the title they have won (or a name: "den Store").
+  const title = grid.EPITHET ? `<b>${w.name} ${grid.EPITHET}</b>` : `<b>${w.name}</b><span>${grid.TITLE ?? 'Ruler of the Map'}</span>`;
+  $('over-ruler').innerHTML = `${sealIcon(lookOf(s.winner))}${title}`;
   const place = G.standings(s);
   const rows = place.map((p, i) => {
     const pl = s.players[p];

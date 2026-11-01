@@ -29,6 +29,7 @@ test('every map has an English name, and its English names are for things it has
     for (const id of Object.keys(names.TERRITORIES ?? {})) assert.ok(grid.MAP.territories[id], `${grid.id}: ${id}`);
     for (const n of Object.keys(names.LANDMARKS ?? {})) assert.ok(grid.LANDMARKS.some((l) => l[2] === n), `${grid.id}: ${n}`);
     if (names.RULERS) assert.equal(names.RULERS.length, grid.RULERS.length, grid.id);
+    assert.equal(!!names.EPITHET, !!grid.EPITHET, `${grid.id}: EPITHET in both languages`);
     const en = inLanguage(grid, 'en');
     assert.equal(en.MAP.name, names.name);
     assert.deepEqual(Object.keys(en.MAP.territories), Object.keys(grid.MAP.territories));

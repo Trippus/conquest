@@ -28,5 +28,6 @@ export function inLanguage(grid, lang) {
     MAP: { ...grid.MAP, name, regions: rename(grid.MAP.regions, names.REGIONS), territories: rename(grid.MAP.territories, names.TERRITORIES) },
     LANDMARKS: grid.LANDMARKS?.map(([x, y, n]) => [x, y, names.LANDMARKS?.[n] ?? n]),
     RULERS: names.RULERS ?? grid.RULERS,
+    EPITHET: names.EPITHET ?? grid.EPITHET,
   };
 }

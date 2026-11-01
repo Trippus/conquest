@@ -128,8 +128,8 @@ export const TERRAIN = {
   V: 'mountains',
   S: 'mountains', // the Apennines
   b: 'mountains',
-  E: 'forest',
-  k: 'forest',
+  E: 'oak',
+  k: 'oak',
   N: 'desert',
   z: 'desert',
 };

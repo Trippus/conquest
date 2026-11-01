@@ -132,7 +132,7 @@ export const TERRAIN = {
   X: 'mountains', // the Hindu Kush
   g: 'mountains', // the Anatolian highlands
   R: 'mountains', // the Armenian highlands
-  P: 'forest',
+  P: 'oak',
   w: 'desert', // the oasis of Ammon in the Libyan desert
   e: 'desert',
   L: 'desert', // the Gedrosian desert

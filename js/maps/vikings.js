@@ -132,10 +132,10 @@ export const TERRITORIES = {
 export const TERRAIN = {
   v: 'mountains', // the fjords
   h: 'mountains',
-  t: 'forest',
-  u: 'forest',
+  t: 'spruce',
+  u: 'spruce',
   g: 'forest',
-  F: 'forest',
+  F: 'spruce',
   Z: 'forest',
   S: 'mountains', // the Highlands
 };

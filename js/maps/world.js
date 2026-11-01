@@ -104,14 +104,14 @@ export const TERRAIN = {
   l: 'mountains', // the Alps
   c: 'mountains', // the Pamirs and Tian Shan
   J: 'mountains',
-  b: 'forest', // the northern forests
+  b: 'spruce', // the northern forests
   q: 'forest',
-  s: 'forest',
-  r: 'forest', // the taiga
-  n: 'forest',
-  A: 'forest', // the rainforests
-  C: 'forest',
-  z: 'forest',
+  s: 'spruce',
+  r: 'spruce', // the taiga
+  n: 'spruce',
+  A: 'oak', // the rainforests
+  C: 'oak',
+  z: 'oak',
   N: 'desert', // the Sahara
   L: 'desert',
   R: 'desert',

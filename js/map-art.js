@@ -35,17 +35,46 @@ function compassRose(quarters) {
 
 // The drawings, in map units (a hex is about 1.7 wide). Used with <use href="#…">.
 export const artDefs = (quarters = 'NØSV') => `
-  <g id="art-mountain">
-    <path d="M-.8 .35L-.22-.55L.02-.2L.3-.5L.85.35Z" fill="#efe1c0" stroke="${INK}" stroke-width=".07" stroke-linejoin="round"/>
-    <path d="M-.22-.55L-.12.3M.3-.5L.38.3" fill="none" stroke="${INK}" stroke-width=".04" opacity=".55"/>
+  <g id="art-mountain" stroke="${INK}" stroke-width=".07" stroke-linejoin="round">
+    <path d="M-.85.38L-.25-.55L.04-.18L.34-.45L.92.38Z" fill="#efe1c0"/>
+    <path d="M-.25-.55L.04-.18L-.06.38H-.2Z M.34-.45L.92.38H.42Z" fill="#a8916a" stroke="none"/>
+    <path d="M-.25-.55L-.44-.25L-.35-.29L-.27-.2L-.17-.29L-.08-.33Z" fill="#fbf6ea" stroke-width=".04"/>
+    <path d="M-.85.38L-.25-.55L.04-.18L.34-.45L.92.38Z" fill="none"/>
   </g>
-  <g id="art-forest" fill="#e9dcb8" stroke="${INK}" stroke-width=".055">
-    <path d="M-.32.32V.05M.28.3V.02M0 .42V.18" fill="none"/>
-    <circle cx="-.32" cy="-.08" r=".24"/><circle cx=".28" cy="-.12" r=".26"/><circle cx="0" cy=".05" r=".22"/>
+  <g id="art-peak" stroke="${INK}" stroke-width=".07" stroke-linejoin="round">
+    <path d="M-.8.38L0-.6L.8.38Z" fill="#efe1c0"/>
+    <path d="M0-.6L.8.38H.06Z" fill="#a8916a" stroke="none"/>
+    <path d="M0-.6L-.24-.3L-.12-.34L-.02-.25L.09-.34L.24-.3Z" fill="#fbf6ea" stroke-width=".04"/>
+    <path d="M-.8.38L0-.6L.8.38Z" fill="none"/>
   </g>
-  <g id="art-desert" fill="none" stroke="${INK}" stroke-width=".05" stroke-linecap="round">
-    <path d="M-.7.15q.35-.35.7 0M.05.3q.3-.28.6 0"/>
-    <path d="M-.25-.25h.01M.35-.1h.01M-.5-.05h.01" stroke-width=".09"/>
+  <g id="art-spruce" stroke="${INK}" stroke-width=".05" stroke-linejoin="round">
+    <path d="M0 .5V.3" fill="none" stroke-width=".08"/>
+    <path d="M0-.62L.2-.32H.1L.3-.04H.15L.38.3H-.38L-.15-.04H-.3L-.1-.32H-.2Z" fill="#7d8b58"/>
+    <path d="M0-.62L.2-.32H.1L.3-.04H.15L.38.3H0Z" fill="#2f3a1e" fill-opacity=".35" stroke="none"/>
+  </g>
+  <g id="art-oak" stroke="${INK}" stroke-width=".05">
+    <path d="M-.07.5L-.04.05H.05L.08.5Z" fill="#6b4a32"/>
+    <g fill="#94a066"><circle cx="-.2" cy="-.1" r=".22"/><circle cx=".2" cy="-.12" r=".23"/><circle cx="0" cy="-.32" r=".24"/><circle cx=".02" cy=".02" r=".2"/></g>
+    <path d="M.3-.28A.23.23 0 0 1 .2.11A.2.2 0 0 1-.02.22Q.25.05.3-.28Z" fill="#2f3a1e" fill-opacity=".35" stroke="none"/>
+  </g>
+  <g id="art-spruce-wood"><use href="#art-spruce" transform="translate(-.38 -.12) scale(.8)"/><use href="#art-spruce" transform="translate(.36 -.08) scale(.85)"/><use href="#art-spruce" transform="translate(0 .08)"/></g>
+  <g id="art-oak-wood"><use href="#art-oak" transform="translate(-.32 -.1) scale(.85)"/><use href="#art-oak" transform="translate(.3 .02) scale(.95)"/></g>
+  <g id="art-mixed-wood"><use href="#art-oak" transform="translate(-.3 -.08) scale(.9)"/><use href="#art-spruce" transform="translate(.32 0)"/></g>
+  <g id="art-dunes" stroke="${INK}" stroke-width=".05" stroke-linejoin="round">
+    <path d="M-.2.05C0-.2.2-.32.38-.3C.55-.28.7-.1.85.1Z" fill="#ead6a2"/>
+    <path d="M.38-.3C.55-.28.7-.1.85.1H.45C.48-.06.45-.2.38-.3Z" fill="#c8a565" stroke="none"/>
+    <path d="M-.85.38C-.55-.02-.3-.2-.05-.18C.2-.16.42.05.62.38Z" fill="#ead6a2"/>
+    <path d="M-.05-.18C.2-.16.42.05.62.38H.12C.15.12.07-.06-.05-.18Z" fill="#c8a565" stroke="none"/>
+    <path d="M-.85.38C-.55-.02-.3-.2-.05-.18C.2-.16.42.05.62.38" fill="none"/>
+  </g>
+  <g id="art-palm" stroke="${INK}" stroke-width=".045" stroke-linejoin="round">
+    <path d="M-.6.42C-.3.2.3.2.6.42Z" fill="#ead6a2"/>
+    <path d="M-.06.32Q.06-.05-.08-.42L.04-.42Q.18-.05.06.32Z" fill="#8a6a4a"/>
+    <g fill="#7d8b58">
+      <path d="M-.02-.42Q-.4-.72-.72-.36Q-.6-.38-.5-.32Q-.3-.5-.02-.42Z"/><path d="M-.02-.42Q.36-.72.7-.34Q.58-.37.48-.3Q.28-.5-.02-.42Z"/>
+      <path d="M-.02-.42Q-.3-.86-.62-.72Q-.5-.66-.46-.58Q-.25-.66-.02-.42Z"/><path d="M-.02-.42Q.24-.88.58-.76Q.46-.68.42-.6Q.2-.66-.02-.42Z"/>
+      <path d="M-.02-.42Q-.08-.9.06-.92Q.08-.7-.02-.42Z"/>
+    </g>
   </g>
   <path id="art-wave" d="M-.6 0q.3-.24.6 0t.6 0" fill="none" stroke="${INK}" stroke-width=".05" stroke-linecap="round"/>
   <g id="art-ship" stroke="${INK}" stroke-width=".05" stroke-linejoin="round" stroke-linecap="round">
@@ -144,8 +173,17 @@ export function mapArt(grid, { keepClear = [], seaLines = [], compass = null } =
   const use = (id, x, y, scale = 1) => `<use href="#art-${id}" transform="translate(${x.toFixed(2)} ${y.toFixed(2)}) scale(${scale})"/>`;
   const ship = (x, y) => use(grid.SHIP ?? 'ship', x, y, 1.5);
   const jitter = (h, shift) => (((h >>> shift) % 100) / 100 - 0.5) * 0.5;
-  const DENSITY = { mountains: 2, forest: 2, desert: 3 }; // one cell in this many gets a drawing
-  const ART = { mountains: 'mountain', forest: 'forest', desert: 'desert' };
+  const DENSITY = { mountains: 2, forest: 2, spruce: 2, oak: 2, desert: 3 }; // one cell in this many gets a drawing
+  // Each kind has a few drawings, chosen by the cell: ranges and single peaks; spruce in the north, oak
+  // (and the broadleaf of the rainforest) in the south, and between them forest, the three mixed; dunes,
+  // now and then a palm.
+  const ART = {
+    mountains: ['mountain', 'mountain', 'peak'],
+    spruce: ['spruce-wood'],
+    oak: ['oak-wood'],
+    forest: ['spruce-wood', 'oak-wood', 'mixed-wood'],
+    desert: ['dunes', 'dunes', 'dunes', 'palm'],
+  };
   let land = '';
   let sea = '';
   let deco = ''; // the ships and the compass: drawn stronger than the waves
@@ -220,7 +258,7 @@ export function mapArt(grid, { keepClear = [], seaLines = [], compass = null } =
         const y = cy + jitter(h, 9);
         // Not on the coast either: the ink coastline stays clean.
         const coast = hexNeighbours(r, c).some(([nr, nc]) => cellAt(nr, nc) === '.');
-        if (h % DENSITY[kind] === 0 && !coast && free(x, y, 0.9)) land += use(ART[kind], x, y, 0.9 + (h % 3) * 0.1);
+        if (h % DENSITY[kind] === 0 && !coast && free(x, y, 0.9)) land += use(ART[kind][(h >>> 17) % ART[kind].length], x, y, 0.9 + (h % 3) * 0.1);
       } else if (dist[r][c] >= 2 && h % 6 === 0) {
         const x = cx + jitter(h, 4);
         const y = cy + jitter(h, 8);

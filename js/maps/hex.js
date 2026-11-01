@@ -9,7 +9,8 @@
 //   REGIONS       region id: name
 //   TERRITORIES   letter: [id, name, region id]
 //   SEA           crossings over water, drawn as dashed lines: [letter, letter]
-//   TERRAIN       letter: 'mountains' | 'forest' | 'desert', what the map art draws there
+//   TERRAIN       letter: 'mountains' | 'spruce' (north) | 'oak' (south) | 'forest' (mixed) | 'desert',
+//                 what the map art draws there
 //   PLACES        letter: [row, column, name side], where a crowded territory puts its seal; side is
 //                 'below', 'above', 'left' or 'right'. The rest use the cell closest to their middle.
 //   MISSIONS      region missions for mission games

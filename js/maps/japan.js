@@ -155,7 +155,7 @@ export const TERRAIN = {
   J: 'mountains', // Kai, Takeda's mountain land
   M: 'mountains', // the Japanese Alps
   a: 'forest',
-  r: 'forest',
+  r: 'spruce',
 };
 
 export const SEA = [

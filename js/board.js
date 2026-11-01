@@ -135,7 +135,7 @@ export function createBoard(svg, grid, map, { onTap, onRegion = () => {}, insets
     <g class="region-bands" pointer-events="none">${map.regions
       .map((r, i) => `<path data-region="${i}" d="${regionOutlines[r.id]}"/>`)
       .join('')}</g>
-    <g class="art" pointer-events="none" opacity=".7">${art.land}</g>
+    <g class="art" pointer-events="none" opacity=".9">${art.land}</g>
     <!-- Crumpled paper over land and sea alike (CC0 texture, see LICENSES.md). Not blended
          (multiply): blending made every redraw costlier, and the land flickered while zooming. -->
     <rect x="${n(-W)}" y="${n(-H)}" width="${n(3 * W)}" height="${n(3 * H)}" class="paper" fill="url(#paper)" pointer-events="none" opacity=".18"/>

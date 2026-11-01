@@ -119,9 +119,9 @@ export const TERRAIN = {
   g: 'mountains', // Snowdonia
   p: 'mountains',
   C: 'mountains', // the fells
-  h: 'forest',
-  M: 'forest',
-  b: 'forest',
+  h: 'oak',
+  M: 'oak',
+  b: 'oak',
 };
 
 export const SEA = [

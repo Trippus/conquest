@@ -5,8 +5,9 @@
 
 // map: the map's id (js/maps/index.js); opponents: how many computer players; home: the region you
 // start with, where history began; goal: the regions to hold, what history's winner took (plusOne:
-// and any one more); bonus: the share of start armies you get extra; art: the picture behind the
-// year card, where there is one (assets/togter, see LICENSES.md). The opponents keep secret missions,
+// and any one more); bonus: the share of start armies you get extra; art: the togt's picture, behind
+// the year card, small in the list and over the end of a won togt (assets/togter, see LICENSES.md); a
+// togt without one shows its map (assets/maps). The opponents keep secret missions,
 // so it is a race.
 //
 // Measured with npm run togt-balance (a hard bot for the player, 400 games): Let 91–100%, Normal

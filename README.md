@@ -29,11 +29,13 @@ npm run design-shots                          # stilprøverne som PNG (kræver n
 | `sw.js` | Henter alle filer på ny hver gang (et hurtigt "uændret", når intet er ændret), så en telefon aldrig blander en ny side med gamle filer efter en opdatering |
 | `js/togter.js` | Togterne i rækkefølge (ældst først), og hvad en sejr åbner: næste togt og kortet i Frit spil. Teksterne står i `js/lang/*.js` |
 | `js/audio.js` | Syntetiserede lyde (terninger, laksegl, horn, kort) og temamusikken, der går i løkke med en blød overgang |
-| `assets/music/`, `assets/togter/` | Temamusikken og billederne bag togternes årstal, lavet med AI (se `LICENSES.md`) |
+| `assets/music/`, `assets/togter/` | Temamusikken og billederne bag togternes årstal, lavet med AI (se `LICENSES.md`). AI'ens opdigtede ord på kortene er visket ud med `tools/smudge.mjs` |
+| `assets/maps/` | Et lille billede af hvert kort til Frit spils kortvalg og til togter uden eget billede, taget af `tools/map-shots.mjs` |
 | `js/map-art.js` | Kortsymboler i blæk: bjerge, skove, klitter, bølger, skibe, kompasrose, placeret ud fra gitteret |
 | `js/emblems.js` | Spillernes emblemer, lavet af `tools/make-emblems.mjs` fra `assets/emblems` (se `LICENSES.md`) |
 | `js/board.js` | Verdenskortet i papirkort-stil: farver, laksegl med hære, markeringer, træk og zoom (knib, hjul, +/−) |
 | `tools/simulate.mjs` | Mange bot-spil til balance |
+| `tools/map-shots.mjs`, `tools/smudge.mjs` | `npm run map-shots` tager de små billeder af kortene (`assets/maps/`); `npm run smudge -- <billede> x,y,w,h …` visker ord ud af et AI-billede |
 | `tools/map-report.mjs`, `tools/balance.mjs` | `npm run map-report -- <kort>` og `npm run balance -- <kort>`: tjek af et korts grænser og balance. Hele opskriften på et nyt kort står i `docs/nyt-kort.md` |
 | `tools/make-grid.mjs` | Tegner et korts gitter ud fra rigtige kystlinjer (Natural Earth, public domain) med opsætningen i `tools/grids/<kort>.mjs`; land uden for spillet bliver `#`, tegnet som uudforsket |
 

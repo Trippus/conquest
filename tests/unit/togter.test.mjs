@@ -7,8 +7,9 @@ import { MAPS } from '../../js/maps/index.js';
 import { DA } from '../../js/lang/da.js';
 import { EN } from '../../js/lang/en.js';
 
-test('every togt picture is there', () => {
+test('every togt picture is there, and every map has its small picture (npm run map-shots)', () => {
   for (const t of TOGTER) if (t.art) assert.ok(existsSync(new URL(`../../${t.art}`, import.meta.url)), t.art);
+  for (const id of Object.keys(MAPS)) assert.ok(existsSync(new URL(`../../assets/maps/${id}.jpg`, import.meta.url)), id);
 });
 
 test('every togt is a map, once, with its texts in both languages', () => {

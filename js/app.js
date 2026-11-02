@@ -775,6 +775,13 @@ function renderSetup() {
         b.type = 'button';
         b.textContent = locked ? `🔒 ${label}` : label;
         b.disabled = !!locked;
+        // The maps are small pictures of themselves (tools/map-shots.mjs).
+        if (name === 'map') {
+          const picture = document.createElement('span');
+          picture.className = 'map-picture';
+          picture.style.backgroundImage = `url('assets/maps/${value}.jpg')`;
+          b.prepend(picture);
+        }
         b.setAttribute('aria-pressed', String(draft[name] === value));
         b.addEventListener('click', () => {
           draft[name] = value;
@@ -863,7 +870,8 @@ function togtOver() {
     !wasFree && L.newFreeMap(mapIn(game.togt).name),
     next ? L.nextUp(togtText(next.map).year, mapIn(next.map).name) : L.allTogterWon,
   ].filter(Boolean);
-  return `<div class="togt-end"><h3>${L.history}</h3><p>${togtText(game.togt).epilogue}</p><p class="news">${news.join(' ')}</p></div>`;
+  const picture = `<div class="togt-picture" style="background-image: url('${pictureOf(game.togt)}')"></div>`;
+  return `<div class="togt-end">${picture}<h3>${L.history}</h3><p>${togtText(game.togt).epilogue}</p><p class="news">${news.join(' ')}</p></div>`;
 }
 
 // What comes after a finished game: a togt won goes on to the next, a togt lost is tried again, a
@@ -1102,6 +1110,8 @@ $('choose-free').addEventListener('click', () => {
 
 // The togter as a line of years, oldest first: won, the next one, or locked until the one before is
 // won. The opponents' level is chosen here, once for all of them.
+// A togt's picture (togter.js, art), or for a togt without one, its map (tools/map-shots.mjs).
+const pictureOf = (id) => togtOf(id)?.art ?? `assets/maps/${id}.jpg`;
 function openTogter() {
   renderTogter();
   $('togter').showModal();
@@ -1124,7 +1134,8 @@ function renderTogter() {
       b.disabled = !open;
       const text = togtText(t.map);
       const state = won ? L.togtWon(L.levels[won]) : open ? L.togtNext : `🔒 ${L.togtLocked}`;
-      b.innerHTML = `<span class="togt-year">${text.year}</span><span class="togt-body"><b>${mapIn(t.map).name}</b><small>${text.teaser}</small><small class="togt-state">${state}</small></span>`;
+      b.innerHTML = `<span class="togt-thumb" style="background-image: url('${pictureOf(t.map)}')"></span>
+        <span class="togt-body"><span class="togt-year">${text.year}</span><b>${mapIn(t.map).name}</b><small>${text.teaser}</small><small class="togt-state">${state}</small></span>`;
       b.addEventListener('click', () => {
         $('togter').close();
         startTogt(t.map);

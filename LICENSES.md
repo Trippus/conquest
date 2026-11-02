@@ -7,7 +7,7 @@ Alt i spillet er lavet til spillet, undtagen:
 | `assets/emblems/*.svg` → `js/emblems.js` | Spillernes emblemer: løve, ørn, galeon, tårn, ulvehoved, krone | [Lorc](https://lorcblog.blogspot.com), [game-icons.net](https://game-icons.net) | [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/): navngivelse kræves, se "Tak til" på startskærmen |
 | `assets/paper.jpg` | Papirtekstur (Paper 003, farvebilledet) | [ambientCG](https://ambientcg.com/view?id=Paper003) | [CC0](https://creativecommons.org/publicdomain/zero/1.0/) |
 | `assets/music/theme.mp3` | Temamusikken "Rulers of the Map – Theme" | Lavet med AI hos [Abracadabrax](https://abracadabrax.app), model "Abracadabrax Instrumental" (Stable Audio), 1/11-2026 | Vores til kommerciel brug: modellen er mærket "cleared for commercial use", og [vilkårene](https://abracadabrax.app/terms) giver ejerskab og kommerciel brug (læst 1/11-2026) |
-| `assets/togter/*.jpg` | Billederne bag togternes årstal (Rom, Alexander, Vikingetogtet) | Lavet med AI hos Abracadabrax, model Seedream 4.5 (ByteDance), 1/11-2026, gjort mindre til 960 px | Som musikken: ejerskab og kommerciel brug efter Abracadabrax' vilkår og FAQ (læst 1/11-2026) |
+| `assets/togter/*.jpg` | Billederne bag togternes årstal (Rom, Alexander, Vikingetogtet) | Lavet med AI hos Abracadabrax, model Seedream 4.5 (ByteDance), 1/11-2026, gjort mindre til 960 px, AI'ens opdigtede ord visket ud | Som musikken: ejerskab og kommerciel brug efter Abracadabrax' vilkår og FAQ (læst 1/11-2026) |
 
 Kortet, kystlinjerne, kortsymbolerne og lydene er tegnet og lavet i koden.
 

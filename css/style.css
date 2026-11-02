@@ -244,6 +244,11 @@ dialog .big { font-family: var(--title); font-size: 20px; margin: 8px 0; }
 .pills { display: flex; flex-wrap: wrap; gap: 6px; }
 .pills button { min-height: 40px; padding: 0 14px; border-radius: 999px; font-size: 15px; }
 .pills button[aria-pressed='true'] { background: var(--ink); color: var(--panel-solid); border-color: var(--ink); }
+/* the free game's maps: a small picture of each, two or three to a row */
+.pills[data-name='map'] { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 8px; }
+.pills[data-name='map'] button { display: flex; flex-direction: column; gap: 6px; min-height: 0; padding: 6px 6px 8px; border-radius: 12px; font-size: 14px; line-height: 1.25; }
+.map-picture { aspect-ratio: 16 / 10; border-radius: 8px; background: center / cover no-repeat; box-shadow: inset 0 0 18px rgb(60 35 15 / .35); }
+.pills button:disabled .map-picture { filter: grayscale(.8) brightness(.7); }
 /* the people at this device: a shield, a name, and a way to remove them */
 .group + .group { border-top: 1px solid var(--line); margin-top: 14px; }
 .group h3 { font: 700 17px var(--title); color: var(--accent); margin: 12px 0 4px; }
@@ -326,10 +331,13 @@ dialog .big { font-family: var(--title); font-size: 20px; margin: 8px 0; }
   background: var(--panel-solid); border: 2px solid var(--line); }
 .togt-list li.won::before { background: var(--accent); border-color: var(--accent); }
 .togt-list li.next::before { border-color: var(--accent); box-shadow: 0 0 0 4px rgb(255 210 90 / 0.35); }
-.togt-list button { display: flex; gap: 12px; align-items: flex-start; width: 100%; padding: 10px 12px; text-align: left; line-height: 1.3; }
+.togt-list button { display: flex; gap: 12px; align-items: flex-start; width: 100%; padding: 10px 12px 10px 10px; text-align: left; line-height: 1.3; }
 .togt-list li.next button { border-color: var(--accent); }
 .togt-list button:disabled { opacity: .55; }
-.togt-year { flex: none; width: 4.6em; font: 700 16px/1.3 var(--title); color: var(--accent); }
+/* the togt's picture, small; dimmed until it can be played */
+.togt-thumb { flex: none; width: 76px; height: 76px; border-radius: 10px; background: 15% 50% / cover no-repeat; box-shadow: inset 0 0 14px rgb(0 0 0 / .45); }
+.togt-list li.locked .togt-thumb { filter: grayscale(.8) brightness(.75); }
+.togt-year { font: 700 15px/1.3 var(--title); color: var(--accent); }
 .togt-body { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
 .togt-body b { font: 700 16px var(--title); }
 .togt-body small { font-size: 13px; color: var(--muted); }
@@ -344,23 +352,27 @@ dialog .big { font-family: var(--title); font-size: 20px; margin: 8px 0; }
   color: #f1e6d0; text-align: center; overflow-y: auto;
   animation: rise-in .35s both;
 }
-/* with a picture, straight to dark, and the picture comes up out of it */
-#chapter.has-art { background: #0c0703; animation: none; }
+/* with a picture, straight to dark, and the picture comes up out of it; the words wait for it */
+#chapter { --wait: 0s; }
+#chapter.has-art { background: #0c0703; animation: none; --wait: 1.5s; }
 @keyframes rise-in { from { opacity: 0; } }
-/* The togt's picture: an old map by candlelight, soft and dark under the text (its AI-drawn lettering
-   is not meant to be read), drifting slowly, the candles flickering from the left. */
+/* The togt's picture: an old map by candlelight, drifting slowly, the candles flickering from the
+   left. It is seen clearly first; then it darkens (::after) for the words to come. */
 .ch-art {
   position: fixed; inset: -30px; pointer-events: none;
   background: 15% 50% / cover no-repeat;
-  filter: blur(2.5px) brightness(.62) saturate(.95);
+  box-shadow: inset 0 0 140px 50px rgb(8 4 2 / .7);
   opacity: 0;
 }
-.ch-art.shown { opacity: 1; animation: rise-in 1.4s .2s both, drift 26s ease-in-out infinite alternate; }
+.ch-art.shown { opacity: 1; animation: rise-in 1.2s .1s both, drift 26s ease-in-out infinite alternate; }
 .ch-art::before {
   content: ''; position: absolute; inset: 0; mix-blend-mode: screen; animation: flicker 3.7s infinite;
   background: radial-gradient(ellipse 50% 60% at 6% 45%, rgb(255 166 77 / .4), transparent 70%);
 }
-.ch-art::after { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse 75% 60% at 50% 50%, rgb(12 7 3 / .62), rgb(12 7 3 / .25)); }
+.ch-art::after {
+  content: ''; position: absolute; inset: 0; animation: rise-in 1s 1.3s both;
+  background: radial-gradient(ellipse 75% 60% at 50% 50%, rgb(12 7 3 / .8), rgb(12 7 3 / .55));
+}
 @keyframes drift { from { transform: scale(1.03); } to { transform: scale(1.1) translate(-1.5%, -1%); } }
 @keyframes flicker {
   0%, 100% { opacity: .8; } 9% { opacity: 1; } 21% { opacity: .68; } 33% { opacity: .95; }
@@ -380,13 +392,13 @@ dialog .big { font-family: var(--title); font-size: 20px; margin: 8px 0; }
 .ch-goal b { color: #e8c27a; }
 #ch-go { min-width: 180px; }
 /* in one after another */
-#chapter .ch-step { animation: rise .7s .1s both; }
-#chapter .ch-year { animation: year 1.1s .35s both cubic-bezier(.2, .7, .2, 1); }
-#chapter .ch-rule path { animation: draw .8s 1.1s both ease-out; }
-#chapter .ch-title { animation: rise .7s 1.5s both; }
-#chapter .ch-story { animation: rise .9s 2.1s both; }
-#chapter .ch-goal-h, #chapter .ch-goal { animation: rise .7s 2.9s both; }
-#chapter #ch-go { animation: rise .6s 3.5s both; }
+#chapter .ch-step { animation: rise .7s calc(var(--wait) + .1s) both; }
+#chapter .ch-year { animation: year 1.1s calc(var(--wait) + .35s) both cubic-bezier(.2, .7, .2, 1); }
+#chapter .ch-rule path { animation: draw .8s calc(var(--wait) + 1.1s) both ease-out; }
+#chapter .ch-title { animation: rise .7s calc(var(--wait) + 1.5s) both; }
+#chapter .ch-story { animation: rise .9s calc(var(--wait) + 2.1s) both; }
+#chapter .ch-goal-h, #chapter .ch-goal { animation: rise .7s calc(var(--wait) + 2.9s) both; }
+#chapter #ch-go { animation: rise .6s calc(var(--wait) + 3.5s) both; }
 @keyframes rise { from { opacity: 0; transform: translateY(10px); } }
 /* only a zoom: wider letters would wrap the year anew while it comes in */
 @keyframes year { from { opacity: 0; transform: scale(1.18); } }
@@ -399,6 +411,8 @@ dialog .big { font-family: var(--title); font-size: 20px; margin: 8px 0; }
 
 /* ---------- the end of a togt ---------- */
 .togt-end { margin: 10px 0 4px; text-align: left; }
+/* a won togt: its picture, clear, over what really happened */
+.togt-picture { height: 150px; margin: 4px 0 12px; border-radius: 12px; background: 15% 55% / cover no-repeat; box-shadow: inset 0 0 40px rgb(0 0 0 / .5); }
 .togt-end h3 { font: 700 17px var(--title); color: var(--accent); margin: 8px 0 4px; }
 .togt-end p { margin: 0 0 8px; font-size: 15px; line-height: 1.5; }
 .togt-end .news { font-weight: 600; }

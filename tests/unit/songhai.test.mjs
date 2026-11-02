@@ -33,7 +33,7 @@ test('down the Niger, and the salt road from Taghaza to Timbuktu', () => {
 
 test('the rivers and caravans are drawn inside the map', () => {
   const inside = ([x, y]) => x >= 0 && x <= E.SONGHAI_GRID.WIDTH && y >= 0 && y <= E.SONGHAI_GRID.HEIGHT;
-  assert.equal(E.RIVERS.length, 5);
+  assert.equal(E.RIVERS.length, 9);
   assert.ok(E.RIVERS.flat().every(inside));
   assert.ok(E.CARAVANS.every(inside));
 });

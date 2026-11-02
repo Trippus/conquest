@@ -1,12 +1,13 @@
 // The grid for Songhai (js/maps/songhai.js), drawn by tools/make-grid.mjs.
 
-// The window: West Africa from the Atlantic to beyond Lake Chad, from the south of Morocco down to
-// the Gulf of Guinea.
-export const LAT_TOP = 29.5;
+// The window: all of Africa, so the continent is plain to see, from the Strait of Gibraltar to the
+// Cape and from the Atlantic to the Horn. The campaign is West Africa; the rest is unexplored. (The
+// window grew by an even number of rows and whole columns, so the campaign's cells stayed the same.)
+export const LAT_TOP = 37.82;
 export const LAT_STEP = 0.26;
-export const ROWS = 98;
+export const ROWS = 280;
 export const LON_WEST = -18;
-export const LON_EAST = 16.5;
+export const LON_EAST = 52;
 export const SQUASH_AT = 16;
 
 // Territory centres [lat, lon, letter]; '#' marks land outside the campaign.
@@ -36,15 +37,36 @@ export const CENTRES = [
   [24.5, -14.0, '#'], [21.5, -13.0, '#'], [21.0, -9.5, '#'], [24.0, 5.0, '#'], [23.5, 10.5, '#'], [20.5, 12.5, '#'],
   [8.5, -12.5, '#'], [7.0, -9.5, '#'], [6.0, -6.5, '#'],
   [5.5, 10.5, '#'], [8.0, 12.0, '#'], [10.0, 14.5, '#'], [11.5, 16.0, '#'],
+  // The rest of Africa, and the corners of Europe and Arabia.
+  [37.3, -4.5, '#'], [37.4, 14.2, '#'], [36.0, 3.0, '#'], [36.0, 9.5, '#'], [33.0, 3.0, '#'], [31.5, 11.0, '#'], [31.0, 17.5, '#'],
+  [27.0, 20.0, '#'], [30.0, 25.0, '#'], [28.0, 30.0, '#'], [24.0, 32.5, '#'], [30.5, 34.5, '#'], [19.5, 21.0, '#'], [15.0, 19.5, '#'],
+  [13.0, 24.0, '#'], [17.0, 30.0, '#'], [19.5, 35.0, '#'], [13.0, 31.0, '#'], [9.0, 25.0, '#'], [9.0, 30.5, '#'], [9.0, 38.5, '#'],
+  [13.5, 39.0, '#'], [11.5, 42.5, '#'], [9.0, 46.0, '#'], [6.0, 48.0, '#'], [3.0, 42.0, '#'], [0.5, 37.5, '#'], [3.0, 30.0, '#'],
+  [3.5, 21.0, '#'], [3.5, 15.5, '#'], [0.5, 11.0, '#'], [-1.5, 15.0, '#'], [-0.5, 20.0, '#'], [-3.5, 25.0, '#'], [-4.0, 30.0, '#'],
+  [-6.5, 35.0, '#'], [-8.0, 39.0, '#'], [-6.5, 13.5, '#'], [-11.0, 17.0, '#'], [-12.0, 23.0, '#'], [-11.0, 28.0, '#'],
+  [-14.0, 33.0, '#'], [-13.0, 38.5, '#'], [-16.0, 16.0, '#'], [-17.0, 24.0, '#'], [-18.5, 30.0, '#'], [-18.5, 35.5, '#'],
+  [-22.0, 16.5, '#'], [-23.0, 22.0, '#'], [-22.0, 28.5, '#'], [-24.0, 33.5, '#'], [-27.5, 18.0, '#'], [-28.0, 24.0, '#'],
+  [-28.5, 29.5, '#'], [-32.0, 20.0, '#'], [-32.0, 26.0, '#'], [-19.0, 46.5, '#'], [-23.0, 45.0, '#'], [-15.0, 49.0, '#'],
+  [33.5, 36.5, '#'], [35.5, 40.0, '#'], [35.0, 46.0, '#'], [33.0, 50.0, '#'], [29.0, 39.0, '#'], [27.0, 44.5, '#'], [24.5, 39.0, '#'],
+  [22.0, 46.0, '#'], [20.0, 41.5, '#'], [18.0, 49.0, '#'], [15.0, 44.5, '#'], [22.5, 51.5, '#'],
 ];
 export const FORCE_LAND = [];
 
-// Lake Chad, as large as it was in the 1400s: open water between Bornu and Kanem.
+// Lake Chad, as large as it was in the 1400s: open water between Bornu and Kanem. Far off, the great
+// lakes: Victoria, Tanganyika and Malawi.
 const lake = [];
 for (let lat = 12.4; lat <= 14.2; lat += 0.1) {
   for (let lon = 13.3; lon <= 15.3; lon += 0.1) if (((lat - 13.3) / 0.85) ** 2 + ((lon - 14.3) / 0.95) ** 2 <= 1) lake.push([lat, lon]);
 }
-export const FORCE_SEA = lake;
+const along = (from, to, half) => {
+  const out = [];
+  for (let k = 0; k <= 1; k += 0.02) for (let w = -half; w <= half; w += 0.1) out.push([from[0] + (to[0] - from[0]) * k, from[1] + (to[1] - from[1]) * k + w]);
+  return out;
+};
+for (let lat = -2.5; lat <= 0.5; lat += 0.1) {
+  for (let lon = 31.5; lon <= 34.5; lon += 0.1) if (((lat + 1) / 1.3) ** 2 + ((lon - 33) / 1.5) ** 2 <= 1) lake.push([lat, lon]);
+}
+export const FORCE_SEA = [...lake, ...along([-3.3, 29.3], [-8.8, 31.0], 0.25), ...along([-9.5, 34.0], [-14.4, 35.3], 0.3)];
 
 // The Bissagos Islands join Kaabu; the Canaries, out by Morocco, are unexplored.
 export const ISLAND = 30;
@@ -66,5 +88,12 @@ export const RIVERS = [
   [[10.8, -11.3], [12.2, -10.6], [13.8, -10.8], [14.45, -11.44], [14.9, -12.45], [15.65, -13.25], [16.2, -13.9], [16.65, -14.96],
     [16.5, -15.5], [16.0, -16.5]],
   [[12.7, -12.5], [13.2, -13.3], [13.65, -14.2], [13.5, -15.5], [13.45, -16.6]],
+  // far off: the Nile and the Blue Nile, the Congo and the Zambezi
+  [[-0.5, 33.2], [1.5, 32.2], [3.6, 31.7], [6.5, 31.5], [9.5, 30.5], [12.0, 32.7], [15.6, 32.5], [17.7, 33.9], [19.5, 33.3],
+    [18.5, 31.8], [19.2, 30.5], [21.8, 31.3], [24.1, 32.9], [26.2, 32.7], [28.0, 30.8], [30.0, 31.2], [31.5, 31.0]],
+  [[12.0, 37.3], [10.5, 38.0], [10.0, 36.0], [11.2, 34.8], [13.5, 33.6], [15.6, 32.5]],
+  [[-11.5, 27.0], [-8.0, 26.5], [-5.0, 25.9], [-2.5, 25.5], [0.5, 25.2], [2.0, 22.5], [1.5, 20.0], [0.0, 18.3], [-2.0, 16.5],
+    [-4.3, 15.3], [-5.5, 13.5], [-6.0, 12.3]],
+  [[-11.5, 24.3], [-14.5, 23.3], [-17.8, 25.2], [-16.0, 28.8], [-15.6, 30.4], [-15.6, 32.7], [-16.5, 34.0], [-18.5, 36.3]],
 ];
 export const CARAVANS = [[21.0, -4.6], [18.6, -10.0], [19.0, 4.6]];

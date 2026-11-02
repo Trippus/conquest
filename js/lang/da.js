@@ -130,6 +130,13 @@ export const DA = {
       story: 'Kong Edvard Bekenderen er død uden børn. Harold Godwinson tager kronen, men Harald Hårderåde fra Norge og Vilhelm af Normandiet gør begge krav på den, og begge sætter flåder over havet.',
       epilogue: 'Harold slog nordmændene ved Stamford Bridge, men måtte marchere sydpå og faldt ved Hastings den 14. oktober. Vilhelm blev kronet juledag 1066 og kaldes siden Erobreren.',
     },
+    inka: {
+      year: '1438',
+      goal: 'Slå chankaerne, collaerne og Chimú, og byg et rige langs Andes.',
+      teaser: 'Pachacuti mod chankaerne, collaerne og Chimú-riget.',
+      story: 'Chankaernes hær står foran Cusco, og den gamle inkakonge er flygtet. Hans søn Cusi Yupanqui bliver og forsvarer byen. Vinder han, venter collaerne ved Titicacasøen, det rige Chimú-rige ved kysten og bjergene hele vejen fra Quito til Chile.',
+      epilogue: 'Cusi Yupanqui slog chankaerne og tog navnet Pachacuti, "han der vender verden om". Han og sønnen Topa Inka byggede Tawantinsuyu, det største rige i Amerika før Columbus, bundet sammen af næsten 40.000 km vej. I 1532 tog spanieren Pizarro inkakongen Atahualpa til fange i Cajamarca.',
+    },
     songhai: {
       year: '1468',
       goal: 'Tag Timbuktu og Jenné, og gør Songhai til herre over Niger.',

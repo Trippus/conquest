@@ -15,7 +15,7 @@ Claude tegner, måler og retter.
 
 **Tidstypisk som udgangspunkt:** skibe, modstandernes navne, vinderens titel, terræn og navne på steder
 følger perioden og stedet. Findes der ikke et tidstypisk skib i spillet, tegner vi et nyt (galejen til
-Rom, et atakebune til Japan, en hjuldamper til Vesten, en karavel ud for Songhai) i stedet for at låne et fra
+Rom, et atakebune til Japan, en hjuldamper til Vesten, en karavel ud for Songhai, en balsaflåde til Inkariget) i stedet for at låne et fra
 en anden tid. Er der ikke meget hav, kan andet pynt bære tiden: floder, karavaner, kanoer (se Songhai).
 
 ## 2. Udkast til inddeling (Claude → Martin godkender)
@@ -43,7 +43,8 @@ Erfaringer:
 - Små øer uden eget midtpunkt hører til nærmeste område (`ISLAND`, `ISLAND_REACH`). En lille ø langt ude
   (Shetland under Orkney) forvirrer søvejene: tag den hellere ud med `FORCE_SEA`.
 - Smalle stræder (Øresund) lukker i gitteret: hold dem åbne med `FORCE_SEA`.
-- Tegn vinduet bredt fra starten: nabokontinenter og -lande med, som uudforsket land med navne.
+- Tegn vinduet bredt fra starten: nabokontinenter og -lande med, som uudforsket land med navne. Man skal
+  kunne se, hvilket kontinent det er (Inkariget viser hele Sydamerika).
 - Et `#`-midtpunkt tager alt land, det er nærmest, også inde i felttoget. Ser man et hul eller en kile
   af uudforsket land mellem områderne, er det oftest et `#`-midtpunkt, der skal flyttes eller fjernes.
 - Et område, der får land på den anden side af et stræde eller en bugt (Sinai under Theben), får et
@@ -61,7 +62,9 @@ palme ind imellem).
 
 Floder og karavaner tegnes, men spilles ikke: skriv dem i grid-filen (`RIVERS`, linjer af [bredde, længde]
 fra kilde til udløb, og `CARAVANS`), så skriver `tools/make-grid.mjs` dem i kortenheder til kortfilen.
-`RIVER_BOATS` sætter kanoer på den første flod. En sø er `FORCE_SEA` inde i landet (Tchadsøen).
+`RIVER_BOATS` sætter kanoer på den første flod. Veje (`ROADS`) tegnes stiplede som inkavejen, `CARAVAN:
+'llamas'` gør karavanerne til lamaer, og `SIGHTS` sætter en tegning lige der (sivbåden på Titicacasøen). En
+sø er `FORCE_SEA` inde i landet (Tchadsøen, Titicacasøen).
 
 Kortet bliver et togt: sæt det ind i `TOGTER` i `js/togter.js` på sin plads i tiden (ældst først) med
 antal modstandere, og giv det tekster i `togter` i `js/lang/da.js` og `en.js`: årstal, en linje til

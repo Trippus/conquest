@@ -189,6 +189,34 @@ export const artDefs = (quarters = 'NØSV') => `
     <path d="M-1.4-.05H1.4" fill="none" opacity=".6"/>
     <path d="M-1.55.85q.3-.15.6 0t.6 0M.3.85q.3-.15.6 0t.6 0" fill="none" opacity=".6"/>
   </g>
+  <g id="art-balsa" stroke="${INK}" stroke-width=".05" stroke-linejoin="round" stroke-linecap="round">
+    <path d="M-.35-.2L.15-2.05M.65-.2L.15-2.05" fill="none" stroke-width=".06"/>
+    <path d="M-.75-1.85H1.05L.9-.5H-.6Z" fill="#f6ecd4"/>
+    <path d="M-.8-1.85H1.1M-.65-.5H.95" fill="none" stroke-width=".07"/>
+    <path d="M.95-.2V-.55L1.15-.7L1.35-.55V-.2Z" fill="#c8a565"/>
+    <path d="M-1.55-.2H1.6L1.42.2H-1.38Z" fill="#b08a5a"/>
+    <path d="M-1.45-.07H1.52M-1.42.07H1.47" fill="none" opacity=".5"/>
+    <path d="M-1.55.55q.3-.15.6 0t.6 0M.3.55q.3-.15.6 0t.6 0" fill="none" opacity=".6"/>
+  </g>
+  <g id="art-llama" stroke="${INK}" stroke-width=".05" stroke-linejoin="round" stroke-linecap="round">
+    <path d="M-.42-.06Q-.44-.3-.16-.3H.22Q.32-.32.34-.46V-.84Q.34-.94.44-.94H.5L.53-1.06L.58-.94Q.7-.9.68-.8L.58-.79V-.42Q.58-.08.32 0L.33.3H.24L.19.02H-.2L-.24.3H-.33L-.34 0Q-.42-.02-.42-.06Z" fill="#efe4cc"/>
+    <path d="M-.24-.44H.12V-.3H-.24Z" fill="#a3261b"/>
+  </g>
+  <g id="art-llamas">
+    <use href="#art-llama" transform="translate(-1.1 .05)"/><use href="#art-llama" transform="translate(0 0)"/><use href="#art-llama" transform="translate(1.1 -.05)"/>
+    <g stroke="${INK}" stroke-width=".05" stroke-linejoin="round" stroke-linecap="round">
+      <path d="M-1.98-.2V.3M-1.82-.2V.3M-1.6-.5L-1.5.3" fill="none"/>
+      <path d="M-2.14-.18L-1.9-.72L-1.66-.18Z" fill="#c98a12"/>
+      <circle cx="-1.9" cy="-.84" r=".1" fill="#3b2f2a"/>
+    </g>
+  </g>
+  <g id="art-reedboat" stroke="${INK}" stroke-width=".05" stroke-linejoin="round" stroke-linecap="round">
+    <path d="M.1-.1V-1.1M.1-1.05L.75-.25H.1" fill="none" stroke-width=".06"/>
+    <path d="M.15-1L.7-.3H.15Z" fill="#d8c48e"/>
+    <path d="M-1.2-.6Q-1.05.12 0 .16Q1.05.12 1.2-.6Q1-.12 0-.1Q-1-.12-1.2-.6Z" fill="#c8a565"/>
+    <path d="M-.8-.05V.1M-.4 0V.15M.4 0V.15M.8-.05V.1" fill="none" opacity=".6"/>
+    <path d="M-1.1.45q.3-.12.6 0t.6 0M.2.45q.3-.12.6 0t.6 0" fill="none" opacity=".5"/>
+  </g>
   <g id="art-compass">${compassRose(quarters)}</g>`;
 
 // A fixed "random" number for a cell, so the map looks the same every time.
@@ -257,7 +285,7 @@ export function mapArt(grid, { keepClear = [], seaLines = [], compass = null } =
   }
   // Ships sail beside the longest sea routes (not those round the back of the map), a little to
   // one side of the dashed line, on open sea. grid.SHIP names the kind ('ship', 'longship', 'galley', 'atakebune',
-  // 'lineship', 'sidewheeler' or 'caravel'), grid.SHIP_COUNT how many (3).
+  // 'lineship', 'sidewheeler', 'caravel' or 'balsa'), grid.SHIP_COUNT how many (3).
   const seaCell = (x, y) => {
     const r = Math.round((y - 1) / 1.5);
     const c = Math.round((x - Math.sqrt(3) / 2) / Math.sqrt(3) - 0.5 * (r & 1));
@@ -312,9 +340,11 @@ export function mapArt(grid, { keepClear = [], seaLines = [], compass = null } =
     }
   }
   // Rivers (grid.RIVERS, lines of [x, y] from source to mouth) run as smooth curves; on the first, a
-  // few boats (grid.RIVER_BOATS) where it runs more or less east–west. Camel caravans walk the desert
-  // near grid.CARAVANS ([x, y]). The forests and dunes keep off them all.
+  // few boats (grid.RIVER_BOATS) where it runs more or less east–west. Roads (grid.ROADS) run the same
+  // way, dashed. Caravans (grid.CARAVAN: camels, or llamas) walk near grid.CARAVANS ([x, y]). The
+  // forests and dunes keep off them all.
   const rivers = (grid.RIVERS ?? []).map(smooth).join('');
+  const roads = (grid.ROADS ?? []).map(smooth).join('');
   const along = (line, step) =>
     line.slice(1).flatMap(([x2, y2], i) => {
       const [x1, y1] = line[i];
@@ -355,10 +385,15 @@ export function mapArt(grid, { keepClear = [], seaLines = [], compass = null } =
       }
     }
     if (!best) continue;
-    land += use('caravan', best.x, best.y, 1.1);
+    land += use(grid.CARAVAN ?? 'caravan', best.x, best.y, 1.1);
     take(best.x, best.y, 2.4);
   }
-  for (const line of grid.RIVERS ?? []) for (const [x, y] of along(line, 0.5)) take(x, y, 0.35);
+  // Sights (grid.SIGHTS, [x, y, art]) go where they are put, a reed boat on a lake.
+  for (const [x, y, kind] of grid.SIGHTS ?? []) {
+    deco += use(kind, x, y, 1.2);
+    take(x, y, 1.6);
+  }
+  for (const line of [...(grid.RIVERS ?? []), ...(grid.ROADS ?? [])]) for (const [x, y] of along(line, 0.5)) take(x, y, 0.35);
   for (let r = 0; r < rows; r++) {
     for (let c = 0; c < cols; c++) {
       const [cx, cy] = hexCenter(r, c);
@@ -378,7 +413,7 @@ export function mapArt(grid, { keepClear = [], seaLines = [], compass = null } =
     }
   }
 
-  return { land, sea, deco, rivers };
+  return { land, sea, deco, rivers, roads };
 }
 
 // A line through the points, smoothed (Catmull-Rom as cubic curves), as an SVG path.

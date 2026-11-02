@@ -130,6 +130,13 @@ export const EN = {
       story: 'King Edward the Confessor has died without children. Harold Godwinson takes the crown, but Harald Hardrada of Norway and William of Normandy both claim it, and both send fleets across the sea.',
       epilogue: 'Harold beat the Norwegians at Stamford Bridge, but had to march south and fell at Hastings on 14 October. William was crowned on Christmas Day 1066 and has been called the Conqueror ever since.',
     },
+    inka: {
+      year: '1438',
+      goal: 'Beat the Chanka, the Colla and Chimú, and build an empire along the Andes.',
+      teaser: 'Pachacuti against the Chanka, the Colla and the Chimú kingdom.',
+      story: 'The Chanka army stands before Cusco, and the old Inca king has fled. His son Cusi Yupanqui stays and defends the city. If he wins, the Colla by Lake Titicaca, the rich Chimú kingdom on the coast and the mountains all the way from Quito to Chile are waiting.',
+      epilogue: 'Cusi Yupanqui beat the Chanka and took the name Pachacuti, “he who turns the world around”. He and his son Topa Inca built Tawantinsuyu, the largest empire in the Americas before Columbus, held together by almost 40,000 km of road. In 1532 the Spaniard Pizarro took the Inca king Atahualpa prisoner at Cajamarca.',
+    },
     songhai: {
       year: '1468',
       goal: 'Take Timbuktu and Jenné, and make Songhai master of the Niger.',

@@ -9,6 +9,7 @@ import { botAction } from './ai.js';
 import { MAPS, rulesFor, inLanguage } from './maps/index.js';
 import { MODERN } from './rules/modern.js';
 import { createBoard, PLAYER_COLORS as COLORS, sealIcon } from './board.js';
+import { mapShapes, regionShapes } from './map-shapes.js';
 import { Sound, Music } from './audio.js';
 import { LANGUAGES, pickLanguage, stringsFor, translatePage } from './i18n.js';
 import { TOGTER, newProgress, isOpen, nextTogt, freeMaps, record, offerEasy, togtStart } from './togter.js';
@@ -20,8 +21,9 @@ const SETTINGS = 'conquest.settings';
 const PROGRESS = 'conquest.progress';
 // people: the players at this device, each with a name (empty: a default) and a coat of arms
 // (colour and emblem number); opponents: how many computer players; togtLevel: the opponents'
-// level in the togter (the free game has its own).
-const DEFAULTS = { people: [{ name: '', look: 0 }], opponents: 2, level: 'medium', mode: 'mission', map: 'world', speed: 'normal', sound: true, music: true, theme: 'dark', togtLevel: 'novice' };
+// level in the togter (the free game has its own); togtGoal: 'history' (the togt's goal) or 'all'
+// (conquer the whole map), chosen on the togt's card.
+const DEFAULTS = { people: [{ name: '', look: 0 }], opponents: 2, level: 'medium', mode: 'mission', map: 'world', speed: 'normal', sound: true, music: true, theme: 'dark', togtLevel: 'novice', togtGoal: 'history' };
 const NAME_LENGTH = 14;
 // Every text in the chosen language (js/i18n.js). The computer opponents are made-up commanders
 // (L.opponents), so the table has someone to play against; a map from another age has its own (RULERS).
@@ -168,7 +170,8 @@ function startTogt(id, { intro = true } = {}) {
   const order = shuffled([you, ...bots]);
   useMap(id);
   const start = togtStart(map, togt, order.indexOf(you), order.length);
-  startGame(order, settings.speed, 'mission', undefined, id, { togt: id, quiet: intro, ...start, bonus: togt.bonus ?? 0 });
+  const mode = settings.togtGoal === 'all' ? 'world' : 'mission';
+  startGame(order, settings.speed, mode, undefined, id, { togt: id, quiet: intro, ...start, bonus: togt.bonus ?? 0 });
   if (intro) showChapter(id);
 }
 
@@ -219,15 +222,29 @@ function showChapter(id) {
   $('ch-year').textContent = text.year;
   $('ch-title').textContent = mapIn(id).name;
   $('ch-story').textContent = text.story;
-  const you = game.seats.indexOf('human');
-  const home = togtOf(id).home && map.regions.find((r) => r.id === togtOf(id).home).name;
-  $('ch-goal').innerHTML = `<b>${text.goal}</b> ${goalText(s.players[you].mission)}${home ? ` ${L.startsIn(home)}` : ''}`;
+  tellGoal(id);
   showChapterArt(togtOf(id).art);
   const box = $('chapter');
   box.classList.remove('leave');
   box.hidden = false;
   document.body.classList.add('telling'); // the players and the turn panel wait out of sight
   $('ch-go').focus({ preventScroll: true });
+}
+// The goal under the story: history's, or the whole map. Choosing deals the same game again in the
+// other mode, so the map stays the same; the choice is kept for the next togter.
+function tellGoal(id) {
+  const all = s.mode === 'world';
+  pills($('ch-mode'), Object.entries(L.togtGoals), all ? 'all' : 'history', (goal) => {
+    saveSettings({ ...loadSettings(), togtGoal: goal });
+    game.setup.mode = goal === 'all' ? 'world' : 'mission';
+    s = G.newGame(map, rules, game.setup);
+    save();
+    render();
+    tellGoal(id);
+  });
+  const home = togtOf(id).home && map.regions.find((r) => r.id === togtOf(id).home).name;
+  const goal = all ? `<b>${L.conquerAll}</b>` : `<b>${togtText(id).goal}</b> ${goalText(s.players[game.seats.indexOf('human')].mission)}`;
+  $('ch-goal').innerHTML = `${goal}${home ? ` ${L.startsIn(home)}` : ''}`;
 }
 // The togt's picture behind the card. With one, the card is dark all through (the game's map does not
 // show), and the picture comes up out of the dark; it is fetched early, while the togter are listed
@@ -944,8 +961,35 @@ function openMission() {
   $('mission-title').textContent = goal ? L.yourGoal : L.yourMission;
   $('mission-text').textContent = goal ? `${togtText(game.togt).goal} ${goalText(s.players[p].mission)}` : missionText(s.players[p].mission);
   $('mission-progress').textContent = missionProgress(p);
+  $('mission-map').innerHTML = missionMap(p);
   $('mission-note').textContent = goal ? L.goalNote : L.missionSecret;
   $('mission-dialog').showModal();
+}
+// The mission on a small map of the whole land: the regions to hold, outlined, with your territories
+// in them in your colour and the ones still missing hatched; or the player to knock out, in their
+// colour. Your other territories are there in a paler colour. Holding a number of territories has no
+// map.
+let shapesFor = null; // the outlines of the map in play, traced once
+function missionMap(p) {
+  const m = s.players[p].mission;
+  if (m.type === 'territories') return '';
+  if (shapesFor?.id !== grid.id) shapesFor = { id: grid.id, land: mapShapes(grid).outlines, regions: regionShapes(grid) };
+  const { land, regions } = shapesFor;
+  const goal = new Set(m.type === 'regions' ? m.regions.flatMap((r) => map.regions[r].members) : G.owned(s, m.target));
+  const yours = COLORS[game.colors[p]];
+  const fill = (t) => {
+    if (!goal.has(t)) return s.owner[t] === p ? `fill="${yours}" fill-opacity=".45"` : 'fill="var(--rest)"';
+    return `fill="${m.type === 'eliminate' ? COLORS[game.colors[m.target]] : s.owner[t] === p ? yours : 'url(#missing)'}"`;
+  };
+  const shape = (d, attrs) => `<path d="${d}" vector-effect="non-scaling-stroke" ${attrs}/>`;
+  const territories = map.territories.map((t, i) => shape(land[grid.MAP.territories[t.id].letter], fill(i))).join('');
+  const outlined = m.type === 'regions' ? m.regions.map((r) => shape(regions[map.regions[r].id], 'fill="none" stroke-width="2.2"')).join('') : '';
+  const key = m.type === 'regions' ? `<p class="mission-key"><i style="background:${yours}"></i>${L.keyYours}<i class="missing"></i>${L.keyMissing}</p>` : '';
+  return `<svg viewBox="0 0 ${grid.WIDTH} ${grid.HEIGHT}" aria-hidden="true">
+    <pattern id="missing" width="1.4" height="1.4" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="1.4" height="1.4" fill="#f6ecd4"/><path d="M0 0V1.4" stroke="#5b4630" stroke-width=".45"/></pattern>
+    ${land['#'] ? shape(land['#'], 'fill="var(--rest)" opacity=".4"') : ''}
+    <g stroke="#5b4630" stroke-width=".6" stroke-linejoin="round">${territories}</g>
+    <g stroke="#2a1d10" stroke-linejoin="round">${outlined}</g></svg>${key}`;
 }
 // The game waits while the mission is shown at the start.
 $('mission-dialog').addEventListener('close', () => schedule());

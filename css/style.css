@@ -230,6 +230,13 @@ dialog .sub { color: var(--muted); margin: 0 0 12px; font-size: 15px; }
 .buttons { display: flex; gap: 8px; margin-top: 4px; position: sticky; bottom: -15px; margin-bottom: -15px; padding: 12px 0 15px; background: var(--panel-solid); }
 .buttons button { flex: 1; }
 dialog .big { font-family: var(--title); font-size: 20px; margin: 8px 0; }
+/* the mission on a small map: yours in your colour, what is missing hatched, the rest pale */
+.mission-map { --rest: #d9cba9; margin: 10px 0 4px; }
+.mission-map:empty { display: none; }
+.mission-map svg { display: block; width: 100%; max-height: 34vh; padding: 6px; box-sizing: border-box; border-radius: 10px; background: #efe4cc; }
+.mission-key { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 6px; margin: 6px 0 0; font-size: 14px; }
+.mission-key i { width: 14px; height: 14px; border-radius: 3px; border: 1px solid #5b4630; }
+.mission-key i.missing { margin-left: 10px; background: repeating-linear-gradient(45deg, #f6ecd4 0 2px, #5b4630 2px 3px); }
 
 
 /* new game: summary, then pills to change it */
@@ -390,6 +397,9 @@ dialog .big { font-family: var(--title); font-size: 20px; margin: 8px 0; }
 .ch-goal-h { margin: 0 0 4px; font-size: 12px; letter-spacing: .22em; text-transform: uppercase; color: #b8a58c; }
 .ch-goal { margin: 0 0 24px; padding: 10px 14px; border: 1px solid rgb(232 194 122 / .45); border-radius: 12px; background: rgb(16 10 5 / .45); font-size: 16px; line-height: 1.45; color: #f1e6d0; max-width: 30em; }
 .ch-goal b { color: #e8c27a; }
+.ch-mode { display: flex; margin: 6px 0 10px; padding: 3px; border: 1px solid rgb(232 194 122 / .45); border-radius: 999px; background: rgb(16 10 5 / .55); }
+.ch-mode button { min-height: 36px; padding: 0 16px; border: 0; border-radius: 999px; background: none; color: #e6d8bd; font-size: 15px; text-shadow: none; }
+.ch-mode button[aria-pressed='true'] { background: #e8c27a; color: #2a1d10; font-weight: 600; }
 #ch-go { min-width: 180px; }
 /* in one after another */
 #chapter .ch-step { animation: rise .7s calc(var(--wait) + .1s) both; }
@@ -397,7 +407,7 @@ dialog .big { font-family: var(--title); font-size: 20px; margin: 8px 0; }
 #chapter .ch-rule path { animation: draw .8s calc(var(--wait) + 1.1s) both ease-out; }
 #chapter .ch-title { animation: rise .7s calc(var(--wait) + 1.5s) both; }
 #chapter .ch-story { animation: rise .9s calc(var(--wait) + 2.1s) both; }
-#chapter .ch-goal-h, #chapter .ch-goal { animation: rise .7s calc(var(--wait) + 2.9s) both; }
+#chapter .ch-goal-h, #chapter .ch-mode, #chapter .ch-goal { animation: rise .7s calc(var(--wait) + 2.9s) both; }
 #chapter #ch-go { animation: rise .6s calc(var(--wait) + 3.5s) both; }
 @keyframes rise { from { opacity: 0; transform: translateY(10px); } }
 /* only a zoom: wider letters would wrap the year anew while it comes in */

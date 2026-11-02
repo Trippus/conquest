@@ -15,7 +15,7 @@ Claude tegner, måler og retter.
 
 **Tidstypisk som udgangspunkt:** skibe, modstandernes navne, vinderens titel, terræn og navne på steder
 følger perioden og stedet. Findes der ikke et tidstypisk skib i spillet, tegner vi et nyt (galejen til
-Rom, et atakebune til Japan) i stedet for at låne et fra en anden tid.
+Rom, et atakebune til Japan, en hjuldamper til Vesten) i stedet for at låne et fra en anden tid.
 
 ## 2. Udkast til inddeling (Claude → Martin godkender)
 

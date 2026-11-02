@@ -21,7 +21,7 @@
 //   RULES         optional rules that differ from the game's rules on this map
 //   LANDMARKS     optional names on unexplored land: [[x, y, name]], in map units
 //   SHIP          optional: the kind of ship by the sea routes ('ship', 'longship', 'galley', 'atakebune',
-//                 'lineship'); SHIP_COUNT how many;
+//                 'lineship', 'sidewheeler'); SHIP_COUNT how many;
 //                 OCEANS, [row, column] in open sea for the ships the routes have no room for
 //   RULERS, TITLE optional flavour: the computer players' names, and what the winner becomes;
 //                 EPITHET instead of a title, what follows the winner's name ('den Store')

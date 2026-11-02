@@ -140,6 +140,13 @@ export const EN = {
       story: 'Napoleon has crowned himself Emperor of the French. Britain, Austria and Russia join forces against him. His army marches east, while the British fleet rules the sea.',
       epilogue: 'Napoleon won at Austerlitz and by 1810 was master of most of Europe. The march on Moscow in 1812 cost him his army, and in 1815 he lost his last battle at Waterloo.',
     },
+    west: {
+      year: '1846',
+      goal: 'Take the West from the Mississippi to the Pacific.',
+      teaser: 'The United States against Mexico, the Comanche and the British in Oregon.',
+      story: 'The United States has just made Texas a state, but Mexico will not accept it. To the west lie Mexico’s New Mexico and California, the Comanche rule the plains, and the British hold Oregon. President Polk wants it all, right out to the Pacific.',
+      epilogue: 'Britain gave up southern Oregon in June 1846, and in 1848 Mexico had to give up all its north, from Texas to California. Just before the peace, gold was found at Sutter’s sawmill, and the gold rush began. The Comanche held out for almost 30 more years.',
+    },
     world: {
       year: 'Today',
       goal: 'Become ruler of the world.',

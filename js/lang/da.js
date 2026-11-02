@@ -140,6 +140,13 @@ export const DA = {
       story: 'Napoleon har kronet sig selv til kejser af Frankrig. Storbritannien, Østrig og Rusland slutter sig sammen mod ham. Hans hær marcherer mod øst, mens den britiske flåde behersker havet.',
       epilogue: 'Napoleon sejrede ved Austerlitz og var i 1810 herre over det meste af Europa. Felttoget mod Moskva i 1812 kostede ham hæren, og i 1815 tabte han det sidste slag ved Waterloo.',
     },
+    west: {
+      year: '1846',
+      goal: 'Tag Vesten fra Mississippi til Stillehavet.',
+      teaser: 'USA mod Mexico, comancherne og briterne i Oregon.',
+      story: 'USA har netop gjort Texas til en stat, men Mexico vil ikke anerkende det. Mod vest ligger Mexicos Ny Mexico og Californien, på sletterne hersker comancherne, og i Oregon sidder briterne. Præsident Polk vil have det hele, helt ud til Stillehavet.',
+      epilogue: 'Briterne opgav det sydlige Oregon i juni 1846, og i 1848 måtte Mexico afstå hele sit nordlige land fra Texas til Californien. Kort før freden fandt man guld ved Sutters savmølle, og guldfeberen begyndte. Comancherne holdt stand i næsten 30 år endnu.',
+    },
     world: {
       year: 'I dag',
       goal: 'Bliv verdens hersker.',

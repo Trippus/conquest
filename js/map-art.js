@@ -139,6 +139,21 @@ export const artDefs = (quarters = 'NØSV') => `
     <path d="M-1.2-.17h.1v.1h-.1zM-.85-.17h.1v.1h-.1zM-.5-.17h.1v.1h-.1zM-.15-.17h.1v.1h-.1zM.2-.17h.1v.1h-.1zM.55-.17h.1v.1h-.1zM.9-.17h.1v.1h-.1zM-1.1.2h.1v.1h-.1zM-.75.2h.1v.1h-.1zM-.4.2h.1v.1h-.1zM-.05.2h.1v.1h-.1zM.3.2h.1v.1h-.1zM.65.2h.1v.1h-.1z" fill="${INK}" stroke="none"/>
     <path d="M-1.55.95q.3-.15.6 0t.6 0M.3.95q.3-.15.6 0t.6 0" fill="none" opacity=".6"/>
   </g>
+  <g id="art-sidewheeler" stroke="${INK}" stroke-width=".05" stroke-linejoin="round" stroke-linecap="round">
+    <g fill="#cdbfa6" stroke="none" opacity=".85"><circle cx="-.05" cy="-2" r=".2"/><circle cx="-.42" cy="-2.12" r=".24"/><circle cx="-.85" cy="-2.08" r=".2"/></g>
+    <path d="M-.9-.3V-1.85M.95-.3V-1.65M1.2-.3L1.85-.62" fill="none"/>
+    <path d="M-1.22-1.6Q-.9-1.5-.58-1.6L-.62-1.15Q-.9-1.06-1.18-1.15Z M-1.2-1.02Q-.9-.92-.6-1.02L-.63-.6Q-.9-.52-1.17-.6Z" fill="#f6ecd4"/>
+    <path d="M.68-1.42Q.95-1.33 1.22-1.42L1.19-1.02Q.95-.94.71-1.02Z M.69-.9Q.95-.82 1.21-.9L1.18-.52Q.95-.45.72-.52Z" fill="#f6ecd4"/>
+    <path d="M1.2-.32L1.75-.6L1.12-.98Z" fill="#f6ecd4"/>
+    <path d="M-.9-1.85h.38v.22h-.38Z" fill="#f6ecd4"/><path d="M-.9-1.78h.38M-.9-1.69h.38" fill="none" stroke="#a3261b" stroke-width=".04"/><path d="M-.9-1.85h.16v.12h-.16Z" fill="#2a4f8a" stroke="none"/>
+    <path d="M-.1-.62V-1.82H.2V-.62Z" fill="#3b2f2a"/><path d="M-.1-1.82H.2V-1.68H-.1Z" fill="#a3261b"/>
+    <path d="M-1.7-.42H1.25L1.85-.6Q1.65.2 1.05.55H-1.2Q-1.6.3-1.7-.42Z" fill="#3b2f2a"/>
+    <path d="M-1.6-.08H1.55" fill="none" stroke="#d9b45a" stroke-width=".11"/>
+    <path d="M-1.25.18h.1v.1h-.1zM-.95.18h.1v.1h-.1zM.75.18h.1v.1h-.1zM1.05.18h.1v.1h-.1z" fill="${INK}" stroke="none"/>
+    <path d="M-.6-.25A.6.6 0 0 1 .6-.25V.3H-.6Z" fill="#8a6a4a"/>
+    <path d="M0-.25L0-.8M0-.25L-.42-.67M0-.25L.42-.67M0-.25L-.58-.4M0-.25L.58-.4" fill="none" opacity=".7"/>
+    <path d="M-1.55.95q.3-.15.6 0t.6 0M.3.95q.3-.15.6 0t.6 0" fill="none" opacity=".6"/>
+  </g>
   <g id="art-compass">${compassRose(quarters)}</g>`;
 
 // A fixed "random" number for a cell, so the map looks the same every time.
@@ -205,7 +220,8 @@ export function mapArt(grid, { keepClear = [], seaLines = [], compass = null } =
     take(compass[0], compass[1], 5.3 * size);
   }
   // Ships sail beside the longest sea routes (not those round the back of the map), a little to
-  // one side of the dashed line, on open sea. grid.SHIP names the kind ('ship', 'longship', 'galley', 'atakebune' or 'lineship'),
+  // one side of the dashed line, on open sea. grid.SHIP names the kind ('ship', 'longship', 'galley', 'atakebune', 'lineship' or
+  // 'sidewheeler'),
   // grid.SHIP_COUNT how many (3).
   const seaCell = (x, y) => {
     const r = Math.round((y - 1) / 1.5);

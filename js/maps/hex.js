@@ -9,8 +9,8 @@
 //   REGIONS       region id: name
 //   TERRITORIES   letter: [id, name, region id]
 //   SEA           crossings over water, drawn as dashed lines: [letter, letter]
-//   TERRAIN       letter: 'mountains' | 'spruce' (north) | 'oak' (south) | 'forest' (mixed) | 'desert',
-//                 what the map art draws there
+//   TERRAIN       letter: 'mountains' | 'spruce' (north) | 'oak' (south) | 'forest' (mixed) | 'desert' |
+//                 'savanna', what the map art draws there
 //   PLACES        letter: [row, column, name side], where a crowded territory puts its seal; side is
 //                 'below', 'above', 'left' or 'right'. The rest use the cell closest to their middle.
 //   MISSIONS      region missions for mission games
@@ -21,8 +21,10 @@
 //   RULES         optional rules that differ from the game's rules on this map
 //   LANDMARKS     optional names on unexplored land: [[x, y, name]], in map units
 //   SHIP          optional: the kind of ship by the sea routes ('ship', 'longship', 'galley', 'atakebune',
-//                 'lineship', 'sidewheeler'); SHIP_COUNT how many;
+//                 'lineship', 'sidewheeler', 'caravel'); SHIP_COUNT how many;
 //                 OCEANS, [row, column] in open sea for the ships the routes have no room for
+//   RIVERS        optional, drawn but not played: rivers as lines of [x, y] in map units, source to mouth;
+//                 RIVER_BOATS how many boats on the first; CARAVANS, [x, y] where camel caravans walk
 //   RULERS, TITLE optional flavour: the computer players' names, and what the winner becomes;
 //                 EPITHET instead of a title, what follows the winner's name ('den Store')
 //   NAMES         optional names in other languages: { en: { name, REGIONS, TERRITORIES, LANDMARKS, RULERS, EPITHET } },

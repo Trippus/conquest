@@ -15,7 +15,8 @@ Claude tegner, måler og retter.
 
 **Tidstypisk som udgangspunkt:** skibe, modstandernes navne, vinderens titel, terræn og navne på steder
 følger perioden og stedet. Findes der ikke et tidstypisk skib i spillet, tegner vi et nyt (galejen til
-Rom, et atakebune til Japan, en hjuldamper til Vesten) i stedet for at låne et fra en anden tid.
+Rom, et atakebune til Japan, en hjuldamper til Vesten, en karavel ud for Songhai) i stedet for at låne et fra
+en anden tid. Er der ikke meget hav, kan andet pynt bære tiden: floder, karavaner, kanoer (se Songhai).
 
 ## 2. Udkast til inddeling (Claude → Martin godkender)
 
@@ -55,7 +56,12 @@ Kopiér `js/maps/england.js` til `js/maps/<kort>.js` og ret: regioner, områder,
 `js/maps/index.js`, så kommer det med i appen, simulatoren og værktøjerne.
 
 Terræn (`TERRAIN`) følger sted og tid: `spruce` (gran) mod nord, `oak` (eg, også regnskov) mod syd,
-`forest` (blandet) imellem, `mountains` og `desert` (klitter og en palme ind imellem).
+`forest` (blandet) imellem, `savanna` (akacier og baobabtræer), `mountains` og `desert` (klitter og en
+palme ind imellem).
+
+Floder og karavaner tegnes, men spilles ikke: skriv dem i grid-filen (`RIVERS`, linjer af [bredde, længde]
+fra kilde til udløb, og `CARAVANS`), så skriver `tools/make-grid.mjs` dem i kortenheder til kortfilen.
+`RIVER_BOATS` sætter kanoer på den første flod. En sø er `FORCE_SEA` inde i landet (Tchadsøen).
 
 Kortet bliver et togt: sæt det ind i `TOGTER` i `js/togter.js` på sin plads i tiden (ældst først) med
 antal modstandere, og giv det tekster i `togter` i `js/lang/da.js` og `en.js`: årstal, en linje til

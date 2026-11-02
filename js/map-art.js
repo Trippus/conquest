@@ -154,6 +154,41 @@ export const artDefs = (quarters = 'NØSV') => `
     <path d="M0-.25L0-.8M0-.25L-.42-.67M0-.25L.42-.67M0-.25L-.58-.4M0-.25L.58-.4" fill="none" opacity=".7"/>
     <path d="M-1.55.95q.3-.15.6 0t.6 0M.3.95q.3-.15.6 0t.6 0" fill="none" opacity=".6"/>
   </g>
+  <g id="art-baobab" stroke="${INK}" stroke-width=".05" stroke-linejoin="round" stroke-linecap="round">
+    <path d="M-.14-.22L-.42-.46M-.06-.24L-.08-.54M.08-.24L.4-.48" fill="none" stroke-width=".07"/>
+    <g fill="#94a066"><ellipse cx="-.44" cy="-.5" rx=".2" ry=".11"/><ellipse cx="-.06" cy="-.58" rx=".22" ry=".12"/><ellipse cx=".4" cy="-.52" rx=".2" ry=".11"/></g>
+    <path d="M-.26.48Q-.36.08-.16-.24H.14Q.34.08.26.48Z" fill="#8a6a4a"/>
+    <path d="M.14-.24Q.34.08.26.48H.06Q.14.08.04-.24Z" fill="#3b2f2a" fill-opacity=".3" stroke="none"/>
+  </g>
+  <g id="art-acacia" stroke="${INK}" stroke-width=".05" stroke-linejoin="round" stroke-linecap="round">
+    <path d="M0 .48V-.02L-.3-.3M0-.02L.26-.32M0-.06V-.3" fill="none" stroke-width=".07"/>
+    <path d="M-.66-.3Q-.52-.54 0-.56Q.52-.54.66-.3Q.3-.22 0-.24Q-.3-.22-.66-.3Z" fill="#94a066"/>
+    <path d="M-.4.48H.42" fill="none" opacity=".5"/>
+  </g>
+  <g id="art-camel" stroke="${INK}" stroke-width=".05" stroke-linejoin="round" stroke-linecap="round">
+    <path d="M-.36.02L-.4.46M-.24.04L-.22.46M.12.04L.1.46M.24.02L.3.46" fill="none" stroke-width=".06"/>
+    <path d="M-.5-.1Q-.45-.45-.2-.42Q-.05-.64.1-.42Q.25-.4.3-.2L.44-.46Q.5-.6.62-.58L.7-.5L.56-.44L.42-.12Q.4.06.25.06H-.4Q-.56.03-.5-.1Z" fill="#c8a565"/>
+    <path d="M-.5-.08q-.12.06-.1.22" fill="none"/>
+  </g>
+  <g id="art-caravan">
+    <use href="#art-camel" transform="translate(-1.3 .08)"/><use href="#art-camel" transform="translate(0 0)"/><use href="#art-camel" transform="translate(1.3 -.08)"/>
+    <g stroke="${INK}" stroke-width=".04" fill="#f6ecd4"><path d="M-1.6-.62h.34v.2h-.34ZM-1.26-.62h.34v.2h-.34ZM-.3-.7h.34v.2h-.34ZM.04-.7h.34v.2h-.34Z"/></g>
+    <g stroke="${INK}" stroke-width=".05" stroke-linejoin="round"><path d="M1.12-.72Q1.2-1.12 1.36-1.12Q1.52-1.12 1.56-.72Z" fill="#2a4f8a"/><circle cx="1.36" cy="-1.2" r=".1" fill="#2a4f8a"/></g>
+  </g>
+  <g id="art-pirogue" stroke="${INK}" stroke-width=".05" stroke-linejoin="round" stroke-linecap="round">
+    <path d="M.3.04L.62-.95" fill="none" stroke-width=".06"/>
+    <path d="M.12.02L.16-.36M.16-.3L.42-.5" fill="none" stroke-width=".07"/>
+    <circle cx=".17" cy="-.46" r=".09" fill="#3b2f2a"/>
+    <path d="M-1.05-.06Q0 .26 1.05-.06Q.92.22 0 .26Q-.92.22-1.05-.06Z" fill="#6b4a32"/>
+  </g>
+  <g id="art-caravel" stroke="${INK}" stroke-width=".05" stroke-linejoin="round" stroke-linecap="round">
+    <path d="M-.6-.3V-1.6M.3-.3V-2M1.05-.3V-1.35M1.35-.35L1.85-.75" fill="none"/>
+    <path d="M-.15-.55L-1.25-1.62L-1.15-.5Z M1-.55L-.4-2.05L-.2-.5Z M1.6-.55L.6-1.45L.7-.5Z" fill="#f6ecd4"/>
+    <path d="M.2-1.3V-.85M0-1.08H.4M-.95-.95V-.65M-1.08-.8H-.82" fill="none" stroke="#a3261b" stroke-width=".1"/>
+    <path d="M-1.5-.62H-1.05V-.35H1.3L1.75-.55Q1.55.2 1 .5H-1.1Q-1.5.25-1.5-.62Z" fill="#8a6a4a"/>
+    <path d="M-1.4-.05H1.4" fill="none" opacity=".6"/>
+    <path d="M-1.55.85q.3-.15.6 0t.6 0M.3.85q.3-.15.6 0t.6 0" fill="none" opacity=".6"/>
+  </g>
   <g id="art-compass">${compassRose(quarters)}</g>`;
 
 // A fixed "random" number for a cell, so the map looks the same every time.
@@ -200,16 +235,17 @@ export function mapArt(grid, { keepClear = [], seaLines = [], compass = null } =
   const use = (id, x, y, scale = 1) => `<use href="#art-${id}" transform="translate(${x.toFixed(2)} ${y.toFixed(2)}) scale(${scale})"/>`;
   const ship = (x, y) => use(grid.SHIP ?? 'ship', x, y, 1.5);
   const jitter = (h, shift) => (((h >>> shift) % 100) / 100 - 0.5) * 0.5;
-  const DENSITY = { mountains: 3, forest: 4, spruce: 4, oak: 4, desert: 3 }; // one cell in this many gets a drawing
+  const DENSITY = { mountains: 3, forest: 4, spruce: 4, oak: 4, desert: 3, savanna: 5 }; // one cell in this many gets a drawing
   // Each kind has a few drawings, chosen by the cell: ranges and single peaks; spruce in the north, oak
   // (and the broadleaf of the rainforest) in the south, and between them forest, the three mixed; dunes,
-  // now and then a palm.
+  // now and then a palm; on the savanna acacias and now and then a baobab.
   const ART = {
     mountains: ['mountain', 'mountain', 'peak'],
     spruce: ['spruce-wood'],
     oak: ['oak-wood'],
     forest: ['spruce-wood', 'oak-wood', 'mixed-wood'],
     desert: ['dunes', 'dunes', 'dunes', 'palm'],
+    savanna: ['acacia', 'acacia', 'baobab'],
   };
   let land = '';
   let sea = '';
@@ -220,9 +256,8 @@ export function mapArt(grid, { keepClear = [], seaLines = [], compass = null } =
     take(compass[0], compass[1], 5.3 * size);
   }
   // Ships sail beside the longest sea routes (not those round the back of the map), a little to
-  // one side of the dashed line, on open sea. grid.SHIP names the kind ('ship', 'longship', 'galley', 'atakebune', 'lineship' or
-  // 'sidewheeler'),
-  // grid.SHIP_COUNT how many (3).
+  // one side of the dashed line, on open sea. grid.SHIP names the kind ('ship', 'longship', 'galley', 'atakebune',
+  // 'lineship', 'sidewheeler' or 'caravel'), grid.SHIP_COUNT how many (3).
   const seaCell = (x, y) => {
     const r = Math.round((y - 1) / 1.5);
     const c = Math.round((x - Math.sqrt(3) / 2) / Math.sqrt(3) - 0.5 * (r & 1));
@@ -276,6 +311,54 @@ export function mapArt(grid, { keepClear = [], seaLines = [], compass = null } =
       ships--;
     }
   }
+  // Rivers (grid.RIVERS, lines of [x, y] from source to mouth) run as smooth curves; on the first, a
+  // few boats (grid.RIVER_BOATS) where it runs more or less east–west. Camel caravans walk the desert
+  // near grid.CARAVANS ([x, y]). The forests and dunes keep off them all.
+  const rivers = (grid.RIVERS ?? []).map(smooth).join('');
+  const along = (line, step) =>
+    line.slice(1).flatMap(([x2, y2], i) => {
+      const [x1, y1] = line[i];
+      const k = Math.max(1, Math.ceil(Math.hypot(x2 - x1, y2 - y1) / step));
+      return Array.from({ length: k }, (_, j) => [x1 + ((x2 - x1) * j) / k, y1 + ((y2 - y1) * j) / k, Math.atan2(y2 - y1, x2 - x1)]);
+    });
+  const onLand = (x, y) => {
+    const r = Math.round((y - 1) / 1.5);
+    const c = Math.round((x - Math.sqrt(3) / 2) / Math.sqrt(3) - 0.5 * (r & 1));
+    return dist[r]?.[c] === 0;
+  };
+  let boats = grid.RIVER_BOATS ?? 0;
+  const niger = grid.RIVERS?.[0] ? along(grid.RIVERS[0], 0.5) : [];
+  const afloat = [];
+  for (const share of [0.45, 0.25, 0.65, 0.85]) {
+    if (!boats) break;
+    // the nearest good spot to this share of the river: flat, on land, free, and apart from the others
+    const at = Math.floor(share * niger.length);
+    const spot = [...niger.keys()]
+      .sort((i, j) => Math.abs(i - at) - Math.abs(j - at))
+      .map((i) => niger[i])
+      .find(([x, y, a]) => Math.abs(Math.sin(a)) < 0.45 && onLand(x, y) && free(x, y, 1.4) && afloat.every(([u, v]) => Math.hypot(x - u, y - v) > 15));
+    if (!spot) continue;
+    const [x, y, a] = spot;
+    afloat.push(spot);
+    const deg = ((((a * 180) / Math.PI + 90) % 180) + 180) % 180 - 90; // along the river, never upside down
+    land += `<use href="#art-pirogue" transform="translate(${x.toFixed(2)} ${y.toFixed(2)}) rotate(${deg.toFixed(0)}) scale(1.35)"/>`;
+    take(x, y, 1.5);
+    boats--;
+  }
+  for (const [x0, y0] of grid.CARAVANS ?? []) {
+    let best = null;
+    for (let dy = -4; dy <= 4; dy += 0.75) {
+      for (let dx = -6; dx <= 6; dx += 0.75) {
+        const [x, y] = [x0 + dx, y0 + dy];
+        const ok = [[-2.2, 0], [2.2, 0], [0, -1.4], [0, 0.8]].every(([ex, ey]) => onLand(x + ex, y + ey));
+        if (ok && free(x, y, 2.2) && (!best || Math.hypot(dx, dy) < best.d)) best = { x, y, d: Math.hypot(dx, dy) };
+      }
+    }
+    if (!best) continue;
+    land += use('caravan', best.x, best.y, 1.1);
+    take(best.x, best.y, 2.4);
+  }
+  for (const line of grid.RIVERS ?? []) for (const [x, y] of along(line, 0.5)) take(x, y, 0.35);
   for (let r = 0; r < rows; r++) {
     for (let c = 0; c < cols; c++) {
       const [cx, cy] = hexCenter(r, c);
@@ -295,5 +378,16 @@ export function mapArt(grid, { keepClear = [], seaLines = [], compass = null } =
     }
   }
 
-  return { land, sea, deco };
+  return { land, sea, deco, rivers };
+}
+
+// A line through the points, smoothed (Catmull-Rom as cubic curves), as an SVG path.
+function smooth(p) {
+  const f = (v) => v.toFixed(2);
+  let d = `M${f(p[0][0])} ${f(p[0][1])}`;
+  for (let i = 0; i < p.length - 1; i++) {
+    const [a, b, c, e] = [p[i - 1] ?? p[i], p[i], p[i + 1], p[i + 2] ?? p[i + 1]];
+    d += `C${f(b[0] + (c[0] - a[0]) / 6)} ${f(b[1] + (c[1] - a[1]) / 6)} ${f(c[0] - (e[0] - b[0]) / 6)} ${f(c[1] - (e[1] - b[1]) / 6)} ${f(c[0])} ${f(c[1])}`;
+  }
+  return d;
 }

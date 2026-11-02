@@ -17,6 +17,7 @@ export const TOGTER = [
   { map: 'alexander', opponents: 2, home: 'hl', goal: ['la', 'me', 'pe'], art: 'assets/togter/alexander.jpg' },
   { map: 'vikings', opponents: 2, home: 'dk', goal: ['dk', 'br', 'no'], bonus: 0.2, art: 'assets/togter/vikings.jpg' },
   { map: 'england', opponents: 3, home: 'nm', goal: ['wx', 'me', 'ea'] },
+  { map: 'songhai', opponents: 3, home: 'so', goal: ['nb', 'nd'], plusOne: true, bonus: 0.6 },
   { map: 'japan', opponents: 3, home: 'to', goal: ['to', 'ks', 'ki'], bonus: 0.5 },
   { map: 'napoleon', opponents: 3, home: 'fr', goal: ['fr', 'os', 'pr'], bonus: 0.6 },
   { map: 'west', opponents: 3, home: 'mi', goal: ['tx', 'ca', 'or'], bonus: 0.3 },
@@ -41,8 +42,9 @@ const ALWAYS_FREE = ['world'];
 // won: { map: level } (the hardest level won on), lost: { map: losses since the last win }.
 export const newProgress = (veteran = false) => ({ welcomed: false, veteran, won: {}, lost: {} });
 
-// A togt can be played once the one before it is won.
-export const isOpen = (progress, i) => i === 0 || !!progress.won[TOGTER[i - 1].map];
+// A togt can be played once the one before it is won. A togt that came later and was put in before
+// one already won is open too, so no one is locked out of what they had reached.
+export const isOpen = (progress, i) => i === 0 || TOGTER.slice(i - 1).some((t) => progress.won[t.map]);
 
 export const nextTogt = (map) => TOGTER[TOGTER.findIndex((t) => t.map === map) + 1] ?? null;
 

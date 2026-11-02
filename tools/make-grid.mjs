@@ -5,11 +5,11 @@
 //
 // Coastlines: Natural Earth 1:50m land (public domain), from the world-atlas package:
 //   curl -L -o land-50m.json https://cdn.jsdelivr.net/npm/world-atlas@2.0.2/land-50m.json
-// Run: node tools/make-grid.mjs <map> path/to/land-50m.json   (map: vikings, england)
+// Run: node tools/make-grid.mjs <map> path/to/land-50m.json   (map: vikings, england, …)
 import { readFileSync } from 'node:fs';
 import { hexCenter, hexNeighbours } from '../js/maps/hex.js';
 
-const { LAT_TOP, LAT_STEP, ROWS, LON_WEST, LON_EAST, SQUASH_AT, CENTRES, FORCE_LAND = [], FORCE_SEA = [], ISLAND = 3, ISLAND_REACH = 6 } =
+const { LAT_TOP, LAT_STEP, ROWS, LON_WEST, LON_EAST, SQUASH_AT, CENTRES, FORCE_LAND = [], FORCE_SEA = [], ISLAND = 3, ISLAND_REACH = 6, RIVERS = [], CARAVANS = [] } =
   await import(`./grids/${process.argv[2]}.mjs`);
 const SQUASH = Math.cos((SQUASH_AT * Math.PI) / 180);
 const UNIT = LAT_STEP / 1.5; // degrees per map unit (a row is 1.5 units)
@@ -131,3 +131,8 @@ const grid = land.map((line, r) =>
 );
 console.log(`// ${ROWS} rows × ${COLS} columns`);
 for (const line of grid) console.log(`  '${line}',`);
+
+// Rivers and caravans, drawn but not played, in map units for the map file.
+const units = ([lat, lon]) => toMap(lat, lon).map((v) => +v.toFixed(2));
+if (RIVERS.length) console.log(`export const RIVERS = ${JSON.stringify(RIVERS.map((r) => r.map(units)))};`);
+if (CARAVANS.length) console.log(`export const CARAVANS = ${JSON.stringify(CARAVANS.map(units))};`);

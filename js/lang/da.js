@@ -126,6 +126,13 @@ export const DA = {
       story: 'Kong Edvard Bekenderen er død uden børn. Harold Godwinson tager kronen, men Harald Hårderåde fra Norge og Vilhelm af Normandiet gør begge krav på den, og begge sætter flåder over havet.',
       epilogue: 'Harold slog nordmændene ved Stamford Bridge, men måtte marchere sydpå og faldt ved Hastings den 14. oktober. Vilhelm blev kronet juledag 1066 og kaldes siden Erobreren.',
     },
+    songhai: {
+      year: '1468',
+      goal: 'Tag Timbuktu og Jenné, og gør Songhai til herre over Niger.',
+      teaser: 'Sunni Ali mod tuaregerne, det gamle Mali og mossierne.',
+      story: 'Mali-riget, der engang var rigt på guld, er ved at falde fra hinanden. Fra Gao ved floden Niger har kong Sunni Ali gjort Songhai stærkt, men tuaregerne holder Timbuktu, og mossiernes ryttere hærger fra syd. Den, der ejer floden, ejer handlen med guld og salt.',
+      epilogue: 'Sunni Ali tog Timbuktu i 1468 og Jenné efter en lang belejring i 1473. Under Askia Muhammad blev Songhai det største rige i Vestafrikas historie, og Timbuktus lærde var berømte. I 1591 kom en marokkansk hær med musketter over Sahara og slog Songhai ved Tondibi.',
+    },
     japan: {
       year: '1560',
       goal: 'Drag mod Kyoto og saml Japan.',

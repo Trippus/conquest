@@ -126,6 +126,13 @@ export const EN = {
       story: 'King Edward the Confessor has died without children. Harold Godwinson takes the crown, but Harald Hardrada of Norway and William of Normandy both claim it, and both send fleets across the sea.',
       epilogue: 'Harold beat the Norwegians at Stamford Bridge, but had to march south and fell at Hastings on 14 October. William was crowned on Christmas Day 1066 and has been called the Conqueror ever since.',
     },
+    songhai: {
+      year: '1468',
+      goal: 'Take Timbuktu and Jenné, and make Songhai master of the Niger.',
+      teaser: 'Sunni Ali against the Tuareg, old Mali and the Mossi.',
+      story: 'The Mali empire, once rich in gold, is falling apart. From Gao on the river Niger, King Sunni Ali has made Songhai strong, but the Tuareg hold Timbuktu, and the Mossi horsemen raid from the south. Whoever holds the river holds the trade in gold and salt.',
+      epilogue: 'Sunni Ali took Timbuktu in 1468 and Jenné after a long siege in 1473. Under Askia Muhammad, Songhai became the largest empire in West African history, and the scholars of Timbuktu were famous. In 1591 a Moroccan army with muskets crossed the Sahara and beat Songhai at Tondibi.',
+    },
     japan: {
       year: '1560',
       goal: 'March on Kyoto and unite Japan.',

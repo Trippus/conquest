@@ -35,6 +35,15 @@ test('only the first togt is open at first; a win opens the next and its map', (
   assert.equal(nextTogt('world'), null);
 });
 
+test('a togt put in before one already won is open, and so is the one won', () => {
+  const p = record(newProgress(), 'japan', true, 'medium');
+  const at = (map) => TOGTER.findIndex((t) => t.map === map);
+  assert.ok(isOpen(p, at('songhai')));
+  assert.ok(isOpen(p, at('japan')));
+  assert.ok(isOpen(p, at('napoleon')));
+  assert.ok(!isOpen(p, at('west')));
+});
+
 test('a veteran has every map in the free game, but begins the togter from the start', () => {
   const p = newProgress(true);
   assert.deepEqual(freeMaps(p, Object.keys(MAPS)), Object.keys(MAPS));

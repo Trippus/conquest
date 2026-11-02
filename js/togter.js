@@ -21,6 +21,7 @@ export const TOGTER = [
   { map: 'songhai', opponents: 3, home: 'so', goal: ['nb', 'nd'], plusOne: true, bonus: 0.6 },
   { map: 'japan', opponents: 3, home: 'to', goal: ['to', 'ks', 'ki'], bonus: 0.5 },
   { map: 'napoleon', opponents: 3, home: 'fr', goal: ['fr', 'os', 'pr'], bonus: 0.6 },
+  { map: 'liberation', opponents: 3, home: 've', goal: ['ng', 'qu', 'pe'], bonus: 0.45 },
   { map: 'west', opponents: 3, home: 'mi', goal: ['tx', 'ca', 'or'], bonus: 0.3 },
   { map: 'world', opponents: 3, goal: ['eu'], plusOne: true, bonus: 0.4 },
 ];

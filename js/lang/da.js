@@ -158,6 +158,13 @@ export const DA = {
       story: 'Napoleon har kronet sig selv til kejser af Frankrig. Storbritannien, Østrig og Rusland slutter sig sammen mod ham. Hans hær marcherer mod øst, mens den britiske flåde behersker havet.',
       epilogue: 'Napoleon sejrede ved Austerlitz og var i 1810 herre over det meste af Europa. Felttoget mod Moskva i 1812 kostede ham hæren, og i 1815 tabte han det sidste slag ved Waterloo.',
     },
+    liberation: {
+      year: '1817',
+      goal: 'Befri Ny Granada, Quito og Peru, og saml dem under ét flag.',
+      teaser: 'Bolívar fra Angostura mod Spaniens hær, San Martín og hoffet i Rio.',
+      story: 'Efter seks års nederlag har Simón Bolívar endelig fået fodfæste i Angostura ved Orinoco. Morillos spanske veteraner holder Caracas og Santa Fe, i syd går San Martín over Andes fra Mendoza, og den portugisiske konge i Rio har netop taget Montevideo. Hvem skal befri kontinentet, og hvem skal herske bagefter?',
+      epilogue: 'Bolívar krydsede Andes og slog spanierne ved Boyacá i 1819, og Gran Colombia blev født. Efter mødet i Guayaquil i 1822 trådte San Martín til side. Ved Ayacucho i 1824 faldt Spaniens sidste store hær, og Øvre Peru tog navnet Bolivia efter ham. Men Gran Colombia brød sammen, og Bolívar døde syg og skuffet i Santa Marta i 1830.',
+    },
     west: {
       year: '1846',
       goal: 'Tag Vesten fra Mississippi til Stillehavet.',

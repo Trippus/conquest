@@ -15,7 +15,7 @@ Claude tegner, måler og retter.
 
 **Tidstypisk som udgangspunkt:** skibe, modstandernes navne, vinderens titel, terræn og navne på steder
 følger perioden og stedet. Findes der ikke et tidstypisk skib i spillet, tegner vi et nyt (galejen til
-Rom, et atakebune til Japan, en hjuldamper til Vesten, en karavel ud for Songhai, en balsaflåde til Inkariget) i stedet for at låne et fra
+Rom, et atakebune til Japan, en hjuldamper til Vesten, en karavel ud for Songhai, en balsaflåde til Inkariget, en fregat til Befrielsen) i stedet for at låne et fra
 en anden tid. Er der ikke meget hav, kan andet pynt bære tiden: floder, karavaner, kanoer (se Songhai).
 
 ## 2. Udkast til inddeling (Claude → Martin godkender)
@@ -63,7 +63,7 @@ palme ind imellem).
 Floder og karavaner tegnes, men spilles ikke: skriv dem i grid-filen (`RIVERS`, linjer af [bredde, længde]
 fra kilde til udløb, og `CARAVANS`), så skriver `tools/make-grid.mjs` dem i kortenheder til kortfilen.
 `RIVER_BOATS` sætter kanoer på den første flod. Veje (`ROADS`) tegnes stiplede som inkavejen, `CARAVAN:
-'llamas'` gør karavanerne til lamaer, og `SIGHTS` sætter en tegning lige der (sivbåden på Titicacasøen). En
+'llamas'` gør karavanerne til lamaer, og `SIGHTS` sætter en tegning lige der (sivbåden på Titicacasøen, llaneroen og gauchoen i Befrielsen). En
 sø er `FORCE_SEA` inde i landet (Tchadsøen, Titicacasøen).
 
 Kortet bliver et togt: sæt det ind i `TOGTER` i `js/togter.js` på sin plads i tiden (ældst først) med

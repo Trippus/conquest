@@ -158,6 +158,13 @@ export const EN = {
       story: 'Napoleon has crowned himself Emperor of the French. Britain, Austria and Russia join forces against him. His army marches east, while the British fleet rules the sea.',
       epilogue: 'Napoleon won at Austerlitz and by 1810 was master of most of Europe. The march on Moscow in 1812 cost him his army, and in 1815 he lost his last battle at Waterloo.',
     },
+    liberation: {
+      year: '1817',
+      goal: 'Free New Granada, Quito and Peru, and unite them under one flag.',
+      teaser: 'Bolívar from Angostura against Spain’s army, San Martín and the court in Rio.',
+      story: 'After six years of defeat, Simón Bolívar has at last gained a foothold at Angostura on the Orinoco. Morillo’s Spanish veterans hold Caracas and Santa Fe, in the south San Martín crosses the Andes from Mendoza, and the Portuguese king in Rio has just taken Montevideo. Who will free the continent, and who will rule it afterwards?',
+      epilogue: 'Bolívar crossed the Andes and beat the Spanish at Boyacá in 1819, and Gran Colombia was born. After their meeting at Guayaquil in 1822, San Martín stepped aside. At Ayacucho in 1824 Spain’s last great army fell, and Upper Peru took the name Bolivia after him. But Gran Colombia fell apart, and Bolívar died, sick and disappointed, at Santa Marta in 1830.',
+    },
     west: {
       year: '1846',
       goal: 'Take the West from the Mississippi to the Pacific.',

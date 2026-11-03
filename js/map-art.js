@@ -287,7 +287,30 @@ export const artDefs = (quarters = 'NØSV') => `
     <path d="M-1.2.05L-1.4.6M-.65.07L-.8.65M-.1.08L-.2.68M.45.08L.37.66M1.0.06L.95.62" fill="none" opacity=".85"/>
     <path d="M-1.6.85q.3-.15.6 0t.6 0M.3.85q.3-.15.6 0t.6 0" fill="none" opacity=".6"/>
   </g>
-  <g id="art-wall" stroke="${INK}" stroke-width=".05" stroke-linejoin="round" stroke-linecap="round">
+  <g id="art-carrack" stroke="${INK}" stroke-width=".05" stroke-linejoin="round" stroke-linecap="round">
+    <path d="M-.95-.55V-1.95M.2-.5V-2.4M1.05-.55V-1.75" fill="none"/>
+    <path d="M-1.3-1.85H-.6L-.52-1.05H-1.38Z" fill="#f6ecd4"/>
+    <path d="M-.35-2.3H.75L.85-1.15H-.45Z" fill="#f6ecd4"/>
+    <path d="M.75-1.7H1.35L1.4-1.05H.7Z" fill="#f6ecd4"/>
+    <path d="M.2-2.05V-1.45M-.05-1.75H.45M-.95-1.65V-1.25M-1.12-1.45H-.78" fill="none" stroke="#a3261b" stroke-width=".1"/>
+    <path d="M.2-2.4L.55-2.3L.2-2.2Z" fill="#a3261b"/>
+    <path d="M-1.85-1.0L-1.15-.95V-.45H-1.75Z" fill="#8a6a4a"/>
+    <path d="M1.3-.85L1.75-.95L1.7-.5H1.3Z" fill="#8a6a4a"/>
+    <path d="M-1.85-.5Q-1.75.1-1.3.15H1.25Q1.7.05 1.95-.6L1.7-.5H-1.8Z" fill="#6b4a32"/>
+    <path d="M-1.55-.22H1.6" fill="none" opacity=".6"/>
+    <path d="M-1.6.55q.3-.15.6 0t.6 0M.3.55q.3-.15.6 0t.6 0" fill="none" opacity=".6"/>
+  </g>
+  <g id="art-elephant" stroke="${INK}" stroke-width=".05" stroke-linejoin="round" stroke-linecap="round">
+    <path d="M-1.05-.15Q-1.2-.95-.4-1.05H.55Q1.05-1.05 1.15-.6Q1.5-.55 1.5-.05Q1.5.35 1.3.55L1.2.4Q1.35.1 1.25-.2L1.05-.15V.55H.75V.05H-.55V.55H-.85V0Z" fill="#a89c8a"/>
+    <path d="M.75-.85Q.95-.55.8-.35" fill="none" opacity=".7"/>
+    <path d="M1.18-.42Q1.45-.3 1.5-.48" fill="none" stroke="#f6ecd4" stroke-width=".07"/>
+    <circle cx="1.0" cy="-.68" r=".04" fill="${INK}" stroke="none"/>
+    <path d="M-.6-1.05V-1.35H.4V-1.05Z" fill="#a3261b"/>
+    <path d="M-.7-1.35H.5L.3-1.75Q-.1-1.95-.5-1.75Z" fill="#d9b45a"/>
+    <path d="M-.85-1.05Q-.1-.6.65-1.05" fill="#a3261b" opacity=".85"/>
+    <path d="M-1.02-.2Q-1.25-.05-1.2.2" fill="none"/>
+  </g>
+  <g id="art-wall"stroke="${INK}" stroke-width=".05" stroke-linejoin="round" stroke-linecap="round">
     <path d="M-1.7.5Q-1.2-.1-.6-.15T.55-.55T1.7-.3V.5Z" fill="#d9c8a4" stroke="none" opacity=".7"/>
     <path d="M-1.7.15L-.6-.4L.55-.8L1.7-.55V-.3L.55-.55L-.6-.15L-1.7.4Z" fill="#c8b08a"/>
     <path d="M-1.6.0v-.12M-1.3-.15v-.12M-1-.3v-.12M-.3-.5v-.12M0-.6v-.12M.85-.73v-.12M1.15-.67v-.12M1.45-.61v-.12" fill="none" stroke-width=".1"/>
@@ -378,7 +401,7 @@ export function mapArt(grid, { keepClear = [], seaLines = [], compass = null } =
   }
   // Ships sail beside the longest sea routes (not those round the back of the map), a little to
   // one side of the dashed line, on open sea. grid.SHIP names the kind ('ship', 'longship', 'galley', 'atakebune',
-  // 'lineship', 'frigate', 'sidewheeler', 'cruiser', 'towership', 'caravel' or 'balsa'), grid.SHIP_COUNT how many (3).
+  // 'lineship', 'frigate', 'sidewheeler', 'cruiser', 'towership', 'carrack', 'caravel' or 'balsa'), grid.SHIP_COUNT how many (3).
   const seaCell = (x, y) => {
     const r = Math.round((y - 1) / 1.5);
     const c = Math.round((x - Math.sqrt(3) / 2) / Math.sqrt(3) - 0.5 * (r & 1));

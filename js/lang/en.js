@@ -151,6 +151,13 @@ export const EN = {
       story: 'The Mali empire, once rich in gold, is falling apart. From Gao on the river Niger, King Sunni Ali has made Songhai strong, but the Tuareg hold Timbuktu, and the Mossi horsemen raid from the south. Whoever holds the river holds the trade in gold and salt.',
       epilogue: 'Sunni Ali took Timbuktu in 1468 and Jenné after a long siege in 1473. Under Askia Muhammad, Songhai became the largest empire in West African history, and the scholars of Timbuktu were famous. In 1591 a Moroccan army with muskets crossed the Sahara and beat Songhai at Tondibi.',
     },
+    akbar: {
+      year: '1556',
+      goal: 'Win back Hindustan, and bring Rajputana and Gujarat under you.',
+      teaser: 'The young Akbar against Hemu, the Rajputs and the sultans.',
+      story: 'Akbar is 13 when his father, the Mughal emperor Humayun, falls down a staircase and dies. The empire is only Kabul and the Punjab. The general Hemu has just taken Delhi and Agra, the Rajputs hold their forts in the desert, and rich sultans rule Gujarat, Malwa and the Deccan. With his guardian Bairam Khan, Akbar marches on Delhi.',
+      epilogue: 'At Panipat in November 1556 an arrow struck Hemu in the eye, and his army fled. Akbar took Delhi and Agra, and over the next 40 years he won Malwa, the Rajputs’ Chittor, Gujarat and Bengal. He made Rajput princes his generals and let every faith speak at his court. When he died in 1605, the Mughal empire was one of the richest in the world.',
+    },
     japan: {
       year: '1560',
       goal: 'March on Kyoto and unite Japan.',

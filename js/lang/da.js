@@ -151,6 +151,13 @@ export const DA = {
       story: 'Mali-riget, der engang var rigt på guld, er ved at falde fra hinanden. Fra Gao ved floden Niger har kong Sunni Ali gjort Songhai stærkt, men tuaregerne holder Timbuktu, og mossiernes ryttere hærger fra syd. Den, der ejer floden, ejer handlen med guld og salt.',
       epilogue: 'Sunni Ali tog Timbuktu i 1468 og Jenné efter en lang belejring i 1473. Under Askia Muhammad blev Songhai det største rige i Vestafrikas historie, og Timbuktus lærde var berømte. I 1591 kom en marokkansk hær med musketter over Sahara og slog Songhai ved Tondibi.',
     },
+    akbar: {
+      year: '1556',
+      goal: 'Tag Hindustan tilbage, og læg Rajputana og Gujarat under dig.',
+      teaser: 'Den unge Akbar mod Hemu, rajputerne og sultanerne.',
+      story: 'Akbar er 13 år, da hans far, mogulkejseren Humayun, falder ned ad en trappe og dør. Riget er kun Kabul og Punjab. Generalen Hemu har netop taget Delhi og Agra, rajputerne holder deres borge i ørkenen, og rige sultaner styrer Gujarat, Malwa og Deccan. Med sin formynder Bairam Khan rykker Akbar mod Delhi.',
+      epilogue: 'Ved Panipat i november 1556 ramte en pil Hemu i øjet, og hans hær flygtede. Akbar tog Delhi og Agra, og i de næste 40 år lagde han Malwa, rajputernes Chittor, Gujarat og Bengalen under sig. Han gjorde rajputfyrster til sine generaler og lod alle religioner tale ved sit hof. Da han døde i 1605, var mogulriget et af verdens rigeste.',
+    },
     japan: {
       year: '1560',
       goal: 'Drag mod Kyoto og saml Japan.',

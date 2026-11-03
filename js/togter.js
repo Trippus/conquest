@@ -20,6 +20,7 @@ export const TOGTER = [
   { map: 'england', opponents: 3, home: 'nm', goal: ['wx', 'me', 'ea'] },
   { map: 'inka', opponents: 3, home: 'hd', goal: ['ch', 'co', 'cm'], bonus: 0.5 },
   { map: 'songhai', opponents: 3, home: 'so', goal: ['nb', 'nd'], plusOne: true, bonus: 0.6 },
+  { map: 'akbar', opponents: 3, home: 'pj', goal: ['hi', 'rj', 'gu'], bonus: 0.6 },
   { map: 'japan', opponents: 3, home: 'to', goal: ['to', 'ks', 'ki'], bonus: 0.5 },
   { map: 'napoleon', opponents: 3, home: 'fr', goal: ['fr', 'os', 'pr'], bonus: 0.6 },
   { map: 'liberation', opponents: 3, home: 've', goal: ['ng', 'qu', 'pe'], bonus: 0.45, art: 'assets/togter/liberation.jpg' },

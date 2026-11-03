@@ -123,14 +123,14 @@ export const DA = {
       epilogue: 'Alexander slog Dareios ved Issos og Gaugamela og nåede helt til Indus. Han døde i Babylon i 323 f.Kr., kun 32 år gammel, og hans generaler delte riget.',
     },
     threekingdoms: {
-      year: '220',
+      year: '220 e.Kr.',
       goal: 'Erobr Shu i vest og hele Yangzi-landet: Jingzhou og Jiangdong.',
       teaser: 'Kina er delt efter Han-rigets fald: Wei mod Shu og Wu.',
       story: 'Han-dynastiet har styret Kina i 400 år, men nu er det forbi. Cao Pi har taget kejsertitlen i Luoyang og grundlagt Wei, der holder hele norden. Men Liu Bei kalder sig også kejser i Chengdu, og Sun Quan hersker over Yangzi fra Jianye. Tre kongeriger, og kun én kan blive Himlens søn.',
       epilogue: 'De tre kongeriger kæmpede i 60 år. Zhuge Liang angreb Wei fra Shu fem gange uden at vinde. Wei erobrede Shu i 263, men to år senere tog Sima-slægten magten og grundlagde Jin. I 280 sejlede Jins flåde ned ad Yangzi og tog Jianye, og Kina var samlet igen. Fortællingen om de tre kongeriger er stadig en af Kinas mest elskede.',
     },
     vikings: {
-      year: '793',
+      year: '793 e.Kr.',
       goal: 'Byg et rige over Nordsøen, som Knud den Store.',
       teaser: 'Fra Norden ud over havet: plyndring, handel og nye lande.',
       story: 'Nordmænd har plyndret klosteret på Lindisfarne, og vikingetiden er begyndt. Langskibene bærer krigere mod vest til Britannien, Irland og Island og mod øst ad floderne til Gardarike.',

@@ -80,6 +80,14 @@ export const EN = {
   togtAllWon: 'Every campaign won',
   chapterStep: (i, n) => `Campaign ${i} of ${n}`,
   chapterWon: (i, n) => `Campaign ${i} of ${n} won`,
+  chapterLost: (i, n) => `Campaign ${i} of ${n} lost`,
+  defeat: 'Defeat',
+  // a free game's beginning: who you are this time
+  dealYou: (lands, region, place, foes) => `${lands} territories, most of them in ${region}. You are number ${place} in turn. Against you stand ${foes}.`,
+  dealFoes: (foes) => `Against you stand ${foes}.`,
+  yourMission: 'Your secret mission:',
+  secretEach: 'Each of you has a secret mission. Take the screen in your own turn and tap Mission to see it.',
+  ourGoal: 'Your goals',
   seeStandings: 'See the standings',
   toBattle: 'To battle',
   tryAgain: 'Try again',
@@ -103,7 +111,7 @@ export const EN = {
       year: '343 BC',
       goal: 'Make Rome master of Italy south of the Po.',
       teaser: 'Rome against the Samnites, the Greeks in the south and the Gauls in the north.',
-      story: 'Rome is one city among many in Italy. The Samnites hold the mountains, rich Greek cities the coasts, the Gauls the Po valley, and Carthage waits across the sea. Make Rome master of Italy.',
+      story: 'Rome is one city among many in Italy. The Samnites hold the mountains, rich Greek cities the coasts, the Gauls the Po valley, and Carthage waits across the sea.',
       epilogue: 'After three wars against the Samnites and victory over King Pyrrhus, all of Italy south of the Po was Roman by 264 BC. That same year the war with Carthage began.',
     },
     alexander: {

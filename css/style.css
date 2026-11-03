@@ -416,10 +416,15 @@ dialog .big { font-family: var(--title); font-size: 20px; margin: 8px 0; }
 .ch-mode button { min-height: 36px; padding: 0 16px; border: 0; border-radius: 999px; background: none; color: #e6d8bd; font-size: 15px; text-shadow: none; }
 .ch-mode button[aria-pressed='true'] { background: #e8c27a; color: #2a1d10; font-weight: 600; }
 #ch-go { min-width: 180px; }
-#ch-standings { margin-top: 14px; color: #b8a58c; }
-/* the end of a won togt: the same card, with what really happened in place of the story */
-#chapter.ending .ch-goal-h, #chapter.ending .ch-mode { display: none; }
-#chapter #ch-standings { animation: rise .6s calc(var(--wait) + 3.8s) both; }
+#ch-standings, #ch-easy { margin-top: 14px; color: #b8a58c; }
+#chapter .ch-goal:empty { display: none; }
+/* the same card for a free game's beginning (no choice of goal there) and for every game's end (what
+   happened in place of the story) */
+#chapter.deal .ch-mode, #chapter.ending .ch-goal-h, #chapter.ending .ch-mode { display: none; }
+#chapter.ending .ch-year { font-size: min(64px, 15vw); }
+.ch-who { display: inline-flex; align-items: center; gap: 6px; vertical-align: middle; margin-right: 4px; }
+.ch-who .seal-icon { width: 26px; height: 26px; }
+#chapter :is(#ch-standings, #ch-easy) { animation: rise .6s calc(var(--wait) + 3.8s) both; }
 /* in one after another */
 #chapter .ch-step { animation: rise .7s calc(var(--wait) + .1s) both; }
 #chapter .ch-year { animation: year 1.1s calc(var(--wait) + .35s) both cubic-bezier(.2, .7, .2, 1); }
@@ -440,9 +445,6 @@ dialog .big { font-family: var(--title); font-size: 20px; margin: 8px 0; }
 }
 
 /* ---------- the end of a togt ---------- */
-.togt-end { margin: 10px 0 4px; text-align: left; }
-.togt-end p { margin: 0 0 8px; font-size: 15px; line-height: 1.5; }
-p.togt-end { text-align: center; }
 .locked-note { margin: 6px 0 0; font-size: 13px; }
 .intro-buttons .intro-setup { margin-bottom: 6px; }
 #hud, #bar { transition: opacity .6s; }

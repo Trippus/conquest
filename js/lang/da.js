@@ -79,6 +79,14 @@ export const DA = {
   togtAllWon: 'Alle togter er vundet',
   chapterStep: (i, n) => `Togt ${i} af ${n}`,
   chapterWon: (i, n) => `Togt ${i} af ${n} vundet`,
+  chapterLost: (i, n) => `Togt ${i} af ${n} tabt`,
+  defeat: 'Nederlag',
+  // a free game's beginning: who you are this time
+  dealYou: (lands, region, place, foes) => `${lands} områder, de fleste i ${region}. Du er nr. ${place} i turen. Mod dig står ${foes}.`,
+  dealFoes: (foes) => `Mod jer står ${foes}.`,
+  yourMission: 'Din hemmelige mission:',
+  secretEach: 'Hver har sin hemmelige mission. Tag skærmen i jeres egen tur, og tryk på Mission for at se den.',
+  ourGoal: 'Jeres mål',
   seeStandings: 'Se stillingen',
   toBattle: 'Til kamp',
   tryAgain: 'Prøv igen',
@@ -103,7 +111,7 @@ export const DA = {
       year: '343 f.Kr.',
       goal: 'Gør Rom til herre over Italien syd for Po.',
       teaser: 'Rom mod samnitterne, grækerne i syd og gallerne i nord.',
-      story: 'Rom er én by blandt mange i Italien. I bjergene står samnitterne, ved kysterne de rige græske byer, i Po-dalen gallerne, og over havet venter Karthago. Gør Rom til herre over Italien.',
+      story: 'Rom er én by blandt mange i Italien. I bjergene står samnitterne, ved kysterne de rige græske byer, i Po-dalen gallerne, og over havet venter Karthago.',
       epilogue: 'Efter tre krige mod samnitterne og sejren over kong Pyrrhus var hele Italien syd for Po romersk i 264 f.Kr. Samme år begyndte krigen mod Karthago.',
     },
     alexander: {

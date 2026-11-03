@@ -148,17 +148,18 @@ function shuffled(arr) {
 }
 
 // A new game from the settings: who plays, then the turn order is drawn.
-function startFromSettings(settings = loadSettings()) {
+function startFromSettings(settings = loadSettings(), { intro = true } = {}) {
   const people = settings.people.map((x, i) => ({ kind: 'human', name: personName(settings, i), color: x.look }));
   const free = COLORS.map((_, i) => i).filter((i) => !settings.people.some((x) => x.look === i));
   const names = shuffled(mapIn(settings.map).RULERS ?? L.opponents);
   const bots = Array.from({ length: settings.opponents }, (_, i) => ({ kind: settings.level, name: names[i], color: free[i] }));
-  startGame(shuffled([...people, ...bots]), 'normal', settings.mode, undefined, settings.map);
+  startGame(shuffled([...people, ...bots]), 'normal', settings.mode, undefined, settings.map, { quiet: intro });
+  if (intro) showDeal();
 }
 
 // A togt: the one person at the phone against the togt's opponents, on the togter's level, starting
 // at home with history's goal (js/togter.js). With intro, the year and the story come first
-// (showChapter); a retry goes straight to the map.
+// (showChapter), also on a retry: the story is part of the togt.
 function startTogt(id, { intro = true } = {}) {
   const settings = loadSettings();
   const person = settings.people[0];
@@ -194,8 +195,9 @@ function startGame(order, speed, mode = 'mission', seed = (Math.random() * 2 ** 
     colors: order.map((x) => x.color),
     speed,
     actions: [],
-    // told: the togt's year card has been read (or skipped); until then, continuing shows it again
-    ...(togt ? { togt, told: !quiet } : {}),
+    // told: the opening card has been read (or skipped); until then, continuing shows it again
+    ...(togt ? { togt } : {}),
+    ...(quiet ? { told: false } : {}),
   };
   s = G.newGame(map, rules, game.setup);
   clearSel();
@@ -222,35 +224,69 @@ function showChapter(id) {
   $('ch-year').textContent = text.year;
   $('ch-title').textContent = mapIn(id).name;
   $('ch-story').textContent = text.story;
+  $('ch-goal-h').textContent = L.yourGoal;
   tellGoal(id);
-  $('ch-go').textContent = L.toBattle;
-  $('ch-standings').hidden = true;
-  openCard(id, false);
+  cardButtons(L.toBattle);
+  openCard(togtOf(id).art, '');
 }
-// A won togt ends as it began: its picture out of the dark, "Victory" where the year was, and what
-// really happened in place of the story. The standings are a tap away; the button goes on to the next
-// togt (where a break between two togter, like the one between two films, would go).
-function showEnding(id, news) {
-  const i = TOGTER.findIndex((t) => t.map === id);
-  $('ch-step').textContent = L.chapterWon(i + 1, TOGTER.length);
-  $('ch-year').textContent = L.victory;
+// A free game begins the same way, with the map's year and story; the goal says who you are this time:
+// the lands the deal gave you, your place in the turn, who is against you and your mission. Several
+// people play at one phone or tablet like at a board; each reads their secret mission with the
+// Mission button in their own turn, so it says only that there is one.
+function showDeal() {
+  const id = grid.id;
+  const humans = game.seats.flatMap((x, i) => (x === 'human' ? [i] : []));
+  const foes = andList(game.seats.flatMap((x, i) => (x === 'human' ? [] : [s.players[i].name])));
+  $('ch-step').textContent = L.freeGame;
+  $('ch-year').textContent = togtText(id)?.year ?? '';
   $('ch-title').textContent = mapIn(id).name;
-  $('ch-story').textContent = togtText(id).epilogue;
-  $('ch-goal').textContent = news.join(' ');
-  $('ch-go').textContent = afterGame()?.label ?? L.toStart;
-  $('ch-standings').hidden = false;
-  openCard(id, true);
+  $('ch-story').textContent = togtText(id)?.story ?? '';
+  const all = s.mode === 'world' ? `<br><b>${L.conquerAll}</b>` : '';
+  if (humans.length === 1) {
+    const p = humans[0];
+    const most = map.regions.map((r) => [r.members.filter((t) => s.owner[t] === p).length, r.name]).sort((a, b) => b[0] - a[0])[0][1];
+    $('ch-goal-h').textContent = L.yourGoal;
+    $('ch-goal').innerHTML = `${who(p)} ${L.dealYou(G.owned(s, p).length, most, p + 1, foes)}${all || `<br><b>${L.yourMission}</b> ${missionText(s.players[p].mission)}`}`;
+  } else {
+    $('ch-goal-h').textContent = L.ourGoal;
+    $('ch-goal').innerHTML = `${humans.map(who).join(' ')}${foes ? ` ${L.dealFoes(foes)}` : ''}${all || `<br>${L.secretEach}`}`;
+  }
+  cardButtons(L.toBattle);
+  openCard(pictureOf(id), 'deal');
 }
-function openCard(id, end) {
-  showChapterArt(togtOf(id).art);
+const who = (p) => `<span class="ch-who">${sealIcon(lookOf(p))}<b>${s.players[p].name}</b></span>`;
+// The card's way on, and below it the standings and an easier try when the game is over.
+function cardButtons(go, { standings = false, easy = false } = {}) {
+  $('ch-go').textContent = go;
+  $('ch-standings').hidden = !standings;
+  $('ch-easy').hidden = !easy;
+}
+// What begins the game: a togt's year card, or a free game's.
+const showOpening = () => (game.togt ? showChapter(game.togt) : showDeal());
+// Every game ends as it began: its picture out of the dark, Victory or Defeat where the year was. A
+// win tells what really happened in history, a loss who won. The standings are a tap away; the button
+// goes on in the dark to the next togt or game (where a break, like the one between two films, would go).
+function showEnding(e) {
+  const id = grid.id;
+  const i = TOGTER.findIndex((t) => t.map === id);
+  $('ch-step').textContent = game.togt ? (e.won ? L.chapterWon : L.chapterLost)(i + 1, TOGTER.length) : L.freeGame;
+  $('ch-year').textContent = e.won ? L.victory : L.defeat;
+  $('ch-title').textContent = mapIn(id).name;
+  $('ch-story').textContent = e.won ? togtText(id)?.epilogue ?? e.how : e.how;
+  $('ch-goal').textContent = (e.won ? (game.togt ? e.news : [e.how]) : [e.place]).join(' ');
+  cardButtons(afterGame()?.label ?? L.toStart, { standings: true, easy: e.easy });
+  openCard(game.togt ? togtOf(id).art : pictureOf(id), 'ending');
+}
+function openCard(art, kind) {
+  showChapterArt(art);
   const box = $('chapter');
   // Shown anew, so the words come in again one by one, also when the card was already up.
   const fromDark = box.classList.contains('fading');
   box.hidden = true;
   void box.offsetWidth;
-  box.classList.toggle('ending', end);
+  box.classList.remove('ending', 'deal', 'leave', 'fading');
   box.classList.toggle('from-dark', fromDark);
-  box.classList.remove('leave', 'fading');
+  if (kind) box.classList.add(kind);
   box.hidden = false;
   document.body.classList.add('telling'); // the players and the turn panel wait out of sight
   $('ch-go').focus({ preventScroll: true });
@@ -304,25 +340,28 @@ $('chapter').addEventListener('click', (e) => {
 });
 $('ch-home').addEventListener('click', home);
 $('ch-standings').addEventListener('click', () => $('game-over').showModal());
+// On from the end: the words and the picture go out and the dark stays for what comes next.
+function onInDark(value) {
+  $('chapter').classList.add('fading');
+  setTimeout(() => goOn(value), 800);
+}
+$('ch-easy').addEventListener('click', () => onInDark('easy'));
 $('ch-go').addEventListener('click', () => {
   const box = $('chapter');
   if (box.classList.contains('ending')) {
     const next = afterGame()?.value;
-    if (!next) return goOn('home');
-    box.classList.add('fading');
-    setTimeout(() => goOn(next), 800);
-    return;
+    return next ? onInDark(next) : goOn('home');
   }
-  box.classList.add('leave');
   game.told = true;
   save();
+  box.classList.add('leave');
   setTimeout(() => {
     box.hidden = true;
     document.body.classList.remove('telling');
     const glide = matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 1500;
     const you = game.seats.indexOf('human');
     board.focus(G.owned(s, you), { glide });
-    // The goal was told with the story; the game begins when the map is there.
+    // The goal was told on the card; the game begins when the map is there.
     setTimeout(schedule, glide + 150);
   }, 450);
 });
@@ -887,13 +926,17 @@ function openGameOver() {
   });
   const me = place.findIndex((p) => game.seats[p] === 'human');
   const mine = me >= 0 && game.seats.filter((x) => x === 'human').length === 1 ? `<p class="your-place">${L.yourPlace(me + 1, place.length)}</p>` : '';
-  $('over-text').innerHTML = `<p>${how}</p>${mine}${game.togt ? togtOver() : ''}<ol class="standings">${rows.join('')}</ol>`;
+  $('over-text').innerHTML = `<p>${how}</p>${mine}<ol class="standings">${rows.join('')}</ol>`;
+  // People at the phone get the end card; a game of computer players only ends in the standings.
+  const people = game.seats.filter((x) => x === 'human').length;
+  const togt = game.togt ? togtOver() : { news: [] };
+  ending = people ? { won: game.seats[s.winner] === 'human', how, place: me >= 0 && people === 1 ? L.yourPlace(me + 1, place.length) : '', ...togt } : null;
   const after = afterGame();
   $('over-again').hidden = !after;
   if (after) Object.assign($('over-again'), { value: after.value, textContent: after.label });
   setTimeout(() => {
     if ($('game-over').open || !$('chapter').hidden) return;
-    if (ending) return showEnding(game.togt, ending);
+    if (ending) return showEnding(ending);
     // The bar says the same with the same buttons; it waits until the winner screen is closed.
     $('bar').hidden = true;
     $('game-over').showModal();
@@ -904,11 +947,11 @@ $('game-over').addEventListener('close', () => {
   goOn($('game-over').returnValue);
 });
 
-// A finished togt is counted once (the game remembers it has been), and the end tells what really
-// happened, what the win opened, or offers easier opponents after two lost tries.
-let ending = null; // what a won togt's end card says under the story, while it is the game shown
+// What the end card says (showEnding), while it is the game shown.
+let ending = null;
+// A finished togt is counted once (the game remembers it has been); a win tells what it opened, a loss
+// offers easier opponents after two lost tries.
 function togtOver() {
-  ending = null;
   const won = game.seats[s.winner] === 'human';
   const level = game.seats.find((x) => x !== 'human');
   const wasFree = freeMaps(progress, Object.keys(MAPS)).includes(game.togt);
@@ -918,17 +961,14 @@ function togtOver() {
     game.counted = true;
     save();
   }
-  if (!won) {
-    return offerEasy(progress, game.togt, level) ? `<p class="togt-end"><button value="easy" class="link">${L.tryEasy}</button></p>` : '';
-  }
+  if (!won) return { news: [], easy: offerEasy(progress, game.togt, level) };
   const next = nextTogt(game.togt);
   preloadArt(next?.art);
   const news = [
     !wasFree && L.newFreeMap(mapIn(game.togt).name),
     next ? L.nextUp(togtText(next.map).year, mapIn(next.map).name) : L.allTogterWon,
   ].filter(Boolean);
-  ending = news;
-  return '';
+  return { news };
 }
 
 // What comes after a finished game: a togt won goes on to the next, a togt lost is tried again, a
@@ -941,10 +981,10 @@ function afterGame() {
 function goOn(value) {
   if (value === 'home') home();
   else if (value === 'next') startTogt(nextTogt(game.togt).map);
-  else if (value === 'again') game.togt ? startTogt(game.togt, { intro: false }) : startFromSettings();
+  else if (value === 'again') game.togt ? startTogt(game.togt) : startFromSettings();
   else if (value === 'easy') {
     saveSettings({ ...loadSettings(), togtLevel: 'novice' });
-    startTogt(game.togt, { intro: false });
+    startTogt(game.togt);
   }
 }
 
@@ -1248,7 +1288,7 @@ document.fonts.ready.then(() => fitTitle(true));
 function hideIntro() {
   $('intro').hidden = true;
   stepAway();
-  if (game?.told === false) return showChapter(game.togt);
+  if (game?.told === false) return showOpening();
   schedule();
 }
 
@@ -1345,7 +1385,10 @@ function useLanguage(lang) {
   if (!$('intro').hidden && progress.welcomed) showIntro();
   if (!$('intro').hidden && !progress.welcomed) $('welcome-input').placeholder = L.yourName;
   if ($('togter').open) renderTogter();
-  if (!$('chapter').hidden && game?.togt) $('chapter').classList.contains('ending') ? showEnding(game.togt, ending) : showChapter(game.togt);
+  if (!$('chapter').hidden && game) {
+    const card = $('chapter').classList;
+    card.contains('ending') ? showEnding(ending) : showOpening();
+  }
 }
 $('settings-btn').addEventListener('click', () => {
   renderSettings();

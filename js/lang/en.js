@@ -144,6 +144,13 @@ export const EN = {
       story: 'The Chanka army stands before Cusco, and the old Inca king has fled. His son Cusi Yupanqui stays and defends the city. If he wins, the Colla by Lake Titicaca, the rich Chimú kingdom on the coast and the mountains all the way from Quito to Chile are waiting.',
       epilogue: 'Cusi Yupanqui beat the Chanka and took the name Pachacuti, “he who turns the world around”. He and his son Topa Inca built Tawantinsuyu, the largest empire in the Americas before Columbus, held together by almost 40,000 km of road. In 1532 the Spaniard Pizarro took the Inca king Atahualpa prisoner at Cajamarca.',
     },
+    constantinople: {
+      year: '1453',
+      goal: 'Conquer Constantinople and Thrace, and bring Greece and Serbia under you.',
+      teaser: 'Sultan Mehmed II against Byzantium, the Hungarians and the princes of the Balkans.',
+      story: 'Mehmed II is 21 and sultan of the Ottomans. His empire runs from Anatolia to the Danube, but in the middle of it lies Constantinople, the last of the Byzantine Empire, behind the strongest walls in the world. To the north, John Hunyadi gathers Hungary’s armies against the Turks, and in Anatolia Karaman waits for its chance. Mehmed has had a giant cannon cast.',
+      epilogue: 'After a siege of 53 days, the Ottomans stormed Constantinople on 29 May 1453, and the last emperor, Constantine XI, fell on the walls. Mehmed was called the Conqueror and made the city his capital. Serbia fell in 1459, the Morea in 1460 and Trebizond in 1461, but Belgrade held out against him. The Ottomans ruled from the city for almost 470 years.',
+    },
     songhai: {
       year: '1468',
       goal: 'Take Timbuktu and Jenné, and make Songhai master of the Niger.',

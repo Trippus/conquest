@@ -144,6 +144,13 @@ export const DA = {
       story: 'Chankaernes hær står foran Cusco, og den gamle inkakonge er flygtet. Hans søn Cusi Yupanqui bliver og forsvarer byen. Vinder han, venter collaerne ved Titicacasøen, det rige Chimú-rige ved kysten og bjergene hele vejen fra Quito til Chile.',
       epilogue: 'Cusi Yupanqui slog chankaerne og tog navnet Pachacuti, "han der vender verden om". Han og sønnen Topa Inka byggede Tawantinsuyu, det største rige i Amerika før Columbus, bundet sammen af næsten 40.000 km vej. I 1532 tog spanieren Pizarro inkakongen Atahualpa til fange i Cajamarca.',
     },
+    constantinople: {
+      year: '1453',
+      goal: 'Erobr Konstantinopel og Thrakien, og læg Grækenland og Serbien under dig.',
+      teaser: 'Sultan Mehmed II mod Byzans, ungarerne og Balkans fyrster.',
+      story: 'Mehmed II er 21 år og sultan over osmannerne. Hans rige går fra Anatolien til Donau, men midt i det ligger Konstantinopel, det sidste af Det Byzantinske Rige, bag verdens stærkeste mure. Mod nord samler János Hunyadi Ungarns hære mod tyrkerne, og i Anatolien venter Karaman på sin chance. Mehmed har ladet støbe en kæmpe kanon.',
+      epilogue: 'Efter 53 dages belejring stormede osmannerne Konstantinopel den 29. maj 1453, og den sidste kejser, Konstantin XI, faldt på murene. Mehmed fik tilnavnet Erobreren og gjorde byen til sin hovedstad. Serbien faldt i 1459, Morea i 1460 og Trapezunt i 1461, men Beograd holdt stand mod ham. Osmannerne regerede fra byen i næsten 470 år.',
+    },
     songhai: {
       year: '1468',
       goal: 'Tag Timbuktu og Jenné, og gør Songhai til herre over Niger.',

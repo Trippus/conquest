@@ -75,7 +75,7 @@
           <button type="button" class="wide" id="intro-togter" data-t="togterTitle"></button>
           <p class="intro-setup" id="togt-summary"></p>
           <button type="button" class="wide" id="intro-new" data-t="freeGame"></button>
-          <p class="intro-setup"><span id="intro-summary"></span> · <button type="button" class="link" id="intro-change" data-t="change"></button></p>
+          <p class="intro-setup" id="intro-summary"></p>
         </div>
         <details class="fold intro-rules" id="intro-rules">
           <summary data-t="howToPlay"></summary>
@@ -144,28 +144,25 @@
   <dialog id="new-game">
     <form method="dialog">
       <h2 data-t="freeGame"></h2>
-      <p id="setup-summary" class="summary"></p>
-      <details class="fold" id="setup-details">
-        <summary data-t="changeSetup"></summary>
-        <section class="group">
-          <h3 data-t="participants"></h3>
-          <div class="field"><span data-t="peopleHere"></span>
-            <ol class="people" id="people"></ol>
-            <button type="button" class="link add-person" id="add-person" data-t="addPerson"></button>
-          </div>
-          <div class="field"><span data-t="computerPlayers"></span><div class="pills" data-name="opponents"></div></div>
-          <div id="bot-fields">
-            <div class="field"><span data-t="computerLevel"></span><div class="pills" data-name="level"></div></div>
-          </div>
-        </section>
-        <section class="group">
-          <h3 data-t="theGame"></h3>
-          <div class="field"><span data-t="map"></span><div class="pills" data-name="map"></div>
-            <p class="sub locked-note" id="locked-note" data-t="lockedMaps"></p></div>
-          <div class="field"><span data-t="victory"></span><div class="pills" data-name="mode"></div></div>
-        </section>
-        <p class="sub" data-t="fairStart"></p>
+      <!-- The map first, and how it is won right under it; then the computer players; the people at
+           this device, rarely changed, folded away. -->
+      <section class="group">
+        <div class="field"><span data-t="map"></span><div class="pills" data-name="map"></div>
+          <p class="sub locked-note" id="locked-note" data-t="lockedMaps"></p></div>
+        <div class="field"><span data-t="victory"></span><div class="pills" data-name="mode"></div></div>
+      </section>
+      <section class="group">
+        <div class="field"><span data-t="computerPlayers"></span><div class="pills" data-name="opponents"></div></div>
+        <div id="bot-fields">
+          <div class="field"><span data-t="computerLevel"></span><div class="pills" data-name="level"></div></div>
+        </div>
+      </section>
+      <details class="fold" id="people-fold">
+        <summary><span><span data-t="peopleHere"></span>: <span id="people-names"></span></span></summary>
+        <ol class="people" id="people"></ol>
+        <button type="button" class="link add-person" id="add-person" data-t="addPerson"></button>
       </details>
+      <p class="sub" data-t="fairStart"></p>
       <div class="buttons">
         <button value="cancel" id="cancel-new" data-t="back"></button>
         <button value="start" class="primary" id="start" data-t="start"></button>

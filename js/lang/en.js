@@ -21,7 +21,6 @@ export const EN = {
   tagline: 'Conquer the map in history’s great wars, or in a game of your own.',
   continue: 'Continue the game',
   newGame: 'New game',
-  change: 'Change',
   howToPlay: 'How to play',
   rules: `<li><b>Reinforce:</b> you get new armies every turn, more the more territories and whole continents you hold. Tap your territories to place them.</li>
     <li><b>Attack:</b> pick one of your territories and a neighbour. The dice decide, and the bigger army usually has luck on its side.</li>
@@ -32,13 +31,10 @@ export const EN = {
     paper from <a href="https://ambientcg.com" target="_blank" rel="noopener">ambientCG</a> (CC0)`,
   settings: 'Settings',
   gameBy: 'a game by',
-  changeSetup: 'Change setup',
-  participants: 'Players',
   peopleHere: 'Players on this device',
   addPerson: '+ Add player',
   computerPlayers: 'Computer players',
   computerLevel: 'Computer difficulty',
-  theGame: 'The game',
   map: 'Map',
   victory: 'Victory',
   fairStart: 'The turn order is drawn at the start, and the starting armies are adjusted so every seat has the same chance.',

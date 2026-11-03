@@ -697,6 +697,9 @@ const CHOICES = {
 
 const andList = (list) => (list.length > 1 ? `${list.slice(0, -1).join(', ')} ${L.and} ${list.at(-1)}` : list[0]);
 
+// Who plays at this device, for the folded list of them.
+const peopleNames = (x) => andList(x.people.map((_, i) => personName(x, i)));
+
 function summary(x) {
   const names = andList(x.people.map((_, i) => personName(x, i)));
   return `${x.opponents ? L.against(names, L.bots(x.opponents, x.level)) : L.eachOther(names)} · ${mapIn(x.map).name} · ${L.modeShort[x.mode] ?? L.modeShort.world}`;
@@ -724,7 +727,7 @@ function renderPeople() {
     input.setAttribute('aria-label', L.nameOf(i + 1));
     input.addEventListener('input', () => {
       person.name = input.value;
-      $('setup-summary').textContent = summary(draft);
+      $('people-names').textContent = peopleNames(draft);
     });
     // Enter closes the keyboard instead of pressing the dialog's first button (Back).
     input.addEventListener('keydown', (e) => {
@@ -782,7 +785,7 @@ $('add-person').addEventListener('click', () => {
 });
 
 function renderSetup() {
-  $('setup-summary').textContent = summary(draft);
+  $('people-names').textContent = peopleNames(draft);
   renderPeople();
   $('bot-fields').hidden = !draft.opponents;
   document.querySelectorAll('#new-game .pills').forEach((box) => {
@@ -813,11 +816,11 @@ function renderSetup() {
   $('locked-note').hidden = Object.keys(MAPS).every(isFree);
 }
 
-function openNewGame(change = false) {
+function openNewGame() {
   draft = loadSettings();
-  lookOpen = draft.people.length === 1 ? 0 : -1;
+  lookOpen = -1;
   renderSetup();
-  $('setup-details').open = change;
+  $('people-fold').open = false;
   $('cancel-new').hidden = false;
   $('new-game').showModal();
 }
@@ -1148,7 +1151,7 @@ $('choose-togter').addEventListener('click', () => {
 });
 $('choose-free').addEventListener('click', () => {
   welcomed();
-  openNewGame(true);
+  openNewGame();
 });
 
 /* ---------- the togter ---------- */
@@ -1242,8 +1245,7 @@ addEventListener('popstate', () => {
   if ($('intro').hidden) goHome();
 });
 $('intro-continue').addEventListener('click', hideIntro);
-$('intro-new').addEventListener('click', () => startFromSettings());
-$('intro-change').addEventListener('click', () => openNewGame(true));
+$('intro-new').addEventListener('click', () => openNewGame());
 
 /* ---------- settings: sound, light or dark, and language ---------- */
 

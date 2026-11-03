@@ -20,7 +20,6 @@ export const DA = {
   tagline: 'Erobr kortet i historiens store felttog, eller i dit eget spil.',
   continue: 'Fortsæt spillet',
   newGame: 'Nyt spil',
-  change: 'Skift',
   howToPlay: 'Sådan spiller du',
   rules: `<li><b>Forstærk:</b> du får nye hære hver tur, flere jo flere områder og hele kontinenter du har. Tryk på dine områder for at sætte dem ud.</li>
     <li><b>Angrib:</b> vælg et af dine områder og en nabo. Terningerne afgør det, og den største hær har oftest held med sig.</li>
@@ -31,13 +30,10 @@ export const DA = {
     papir fra <a href="https://ambientcg.com" target="_blank" rel="noopener">ambientCG</a> (CC0)`,
   settings: 'Indstillinger',
   gameBy: 'et spil fra',
-  changeSetup: 'Skift opsætning',
-  participants: 'Deltagere',
   peopleHere: 'Spillere på denne enhed',
   addPerson: '+ Tilføj spiller',
   computerPlayers: 'Computerspillere',
   computerLevel: 'Computerens sværhedsgrad',
-  theGame: 'Spillet',
   map: 'Kort',
   victory: 'Sejr',
   fairStart: 'Turrækkefølgen trækkes ved start, og starthærene er justeret, så alle pladser har lige gode chancer.',

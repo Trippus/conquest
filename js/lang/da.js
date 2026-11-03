@@ -172,6 +172,13 @@ export const DA = {
       story: 'USA har netop gjort Texas til en stat, men Mexico vil ikke anerkende det. Mod vest ligger Mexicos Ny Mexico og Californien, på sletterne hersker comancherne, og i Oregon sidder briterne. Præsident Polk vil have det hele, helt ud til Stillehavet.',
       epilogue: 'Briterne opgav det sydlige Oregon i juni 1846, og i 1848 måtte Mexico afstå hele sit nordlige land fra Texas til Californien. Kort før freden fandt man guld ved Sutters savmølle, og guldfeberen begyndte. Comancherne holdt stand i næsten 30 år endnu.',
     },
+    ethiopia: {
+      year: '1895',
+      goal: 'Slå italienerne i Tigray, og udvid riget mod syd til Kaffa og Ogaden.',
+      teaser: 'Menelik II mod Italien, mahdisterne i Sudan og briterne.',
+      story: 'Italien kalder Etiopien sit protektorat, men kejser Menelik II har sagt traktaten op. Fra kolonien Eritrea rykker general Baratieris hær ind i Tigray. Mod vest står mahdisternes Sudan, og briterne holder Egypten, Aden og kysten ved Berbera. Hele Afrika bliver delt mellem Europas magter, men Menelik har samlet en hær og købt geværer.',
+      epilogue: 'Meneliks hær slog italienerne ved Amba Alagi i december 1895, og ved Adwa den 1. marts 1896 knuste omkring 100.000 etiopiere Baratieris hær. Ved freden i Addis Abeba måtte Italien anerkende Etiopiens uafhængighed. Menelik lagde Kaffa under sig i 1897, og Adwa blev et symbol for hele Afrika: et land, der slog en europæisk hær og bevarede sin frihed.',
+    },
     world: {
       year: 'I dag',
       goal: 'Bliv verdens hersker.',

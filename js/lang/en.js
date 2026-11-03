@@ -172,6 +172,13 @@ export const EN = {
       story: 'The United States has just made Texas a state, but Mexico will not accept it. To the west lie Mexico’s New Mexico and California, the Comanche rule the plains, and the British hold Oregon. President Polk wants it all, right out to the Pacific.',
       epilogue: 'Britain gave up southern Oregon in June 1846, and in 1848 Mexico had to give up all its north, from Texas to California. Just before the peace, gold was found at Sutter’s sawmill, and the gold rush began. The Comanche held out for almost 30 more years.',
     },
+    ethiopia: {
+      year: '1895',
+      goal: 'Beat the Italians in Tigray, and push the empire south to Kaffa and the Ogaden.',
+      teaser: 'Menelik II against Italy, the Mahdists of the Sudan and the British.',
+      story: 'Italy calls Ethiopia its protectorate, but Emperor Menelik II has renounced the treaty. From the colony of Eritrea, General Baratieri’s army marches into Tigray. To the west stands the Mahdists’ Sudan, and the British hold Egypt, Aden and the coast at Berbera. All Africa is being shared out among the powers of Europe, but Menelik has raised an army and bought rifles.',
+      epilogue: 'Menelik’s army beat the Italians at Amba Alagi in December 1895, and at Adwa on 1 March 1896 around 100,000 Ethiopians crushed Baratieri’s army. At the peace of Addis Ababa, Italy had to recognise Ethiopia’s independence. Menelik took Kaffa in 1897, and Adwa became a symbol for all Africa: a country that beat a European army and kept its freedom.',
+    },
     world: {
       year: 'Today',
       goal: 'Become ruler of the world.',

@@ -260,6 +260,34 @@ export const artDefs = (quarters = 'NØSV') => `
       <g fill="#8a6a4a"><circle cx=".2" cy="-1.3" r=".06"/><circle cx=".56" cy="-1.25" r=".06"/><circle cx=".4" cy="-1.36" r=".06"/></g>
     </g>
   </g>
+  <g id="art-cruiser" stroke="${INK}" stroke-width=".05" stroke-linejoin="round" stroke-linecap="round">
+    <g fill="#cdbfa6" stroke="none" opacity=".85"><circle cx="-.3" cy="-1.72" r=".18"/><circle cx="-.65" cy="-1.88" r=".22"/><circle cx=".28" cy="-1.6" r=".16"/><circle cx="-.02" cy="-1.78" r=".19"/></g>
+    <path d="M-1.05-.45V-1.75M1.0-.45V-1.6M-1.55-.45V-1" fill="none"/>
+    <path d="M-1.18-1.35h.26v.12h-.26ZM.88-1.25h.24v.12h-.24Z" fill="#3b2f2a"/>
+    <path d="M-.55-.5V-1.45H-.2V-.5ZM.05-.5V-1.35H.38V-.5Z" fill="#d9b45a"/>
+    <path d="M-.55-1.45H-.2V-1.33H-.55ZM.05-1.35H.38V-1.23H.05Z" fill="#3b2f2a"/>
+    <path d="M-.8-.45V-.72H.75V-.45ZM.75-.82H1.05V-.45H.75Z" fill="#efe4cc"/>
+    <path d="M1.05-.6H1.42M-.8-.6H-1.2" fill="none" stroke-width=".08"/>
+    <path d="M-1.55-1h.12v.2h-.12Z" fill="#3f7a4a" stroke="none"/><path d="M-1.43-1h.12v.2h-.12Z" fill="#f6ecd4" stroke="none"/><path d="M-1.31-1h.12v.2h-.12Z" fill="#a3261b" stroke="none"/>
+    <path d="M-1.7-.45H1.5L1.6.15L1.85.38L1.45.55H-1.35Q-1.65.4-1.7-.45Z" fill="#3b2f2a"/>
+    <path d="M-1.6-.12H1.52" fill="none" stroke="#d9b45a" stroke-width=".1"/>
+    <path d="M-1.1.12h.08v.08h-.08zM-.7.12h.08v.08h-.08zM-.3.12h.08v.08h-.08zM.1.12h.08v.08h-.08zM.5.12h.08v.08h-.08zM.9.12h.08v.08h-.08z" fill="#efe4cc" stroke="none"/>
+    <path d="M-1.55.95q.3-.15.6 0t.6 0M.3.95q.3-.15.6 0t.6 0" fill="none" opacity=".6"/>
+  </g>
+  <g id="art-dhow" stroke="${INK}" stroke-width=".05" stroke-linejoin="round" stroke-linecap="round">
+    <path d="M0-.25L.1-1" fill="none" stroke-width=".06"/>
+    <path d="M.88-.47L-.98-1.73Q-.7-.9-.55-.32Z" fill="#f6ecd4"/>
+    <path d="M.95-.42L-1.05-1.78" fill="none" stroke-width=".06"/>
+    <path d="M-1.25-.5L-1.0.15H.75Q1.05.05 1.3-.35Q.3-.22-1.0-.28Z" fill="#8a6a4a"/>
+    <path d="M-1.1.45q.3-.12.6 0t.6 0M.2.45q.3-.12.6 0t.6 0" fill="none" opacity=".5"/>
+  </g>
+  <g id="art-obelisk" stroke="${INK}" stroke-width=".05" stroke-linejoin="round" stroke-linecap="round">
+    <path d="M-.62.45h1.24v.1h-1.24Z" fill="#c8b08a"/>
+    <path d="M.32.45V-.45Q.32-.58.43-.62Q.54-.58.54-.45V.45Z" fill="#c8b08a"/>
+    <path d="M-.22.45V-1.05Q-.22-1.3 0-1.38Q.22-1.3.22-1.05V.45Z" fill="#c8b08a"/>
+    <path d="M-.22-.82H.22M-.22-.52H.22M-.22-.22H.22M-.22.08H.22" fill="none" opacity=".7"/>
+    <path d="M-.07-1.08h.14v.14h-.14ZM.38-.38h.1v.1h-.1Z" fill="${INK}" stroke="none" opacity=".6"/>
+  </g>
   <g id="art-compass">${compassRose(quarters)}</g>`;
 
 // A fixed "random" number for a cell, so the map looks the same every time.
@@ -328,7 +356,7 @@ export function mapArt(grid, { keepClear = [], seaLines = [], compass = null } =
   }
   // Ships sail beside the longest sea routes (not those round the back of the map), a little to
   // one side of the dashed line, on open sea. grid.SHIP names the kind ('ship', 'longship', 'galley', 'atakebune',
-  // 'lineship', 'frigate', 'sidewheeler', 'caravel' or 'balsa'), grid.SHIP_COUNT how many (3).
+  // 'lineship', 'frigate', 'sidewheeler', 'cruiser', 'caravel' or 'balsa'), grid.SHIP_COUNT how many (3).
   const seaCell = (x, y) => {
     const r = Math.round((y - 1) / 1.5);
     const c = Math.round((x - Math.sqrt(3) / 2) / Math.sqrt(3) - 0.5 * (r & 1));
@@ -431,7 +459,7 @@ export function mapArt(grid, { keepClear = [], seaLines = [], compass = null } =
     land += use(grid.CARAVAN ?? 'caravan', best.x, best.y, 1.1);
     take(best.x, best.y, 2.4);
   }
-  // Sights (grid.SIGHTS, [x, y, art]) go where they are put: a reed boat on a lake, a rider on the plains.
+  // Sights (grid.SIGHTS, [x, y, art]) go where they are put: a reed boat on a lake, a rider on the plains, a dhow at sea.
   for (const [x, y, kind] of grid.SIGHTS ?? []) {
     // On land over the territory's colour, as the caravans; on water with the ships.
     if (onLand(x, y)) land += use(kind, x, y, 1.2);

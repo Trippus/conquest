@@ -11,9 +11,10 @@ import { JAPAN_GRID } from './japan.js';
 import { NAPOLEON_GRID } from './napoleon.js';
 import { LIBERATION_GRID } from './liberation.js';
 import { WEST_GRID } from './west.js';
+import { ETHIOPIA_GRID } from './ethiopia.js';
 import { WORLD_GRID } from './world.js';
 
-export const MAPS = { italy: ITALY_GRID, alexander: ALEXANDER_GRID, vikings: VIKINGS_GRID, england: ENGLAND_GRID, inka: INKA_GRID, songhai: SONGHAI_GRID, japan: JAPAN_GRID, napoleon: NAPOLEON_GRID, liberation: LIBERATION_GRID, west: WEST_GRID, world: WORLD_GRID };
+export const MAPS = { italy: ITALY_GRID, alexander: ALEXANDER_GRID, vikings: VIKINGS_GRID, england: ENGLAND_GRID, inka: INKA_GRID, songhai: SONGHAI_GRID, japan: JAPAN_GRID, napoleon: NAPOLEON_GRID, liberation: LIBERATION_GRID, west: WEST_GRID, ethiopia: ETHIOPIA_GRID, world: WORLD_GRID };
 
 // A map's rules: the game's rules with the map's own changes (seat compensation, handicap for Let).
 export const rulesFor = (grid, base) => ({ ...base, ...grid.RULES });

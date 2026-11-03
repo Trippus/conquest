@@ -17,7 +17,7 @@ export const TOGTER = [
   { map: 'alexander', opponents: 2, home: 'hl', goal: ['la', 'me', 'pe'], art: 'assets/togter/alexander.jpg' },
   { map: 'threekingdoms', opponents: 3, home: 'zy', goal: ['sh', 'jz', 'jd'], bonus: 0.9 },
   { map: 'vikings', opponents: 2, home: 'dk', goal: ['dk', 'br', 'no'], bonus: 0.2, art: 'assets/togter/vikings.jpg' },
-  { map: 'england', opponents: 3, home: 'nm', goal: ['wx', 'me', 'ea'] },
+  { map: 'england', opponents: 3, home: 'nm', goal: ['wx', 'me', 'ea'], art: 'assets/togter/england.jpg' },
   { map: 'inka', opponents: 3, home: 'hd', goal: ['ch', 'co', 'cm'], bonus: 0.5 },
   { map: 'constantinople', opponents: 3, home: 'an', goal: ['tr', 'gr', 'sr'], bonus: 0.5 },
   { map: 'songhai', opponents: 3, home: 'so', goal: ['nb', 'nd'], plusOne: true, bonus: 0.6 },
@@ -25,7 +25,7 @@ export const TOGTER = [
   { map: 'japan', opponents: 3, home: 'to', goal: ['to', 'ks', 'ki'], bonus: 0.5 },
   { map: 'napoleon', opponents: 3, home: 'fr', goal: ['fr', 'os', 'pr'], bonus: 0.6 },
   { map: 'liberation', opponents: 3, home: 've', goal: ['ng', 'qu', 'pe'], bonus: 0.45, art: 'assets/togter/liberation.jpg' },
-  { map: 'west', opponents: 3, home: 'mi', goal: ['tx', 'ca', 'or'], bonus: 0.3 },
+  { map: 'west', opponents: 3, home: 'mi', goal: ['tx', 'ca', 'or'], bonus: 0.3, art: 'assets/togter/west.jpg' },
   { map: 'ethiopia', opponents: 3, home: 'sh', goal: ['ti', 'kf', 'og'], bonus: 0.55 },
   { map: 'world', opponents: 3, goal: ['eu'], plusOne: true, bonus: 0.4 },
 ];

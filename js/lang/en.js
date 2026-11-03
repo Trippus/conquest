@@ -116,6 +116,13 @@ export const EN = {
       story: 'Alexander is 21 and King of Macedon. With nearly 40,000 men he crosses the Hellespont to attack the Persian Empire, the largest in the world. Darius III can raise armies from Egypt to the Indus.',
       epilogue: 'Alexander defeated Darius at Issus and Gaugamela and reached the Indus. He died in Babylon in 323 BC, only 32, and his generals divided the empire.',
     },
+    threekingdoms: {
+      year: '220',
+      goal: 'Conquer Shu in the west and all the Yangzi lands: Jingzhou and Jiangdong.',
+      teaser: 'Wei against Liu Bei’s Shu, Sun Quan’s Wu and the tribes of the south.',
+      story: 'The Han dynasty has ruled China for 400 years, but now it is over. Cao Pi has taken the title of emperor in Luoyang and founded Wei, which holds all the north. But Liu Bei calls himself emperor too, in Chengdu, and Sun Quan rules the Yangzi from Jianye. Three kingdoms, and only one can become the Son of Heaven.',
+      epilogue: 'The three kingdoms fought for 60 years. Zhuge Liang attacked Wei from Shu five times without winning. Wei conquered Shu in 263, but two years later the Sima family took power and founded the Jin. In 280 the Jin fleet sailed down the Yangzi and took Jianye, and China was one again. The story of the three kingdoms is still one of China’s best loved.',
+    },
     vikings: {
       year: '793',
       goal: 'Build an empire across the North Sea, like Cnut the Great.',

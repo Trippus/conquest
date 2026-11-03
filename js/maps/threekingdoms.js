@@ -1,0 +1,322 @@
+// De tre kongeriger, 220: the Han dynasty has fallen, and Cao Pi of Wei, who holds the north from
+// Luoyang, faces Liu Bei's Shu in the west, Sun Quan's Wu on the Yangzi, Meng Huo's tribes of
+// Nanzhong, the Gongsun of Liaodong and the Xianbei of the steppe. The map shows China from the Gobi
+// to the Gulf of Tonkin with Korea, Japan and Indochina round it, the Yangzi, the Yellow River, the
+// Han and the Huai, and a piece of the Great Wall. 33 territories in 10 regions, drawn as a hex grid
+// (see hex.js for what each part means). The coastlines are real (tools/make-grid.mjs); land outside
+// the campaign is '#', drawn as unexplored.
+
+import { hexMap } from './hex.js';
+
+export const GRID = [
+  '#################################################################################################################################################################################',
+  '#################################################################################################################################################################################',
+  '#################################################################################################################################################################################',
+  '#################################################################################################################################################################################',
+  '#################################################################################################################################################################################',
+  '#################################################################################################################################################################################',
+  '#################################################################################################################################################################################',
+  '#################################################################################################################################################################################',
+  '#################################################################################################################################################################################',
+  '#################################################################################################################################################################################',
+  '#################################################################################################################################################################################',
+  '#################################################################################################################################################################################',
+  '#################################################################################################################################################################################',
+  '###############################################################################################################################################################################..',
+  '###############################################################################################################################################################################..',
+  '##############################################################################################################################################################################...',
+  '##############################################################################################################################################################################...',
+  '#############################################################################################################################################################################....',
+  '###################################################################################################################RR#######################################################.....',
+  '##################################################################################################################RRRR##########################################.#########.......',
+  '##################################################################################################################RRRRR#########################################...######........',
+  '#################################################################################################################RRRRRRR#######################################......#...........',
+  '#################################################################################################################RRRRRRRR############SS######################....................',
+  '################################################################################################################RRRRRRRRRR########SSSSS######################....................',
+  '################################################################################################################JRRRRRRRRRR####SSSSSSSS####################......................',
+  '##############################################################################################################JJJRRRRRRRRRRRSSSSSSSSSSS###################.......................',
+  '##############################################################################################################JJJJRRRRRRRRRRSSSSSSSSSSS###################.......................',
+  '############################################################################################################JJJJJJRRRRRRRRRRSSSSSSSSSSS##################........................',
+  '###########################################################################################################JJJJJJJJRRRRRRRRRSSSSSSSSSSSS#################........................',
+  '##################################################################################################JJJJJJJJJJJJJJJJJRRRRRRRRRSSSSSSSSSSS##################........................',
+  '####################WWWW##########WW##############################################################JJJJJJJJJJJJJJJJJRRRRRRRRRSSSSSSSSSSSS#################........................',
+  '###################WWWWWWWW######WWWW############################################################JJJJJJJJJJJJJJJJJJRRRRRR...SSSSSSSSSSS#################.........................',
+  '##################WWWWWWWWWWWW###WWWWWW###########################################################JJJJJJJJJJJJJJJJJJRRRR......SSSSSSSSSS###############..........................',
+  '#################WWWWWWWWWWWWWWWWWWWWWWW#######WWW###############################################JJJJJJJJJJJJJJJJJJJRRR......SSSSSSSSSSUUU############...........................',
+  '##################WWWWWWWWWWWWWWWWWWWWWWWW###WWWWWW##############################################JJJJJJJJJJJJJJJJJJJJRR......SSSSSSSSSUUUUUUUU#######............................',
+  '###################WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW##################################BBBBBBBBBBBZJJJJJJJJJJJJJJJJJJJJ.......SSSSSSSSSUUUUUUUUUUU##...............................',
+  '#####################WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW#################################BBBBBBBBBBBZZZJJJJJJJJJJJJJJJJJ.......SSSSSSSS...UUUUUUUUUUU................................',
+  '#####################WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW#################################BBBBBBBBBBZZZZJJJJJJJJJJJJJJJ........SSSSS.........UUUUUUUUU................................',
+  '#######################WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW###############################BBBBBBBBBBBZZZZZJJJJJJJJJJJJJJ.......SSSS...........UUUUUUUU................................',
+  '########################WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW#############################BBBBBBBBBBBZZZZZZJJJJJJJJ.JJJ..........SS............UUUUUUU.................................',
+  '##########################WWWWW##WWWWWWWWWWWWWWWWWWWWWWWW###########################BBBBBBBBBBBZZZZZZZZJJJZZZ..............S.............UUUUUUUUU...............................',
+  '###########################WWW#####WWWWWWWWWWWWWWWWWWWWWWW#########################BBBBBBBBBBBZZZZZZZZZZZZZZ.............S..............UUUUUUUUUUU..............................',
+  '############################W#########WWWWWWWWWWWWWWWWWWWWWWW######################BBBBBBBBBBBZZZZZZZZZZZZZZZ...........................UUUUUUUUUUUU.............................',
+  '#######################################WWWWWWWWWWWWWWWWWWWWWWW###############AAAABBBBBBBBBBBBBZZZZZZZZZZZZZZ...........................UUUUUUUUUUUUU.............................',
+  '#########################################WWWWWWWWWWWWWWWWWWWWWWW############AAAAAABBBBBBBBBBBBBZZZZZZZZZZZZZZZ.........................UUUUUUUUUUUUUU............................',
+  '#########################################WWWWWWWWWWWWWWWWWWWWWWW##########AAAAAAAABBBBBBBBBBBBZZZZZZYYZZZZZZZZQQQ.......................UUUUUUUUUUU##............................',
+  '##########################################WWWWWWWWWWWWWWWWWWWWWW#########AAAAAAAAAABBBBBBBBBBBBZZYYYYYYZZZZZZZQQQQ......Q................U...UUUUU####...........................',
+  '##########################################WWWWWWWWWWWWWWWWWWWWWTT######AAAAAAAAAAAABBBBBBBBBBBBYYYYYYYYZZZZZZQQQQ.....QQQQ...................UUUU#####...........................',
+  '###########################################WWWWWWWWWWWWWWWWWWWTTTTT###AAAAAAAAAAAAAABBBBBBBBBBBYYYYYYYYYZZZZZQQQQQ...QQQQQQQQQQ...............UU#######..........................',
+  '############################################WWWWWWWWWWWWWWWWTTTTTTTTAAAAAAAAAAAAAAAABBBBBBBBBYYYYYYYYYYYZZZQQQQQQQ..QQQQQQQQQQQ...............#########..........................',
+  '##############################################WWWWWWWWWWWWWTTTTTTTTTAAAAAAAAAAAAAAAABBBBBBBBBYYYYYYYYYYYZZZQQQQQQQQQQQQQQQQQQQQ..............#.#########.........................',
+  '##############################################WWWWWWWWWWWTTTTTTTTTTTAAAAAAAAAAAAAAAABBBBBBBBBYYYYYYYYYYYCCQQQQQQQQQQQQQQQQQ.................############.........................',
+  '###############################################WWWWWWWWWTTTTTTTTTTTTTAAAAAAAAAAAAAAABBBBBBBBBYYYYYYYYYYCCCCQQQQQQQQQQQQQQ....................###########.........................',
+  '###############################################WWWWWWWTTTTTTTTTTTTTTTAAAAAAAAAAAAAABBBBBBBBBYYYYYYYYYCCCCCCQQQQQQQGGQQQQ.....................###########.........................',
+  '###################################################WWTTTTTTTTTTTTTTTTTAAAAAAAAAAAAAABBBBBBBBBYYYYYYYYCCCCCCCQQQQGGGGGG.Q......................##########..............#..........',
+  '####################################################TTTTTTTTTTTTTTTTTTAAAAAAAAAAAAABBBBBBBBBYYYYYYYYCCCCCCCCQGGGGGGGGG........................##########........................#',
+  '#####################################################TTTTTTTTTTTTTTTTTTAAAAAAAAAAAAABBBBBBBBBYYYYYYYCCCCCCCCCGGGGGGGGG........................##########.........................',
+  '#####################################################TTTTTTTTTTTTTTTTTTAAAAAAAAAAAAABBBBBBBBYYYYYYCCCCCCCCCCCGGGGGGG.........................###########..................###..##',
+  '######################################################TTTTTTTTTTTTTTTTTAAAAAAAAAAAAAALLLLLLLLYYYYCCCCCCCCCCCCGGGGGGG.........................###########............#############',
+  '######################################################TTTTTTTTTTTTTTTTTAAAAAAAAAAAAALLLLLLLLLLYYCCCCCCCCCCCCPGGGGGG.........................###########............##############',
+  '#######################################################TTTTTTTTTTTTTTTTAAAAAAAAAAAAALLLLLLLLLLXXCCCCCCCCCCCPPPPGGGG..........................#######.#............###############',
+  '#######################################################TTTTTTTTTTTTTTTTAAAAAAAAAAAALLLLLLLLLLXXXCCCCCCCCCCPPPPPPGG.........................#.###..#.#............################',
+  '#######################################################TTTTTTTTTTTTTTTTAAAAAAAAAAAAALLLLLLLLLXXXXCCCCCCCCPPPPPPPPPGG.........................##.#...............#########.....###',
+  '#######################################################TTTTTTTTTTTTTTTHAAAAAAAAAAAALLLLLLLLLXXXXXXCCCCCCCPPPPPPPPPPPP......................#..................########.....#.####',
+  '########################################################TTTTTTTTTTTTTHHHAAAAAAAAAAALLLLLLLLLXXXXXXXCCCCCCPPPPPPPPPPPPPP................................#......####......###..####',
+  '########################################################TTTTTTTTTTTTHHHHAAAAAAAAAAALLLLLLLLXXXXXXXXCCCCCPPPPPPPPPPPPPP.......................................##.##..#..####..####',
+  '#########################################################THHTTTTTTTHHHHHHAAAAAAAAAVVLLLLLLLXXXXXXXXXXXCCPPPPPPPPPPPPPPP.....................................##......#######...###',
+  '########################################################HHHHHHHHHHHHHHHHHAAAAAAAAVVVVLLLLLXXXXXXXXXXXXXPPPPPPPPPPPPPPPP....................................###.#...#######....##.',
+  '########################################################HHHHHHHHHHHHHHHHHHAAAAAAVVVVVVLLLLXXXXXXXXXXXXXXPPPPPPPPPPPPPPPP....................###...........######...####..#.......',
+  '######################################################DDHHHHHHHHHHHHHHHHHHAAAAVVVVVVVVVVVVXXXXXXXXXXXXXXPPPPPPPPPPPPPPPP...............................##########..###...........',
+  '#####################################################DDDDHHHHHHHHHHHHHHHHHHHAVVVVVVVVVVVVVVXXXXXXXXXXXXXjjjjPPPPPPPPPPPPP.................................#.#####..##............',
+  '###################################################DDDDDDHHHHHHHHHHHHHHHHHHHVVVVVVVVVVVVVVVVXXXXXXXXXXXjjjjjjjjPPPPPPPPP.................................##.#####..#.............',
+  '###################################################DDDDDDDHHHHHHHHHHHHHHHHHHVVVVVVVVVVVVVVVVVXXXXXXXXXXjjjjjjjjjjjjPPPPww............................#...#..#####................',
+  '###################################################DDDDDDDHHHHHHHHHHHHHHHHHKVVVVVVVVVVVVVVVVVXXXXXXXXXjjjjjjjjjjjjjjjwwwww................................#.####.................',
+  '###################################################DDDDDDDDHHHHHHHHHHHHHHHKKKVVVVVVVVVVVVVVVVVXXXXXXXXjjjjjjjjjjjjjjjwwwwww.................................####.................',
+  '##################################################DDDDDDDDDHHHHHHHHHHHHHKKKKKVVVVVVVVVVVVVVVVVXXXXXXXjjjjjjjjjjjjjjjjwwwwww...............................#####..................',
+  '###################################################DDDDDDDDDDHHHHHHHHHHKKKKKKKKVVVVVVVVVVVVVVVIXXXXXjjjjjjjjjjjjjjjjjwwww.ww...............................#####.................',
+  '##################################################DDDDDDDDDDDDHHHHHHHKKKKKKKKKKVVVVVVVVVVVVVVIIIIIIjjjjjjjjjjjjjjjjjwwwwwww................................#.##..................',
+  '###################################################DDDDDDDDDDDDDHHHHHKKKKKKKKKKKVVVVVVVVVVVVVIIIIIIIjjjjjjjjjjjjjjjjwwwwwww................................#.#...................',
+  '##################################################DDDDDDDDDDDDDDDHKKKKKKKKKKKKKKVVVVVVVVVVVVIIIIIIIIjjjjjjjjjjjjjjjwwwwwwww......................................................',
+  '###################################################DDDDDDDDDDDDDDDKKKKKKKKKKKKKKKKVIIIIIIIIIIIIIIIIIjjjjjjjjjjjjjjjwwwwwwwww.....................................................',
+  '##################################################DDDDDDDDDDDDDDDKKKKKKKKKKKKKKKKKIIIIIIIIIIIIIIIIIIjjjjjjjjjjjjjjwwwwwwww...................................#...................',
+  '###################################################DDDDDDDDDDDDDDKKKKKKKKKKKKKKKKKIIIIIIIIIIIIIIIIIIjjjjjjjjjjjjjjkkkkkkkk.......................................................',
+  '##################################################DDDDDDDDDDDDDDKKKKKKKKKKKKKKKKKIIIIIIIIIIIIIIIIIIIjjjjjjjyyyyyjkkkkkkk...................................#.....................',
+  '###################################################DDDDDDDDDDDDDKKKKKKKKKKKKKKKKKIIIIIIIIIIIIIIIIIIIIjjjjyyyyyyyykkkkkkk.kk......................................................',
+  '##################################################DDDDDDDDDDDDDKKKKKKKKKKKKKKKKKIIIIIIIIIIIIIIIIIIIIjjyyyyyyyyyykkkkkkkkkkk......................................................',
+  '###################################################DDDDDDDDDDDDKKKKKKKKKKKKKKKKIIIIIIIIIIIIIIIIIIIIIIyyyyyyyyyyyykkkkkkkkkkkk....................................................',
+  '#################################################NNDDDDDDDDDDDKKKKKKKKKKKKKKKKIIIIIIIIIIIIIIIIIIIIIyyyyyyyyyyyyykkkkkkkkkkkk.....................................................',
+  '################################################NNNNNNDDDDDDDDKKKKKKKKKKKKKKKKIIIIIIIIIIIIIIccIIIIyyyyyyyyyyyyyykkkkkkkkkkkkk....................................................',
+  '###############################################NNNNNNNNDDDDDDKKKKKKKKKKKKKKKIIIIIIIIIIIIIccccccIIyyyyyyyyyyyyyyykkkkkkkkkkk......................................................',
+  '###############################################NNNNNNNNNNDDDDKKKKKKKKKKKKKKKIIIIIIIIIIIIIcccccccyyyyyyyyyyyyyyyykkkkkkkkkkkk.....................................................',
+  '##############################################NNNNNNNNNNNNDDKKKKKKKKKKKKKKKIIIIIIIIIIIIIccccccccyyyyyyyyyyyyyyykkkkkkkkkkkk......................................................',
+  '##############################################NNNNNNNNNNNNNNKKKKKKKKKKKKKKKKIIIIIIIIIIIIcccccccccyyyyyyyyyyyyyykkkkkkkkkkkk......................................................',
+  '##############################################NNNNNNNNNNNNNNKKKKKKKKKKKKKKKIIIIIIIIIIIIcccccccccyyyyyyyyyyyyyykkkkkkkkkkkkk......................................................',
+  '##############################################NNNNNNNNNNNNNNNKKKKKKKKKKKKKKIIIIIIIIIIIIccccccccccyyyyyyyyyyyyykkkkkkkkkkk........................................................',
+  '#############################################NNNNNNNNNNNNNNNNKKKEEEEEEEEEEEIIIIIIIIIIIccccccccccyyyyyyyyyyyyykkkkkkkkkkk.........................................................',
+  '#############################################NNNNNNNNNNNNNNNNNEEEEEEEEEEEEEEIIIIIIIIIIcccccccccccyyyyyyyyyyyyykkkkkkkkkk..............................#..........................',
+  '#############################################NNNNNNNNNNNNNNNNEEEEEEEEEEEEEEEEIIIIIIIIcccccccccccyyyyyyyyyyyyykkkkkkkkkk..........................................................',
+  '#############################################NNNNNNNNNNNNNNNNEEEEEEEEEEEEEEEEEIIIllllllccccccccccyyyyyyyyyyyykkkkkkkkkkk.........................................................',
+  '############################################NNNNNNNNNNNNNNNNEEEEEEEEEEEEEEEEEllllllllllllcccccccyyyyyyyyyyykkkkkkkkkkkk..........................................................',
+  '############################################NNNNNNNNNNNNNNNNNEEEEEEEEEEEEEEEEEllllllllllllcccccccyyyyyyyyyyykkkkkkkkkk...........................................................',
+  '######################################OOOOOONNNNNNNNNNNNNNNNEEEEEEEEEEEEEEEEEElllllllllllcccccccyyyyyyyyyyykkkkkkkkkk..............................#.............................',
+  '#################################OOOOOOOOOOOOONNNNNNNNNNNNNNEEEEEEEEEEEEEEEEEEEllllllllllllccccccyyyyyyyyyykkkkkkkkkk............................................................',
+  '##########################OOOOOOOOOOOOOOOOOOOONNNNNNNNNNNNNNEEEEEEEEEEEEEEEEEEllllllllllllllccccyyyyyyyyyykkkkkkkkkk.............................#...............................',
+  '#######################OOOOOOOOOOOOOOOOOOOOOOOONNNNNNNNNNNNNNEEEEEEEEEEEEEEEEEEllllllllllllllllccyyyyyyyyyykkkkkkkkk.............................................................',
+  '#######################OOOOOOOOOOOOOOOOOOOOOOOOONNNNNNNNNNNNNEEEEEEEEEEEEEEEEEglllllllllllllllllyyyyyyyyyykkkkkkkkkk.............................................................',
+  '#########################OOOOOOOOOOOOOOOOOOOOOOOONNNNNNNNNNNNNEEEEEEEEEEEEEEEEgggllllllllllllllllyyyyyyyyykkkkkkkkkk.............................................................',
+  '##########################OOOOOOOOOOOOOOOOOOOOOOONNNNNNNNNNNNNEEEEEEEEEEEEEEEggggglllllllllllllllyyyyyyyyykkkkkkkkk..............................................................',
+  '###########################OOOOOOOOOOOOOOOOOOOOOOONNNNNNNNNNNNNEEEEEEEEEEEEEEggggggllllllllllllllllyyyyyyykkkkkkkkk..............................................................',
+  '############################OOOOOOOOOOOOOOOOOOOOONNNNNNNNNNNNNNEEEEEEEEEEEEEEggggggglllllllllllllllyyyppppkkkkkkk.........#......................................................',
+  '##############################OOOOOOOOOOOOOOOOOOOONNNNNNNNNNNNNNNEEEEEEEEEEEEgggggggglllllllllllllllpppppppkkkkkkk.......####....................................................',
+  '###############################OOOOOOOOOOOOOOOOOOONNNNNNNNNNNNNNNEEEEEEEEEEEggggggggggglllllllllllppppppppppkkkk........####............#........................................',
+  '################################OOOOOOOOOOOOOOOOOOONNNNNNNNNNNNNNNEEEEEEEEEEggggggggggggglllllllllpppppppppppkkk........####.....................................................',
+  '#################################OOOOOOOOOOOOOOOOOONNNNNNNNNNNNNNEEEEEEEEEEgggggggggggggggppppppppppppppppppp..........#####........#............................................',
+  '###################################OOOOOOOOOOOOOOOONNNNNNNNNNNNNNNEEEEEEEEEgggggggggggggggpppppppppppppppppppp.........#####.....................................................',
+  '###################################OOOOOOOOOOOOOOOONNNNNNNNNNNNNNNEEEEEggggggggggggggggggpppppppppppppppppppp.........#####......................................................',
+  '#####################################OOOOOOOOOOOOOOONNNNNNNNNNNNNNNEggggggggggggggggggggggpppppppppppppppppp..........#####......................................................',
+  '######################################OOOOOOOOOOOOO#NNNNNNNNNNNNNNNggggggggggggggggggggggpppppppppppppppppp..........######......................................................',
+  '#########.##############################OOOOOOOOOO####NNNNNNNNNNNNNggggggggggggggggggggggppppppppppppppppp............#####......................................................',
+  '########################################OOOOOOOOO######NNNNNNNNNNNgggggggggggggggggggggggppppppppppppppp.............#####.......................................................',
+  '#########################################OOOOOOO########NNNNNNNNNNgggggggggggggggggggggggpppp.ppppppppppp.............####.......................................................',
+  '#########################################OOOOO###########NNNNNNNzzggggggggggggggggggggggppppp.ppppp.p.................###........................................................',
+  '##########...#############################OOOO#############NNNNzzzzzgggggggggggggggggggggppppp.pp......................##........................................................',
+  '##########..##############################OO###############NNzzzzzzzggggggggggggggggggggppppp..p.......................#.........................................................',
+  '##########.#..##############################################zzzzzzzzzgggggggggggggggggggpppppp..........................#........................................................',
+  '######.#......#############################################zzzzzzzzzzggggggggggggggggggpppp......................................................................................',
+  '##.##..........############################################zzzzzzzzzzzggggg.gggggggggggg.p.......................................................................................',
+  '..............#############################################zzzzzzzzzzzzggg...ggggggggg....#......................................................................................',
+  '...............############################################zzzzzzzzzzzzz........gggg.............................................................................................',
+  '..............############################################zzzzzzzzzzzzz........ggg...............................................................................................',
+  '...............###########################################zzzzzzzzzzzzz.........g.g..............................................................................................',
+  '...............##########################################zzzzzzzzzzz.z.........ggg...............................................................................................',
+  '................###########################################zzzzzzzzz............gg...............................................................................................',
+  '.................#########################################zzzzzzzzzz............gg...............................................................................................',
+  '..................#########################################zzzzzzzzz.............................................................................................................',
+  '..................#.#######################################zzzzzzz...............##..............................................................................................',
+  '.....................######################################zzzzzzz............######.............................................................................................',
+  '.....................######################################zzzzzz............#######.............................................................................................',
+  '.....................#######################################zzzzz...........#######..............................................................................................',
+  '....................#######################################zzzzzz..........#######...............................................................................................',
+  '.....................#######################################zzzzz...........#######..............................................................................................',
+  '....................#.######################################zzzzz..........#######...............................................................................................',
+  '.......................#####################################zzzzz...........#####.......................................##.......................................................',
+  '.......................#######################################zzzz..........####.......................................####......................................................',
+  '........................##########################################z....................................................#######...................................................',
+  '.......................############################################....................................................######....................................................',
+  '........................############################################...................................................######....................................................',
+  '........................############################################..................................................#######....................................................',
+  '........................#############################################..................................................#######...................................................',
+  '.......................#########.####################################..................................................#######...................................................',
+  '........................#########.####################################.................................................########..................................................',
+  '.......................#########.######################################...............................................########...................................................',
+  '.......................#########..######################################...............................................#######...................................................',
+  '......................########....######################################..............................................#######....................................................',
+  '.......................#.####......#######################################...........................................#.######....................................................',
+  '.......................#####.......#######################################..........................................#######......................................................',
+];
+
+// The regions of the Han empire as the three kingdoms knew them; no region shares its name with one
+// of its territories.
+export const REGIONS = {
+  zy: 'Zhongyuan',
+  gz: 'Guanzhong',
+  hb: 'Hebei',
+  sd: 'Shandong',
+  ld: 'Liaodong',
+  sh: 'Shu',
+  nz: 'Nanzhong',
+  jz: 'Jingzhou',
+  jd: 'Jiangdong',
+  ln: 'Lingnan',
+};
+
+// letter: [id, name, region]. Capitals and commanderies of the Han.
+export const TERRITORIES = {
+  L: ['luoyang', 'Luoyang', 'zy'],
+  X: ['xuchang', 'Xuchang', 'zy'],
+  Y: ['ye', 'Ye', 'zy'],
+  C: ['chenliu', 'Chenliu', 'zy'],
+  A: ['changan', "Chang'an", 'gz'],
+  T: ['tianshui', 'Tianshui', 'gz'],
+  W: ['wuwei', 'Wuwei', 'gz'],
+  J: ['ji', 'Ji', 'hb'],
+  Z: ['zhongshan', 'Zhongshan', 'hb'],
+  B: ['taiyuan', 'Taiyuan', 'hb'],
+  Q: ['linzi', 'Linzi', 'sd'],
+  G: ['langya', 'Langya', 'sd'],
+  P: ['xiapi', 'Xiapi', 'sd'],
+  S: ['xiangping', 'Xiangping', 'ld'],
+  R: ['liaoxi', 'Liaoxi', 'ld'],
+  U: ['lelang', 'Lelang', 'ld'],
+  D: ['chengdu', 'Chengdu', 'sh'],
+  H: ['hanzhong', 'Hanzhong', 'sh'],
+  K: ['jiangzhou', 'Jiangzhou', 'sh'],
+  N: ['jianning', 'Jianning', 'nz'],
+  O: ['yongchang', 'Yongchang', 'nz'],
+  E: ['zangke', 'Zangke', 'nz'],
+  V: ['xiangyang', 'Xiangyang', 'jz'],
+  I: ['jiangling', 'Jiangling', 'jz'],
+  c: ['changsha', 'Changsha', 'jz'],
+  l: ['lingling', 'Lingling', 'jz'],
+  j: ['jianye', 'Jianye', 'jd'],
+  w: ['wujun', 'Wujun', 'jd'],
+  k: ['kuaiji', 'Kuaiji', 'jd'],
+  y: ['yuzhang', 'Yuzhang', 'jd'],
+  p: ['panyu', 'Panyu', 'ln'],
+  g: ['cangwu', 'Cangwu', 'ln'],
+  z: ['jiaozhi', 'Jiaozhi', 'ln'],
+};
+
+export const TERRAIN = {
+  L: 'forest', // the plains of the north, farmed and wooded
+  X: 'forest',
+  Y: 'forest',
+  C: 'forest',
+  Z: 'forest',
+  J: 'forest',
+  Q: 'forest',
+  G: 'forest',
+  P: 'forest',
+  A: 'mountains', // the loess hills and the passes of the west
+  T: 'mountains',
+  B: 'mountains',
+  H: 'mountains',
+  D: 'mountains',
+  O: 'mountains',
+  N: 'mountains',
+  E: 'mountains',
+  W: 'desert', // the Hexi corridor, between the Gobi and the mountains
+  S: 'spruce', // the cold north-east
+  R: 'spruce',
+  U: 'spruce',
+  K: 'oak', // the warm, wet south
+  V: 'oak',
+  I: 'oak',
+  c: 'oak',
+  l: 'oak',
+  j: 'oak',
+  w: 'oak',
+  k: 'oak',
+  y: 'oak',
+  p: 'oak',
+  g: 'oak',
+  z: 'oak',
+};
+
+export const SEA = [
+  ['Q', 'S'], // Donglai to Liaodong over the Bohai strait
+];
+
+// Drawn, not played: the Yangzi, the Yellow River, the Han and the Huai, and the Great Wall
+// (tools/grids/threekingdoms.mjs, in map units).
+export const RIVERS = [[[73.78,148],[86.5,156.25],[97.31,146.5],[105.58,137.5],[117.67,131.5],[129.75,122.5],[141.2,121],[153.92,126.25],[160.28,133],[167.28,124.75],[178.09,130],[186.99,124],[195.26,113.5],[203.53,115],[211.8,116.5]],[[80.14,94],[100.49,83.5],[109.4,72.25],[118.94,58],[127.21,49],[146.29,51.25],[143.74,64],[142.47,86.5],[142.47,93.25],[159.01,92.5],[171.73,88.75],[180.63,81.25],[188.27,73],[194.63,69.25]],[[118.3,105.25],[132.93,107.5],[143.74,109],[153.28,113.5],[156.46,119.5],[166.64,124]],[[161.55,109.75],[174.91,110.5],[186.99,106.75],[195.9,102.25],[204.17,98.5]]];
+export const SIGHTS = [[160.92,52.38,"wall"]];
+
+// Region missions: about 7–9 territories each; the small ones need one more region of your choice.
+export const MISSIONS = [
+  { type: 'regions', regions: ['sh', 'nz'], plusOne: true },
+  { type: 'regions', regions: ['jd', 'ln'] },
+  { type: 'regions', regions: ['zy', 'gz'] },
+  { type: 'regions', regions: ['gz', 'sh'], plusOne: true },
+  { type: 'regions', regions: ['hb', 'ld', 'sd'] },
+  { type: 'regions', regions: ['jz', 'jd'] },
+  { type: 'regions', regions: ['zy', 'sd'], plusOne: true },
+];
+
+// Where the region names and the compass go. A name may sit on unexplored land.
+export const REGION_PLACES = { zy: [163, 85.5], gz: [120.2, 67], hb: [172.5, 41.5], sd: [208.65, 90], ld: [228.65, 58.5], sh: [91.9, 101.5], nz: [91.65, 184.5], jz: [141, 144.4], jd: [221.2, 125.5], ln: [152.6, 195] };
+export const COMPASS = [236, 130, 2.4];
+export const SHIP = 'towership'; // a Han tower ship, the louchuan, with its decks of archers
+export const OCEANS = [[90, 132], [140, 92], [60, 130]];
+export const LANDMARKS = [[172, 23.5, 'Xianbei'], [102, 31, 'Gobi'], [51, 98.5, 'Qiang'], [245, 38.5, 'Goguryeo'], [253, 85, 'Samhan'], [286, 95, 'Wa (Japan)'], [19, 53.5, 'Vestlandene'], [70, 192, 'Ailao']];
+
+// Rules that differ from the modern rules on this map, measured with npm run balance -- threekingdoms: seats
+// 54/46, 31/36/34 and 25/24/24/26 with 2, 3 and 4 players; easy computer players start with 30% fewer
+// armies, so a medium bot standing in for a player wins 98%/85% against two/three of them (many small
+// regions: aim 85–90%).
+export const RULES = { laterSeatArmies: { 2: 7, 3: 2, 4: 1, 5: 0, 6: 0 }, noviceHandicap: 0.3 };
+
+// The flavour of the age: the computer players' names and what the winner becomes.
+export const RULERS = ['Liu Bei', 'Sun Quan', 'Zhuge Liang', 'Meng Huo', 'Gongsun Gong', 'Kebineng'];
+export const TITLE = 'Son of Heaven';
+
+// The names in English, where they differ (see inLanguage in index.js).
+export const EN = {
+  name: 'The Three Kingdoms',
+  LANDMARKS: { Vestlandene: 'The Western Regions', 'Wa (Japan)': 'Wa (Japan)' },
+};
+
+export const THREEKINGDOMS_GRID = hexMap({
+  id: 'threekingdoms',
+  name: 'De tre kongeriger',
+  GRID,
+  REGIONS,
+  TERRITORIES,
+  TERRAIN,
+  SEA,
+  RIVERS,
+  SIGHTS,
+  MISSIONS,
+  REGION_PLACES,
+  COMPASS,
+  SHIP,
+  OCEANS,
+  LANDMARKS,
+  RULES,
+  RULERS,
+  TITLE,
+  NAMES: { en: EN },
+});
+export const THREEKINGDOMS = THREEKINGDOMS_GRID.MAP;

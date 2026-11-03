@@ -21,13 +21,13 @@
 //   RULES         optional rules that differ from the game's rules on this map
 //   LANDMARKS     optional names on unexplored land: [[x, y, name]], in map units
 //   SHIP          optional: the kind of ship by the sea routes ('ship', 'longship', 'galley', 'atakebune',
-//                 'lineship', 'frigate', 'sidewheeler', 'cruiser', 'caravel', 'balsa'); SHIP_COUNT how many;
+//                 'lineship', 'frigate', 'sidewheeler', 'cruiser', 'caravel', 'balsa', 'towership'); SHIP_COUNT how many;
 //                 OCEANS, [row, column] in open sea for the ships the routes have no room for
 //   RIVERS        optional, drawn but not played: rivers as lines of [x, y] in map units, source to mouth;
 //                 RIVER_BOATS how many boats on the first; ROADS, lines like the rivers, drawn dashed;
 //                 CARAVANS, [x, y] where caravans walk, CARAVAN which ones ('caravan', camels, or
 //                 'llamas'); SIGHTS, [x, y, art] put just there ('reedboat' on a lake, 'llanero' or
-//                 'gaucho' on the plains, 'obelisk', 'dhow' at sea)
+//                 'gaucho' on the plains, 'obelisk', 'wall', 'dhow' at sea)
 //   RULERS, TITLE optional flavour: the computer players' names, and what the winner becomes;
 //                 EPITHET instead of a title, what follows the winner's name ('den Store')
 //   NAMES         optional names in other languages: { en: { name, REGIONS, TERRITORIES, LANDMARKS, RULERS, EPITHET } },

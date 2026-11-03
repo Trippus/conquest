@@ -116,6 +116,13 @@ export const DA = {
       story: 'Alexander er 21 år og konge af Makedonien. Med knap 40.000 mand krydser han Hellesponten for at angribe Perserriget, verdens største rige. Dareios III kan samle hære fra Egypten til Indus.',
       epilogue: 'Alexander slog Dareios ved Issos og Gaugamela og nåede helt til Indus. Han døde i Babylon i 323 f.Kr., kun 32 år gammel, og hans generaler delte riget.',
     },
+    threekingdoms: {
+      year: '220',
+      goal: 'Erobr Shu i vest og hele Yangzi-landet: Jingzhou og Jiangdong.',
+      teaser: 'Wei mod Liu Beis Shu, Sun Quans Wu og stammerne i syd.',
+      story: 'Han-dynastiet har styret Kina i 400 år, men nu er det forbi. Cao Pi har taget kejsertitlen i Luoyang og grundlagt Wei, der holder hele norden. Men Liu Bei kalder sig også kejser i Chengdu, og Sun Quan hersker over Yangzi fra Jianye. Tre kongeriger, og kun én kan blive Himlens søn.',
+      epilogue: 'De tre kongeriger kæmpede i 60 år. Zhuge Liang angreb Wei fra Shu fem gange uden at vinde. Wei erobrede Shu i 263, men to år senere tog Sima-slægten magten og grundlagde Jin. I 280 sejlede Jins flåde ned ad Yangzi og tog Jianye, og Kina var samlet igen. Fortællingen om de tre kongeriger er stadig en af Kinas mest elskede.',
+    },
     vikings: {
       year: '793',
       goal: 'Byg et rige over Nordsøen, som Knud den Store.',

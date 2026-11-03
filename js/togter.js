@@ -15,6 +15,7 @@
 export const TOGTER = [
   { map: 'italy', opponents: 2, home: 'la', goal: ['la', 'sa', 'mg', 'um'], bonus: 0.5, art: 'assets/togter/italy.jpg' },
   { map: 'alexander', opponents: 2, home: 'hl', goal: ['la', 'me', 'pe'], art: 'assets/togter/alexander.jpg' },
+  { map: 'threekingdoms', opponents: 3, home: 'zy', goal: ['sh', 'jz', 'jd'], bonus: 0.9 },
   { map: 'vikings', opponents: 2, home: 'dk', goal: ['dk', 'br', 'no'], bonus: 0.2, art: 'assets/togter/vikings.jpg' },
   { map: 'england', opponents: 3, home: 'nm', goal: ['wx', 'me', 'ea'] },
   { map: 'inka', opponents: 3, home: 'hd', goal: ['ch', 'co', 'cm'], bonus: 0.5 },

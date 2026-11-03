@@ -446,13 +446,15 @@ function render() {
     game.colors,
   );
 
+  // With four players or more, two to a row, so the names take less of the map.
+  $('players').classList.toggle('many', s.players.length > 3);
   $('players').replaceChildren(
     ...s.players.map((pl, i) => {
       const li = document.createElement('li');
       li.className = (i === p && s.phase !== 'over' ? 'current ' : '') + (pl.alive ? '' : 'out');
       const land = G.owned(s, i).length;
       li.title = L.playerTitle(pl.name, land, pl.stars);
-      li.innerHTML = `${sealIcon(lookOf(i))}${pl.name}
+      li.innerHTML = `${sealIcon(lookOf(i))}<span class="name">${pl.name}</span>
         <span class="stats">${land} · ${starsText(pl.stars)}</span>`;
       return li;
     }),

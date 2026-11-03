@@ -330,6 +330,49 @@ export const artDefs = (quarters = 'NØSV') => `
     <circle cx=".8" cy=".55" r=".22" fill="#6b4a32"/>
     <g fill="#3b2f2a" stroke="none"><circle cx="-1.75" cy=".35" r=".13"/><circle cx="-1.95" cy=".42" r=".13"/><circle cx="-1.85" cy=".2" r=".13"/></g>
   </g>
+  <g id="art-grass" stroke="${INK}" stroke-width=".05" stroke-linecap="round" fill="none">
+    <path d="M-.3.3Q-.32 0-.46-.2M-.22.3Q-.2-.05-.1-.3M-.14.3Q-.06.05.12-.12M.22.3Q.2.05.32-.12M.3.3Q.36.08.5.0" stroke="#7a8a4a"/>
+    <path d="M-.5.3H.56" opacity=".45"/>
+  </g>
+  <g id="art-ger" stroke="${INK}" stroke-width=".05" stroke-linejoin="round" stroke-linecap="round">
+    <path d="M-.7.12H.75" fill="none" stroke-width=".08"/>
+    <circle cx="-.42" cy=".28" r=".17" fill="#8a6a4a"/><circle cx=".42" cy=".28" r=".17" fill="#8a6a4a"/>
+    <path d="M-.55.12V-.3Q-.3-.62 0-.66Q.3-.62.55-.3V.12Z" fill="#efe4cc"/>
+    <path d="M-.55-.3H.55M-.12.12V-.16H.12V.12" fill="none"/>
+    <path d="M-.08-.66h.16v-.1h-.16Z" fill="#3b2f2a"/>
+  </g>
+  <g id="art-ox" stroke="${INK}" stroke-width=".05" stroke-linejoin="round" stroke-linecap="round">
+    <path d="M-.3.02L-.32.32M-.16.04L-.14.32M.16.04L.14.32M.28.02L.3.32" fill="none" stroke-width=".06"/>
+    <path d="M-.42-.06Q-.42-.3-.2-.3H.26Q.36-.32.44-.26L.6-.2Q.64-.1.56-.04L.42-.02Q.36.06.24.06H-.32Q-.42.04-.42-.06Z" fill="#6b4a32"/>
+    <path d="M.42-.28Q.46-.42.56-.42M.52-.24Q.62-.34.7-.3" fill="none"/>
+  </g>
+  <g id="art-gers">
+    <use href="#art-ger" transform="translate(-.9 0)"/><use href="#art-ox" transform="translate(.35 .1)"/>
+    <use href="#art-ger" transform="translate(1.55 -.06) scale(.85)"/><use href="#art-ox" transform="translate(2.55 .02) scale(.9)"/>
+  </g>
+  <g id="art-archer">
+    <use href="#art-horse"/>
+    <g stroke="${INK}" stroke-width=".05" stroke-linejoin="round" stroke-linecap="round">
+      <path d="M.02-.36L.1-.06" fill="none" stroke-width=".07"/>
+      <path d="M-.16-.3Q-.16-.62-.02-.7Q.14-.64.14-.3Z" fill="#2a4f8a"/>
+      <circle cx="-.02" cy="-.8" r=".09" fill="#3b2f2a"/>
+      <path d="M-.14-.84Q-.02-1.04.1-.84Z" fill="#a3261b"/>
+      <path d="M.08-.56L.42-.66" fill="none" stroke-width=".06"/>
+      <path d="M.42-1.02Q.66-.66.42-.3" fill="none" stroke="#6b4a32" stroke-width=".07"/>
+      <path d="M.42-1.02L.2-.64L.42-.3M.2-.64H.86" fill="none" stroke-width=".03"/>
+      <path d="M.86-.64L.76-.6V-.68Z" fill="${INK}"/>
+    </g>
+  </g>
+  <g id="art-junk" stroke="${INK}" stroke-width=".05" stroke-linejoin="round" stroke-linecap="round">
+    <path d="M-.45-.4V-2.05M.75-.4V-1.55" fill="none"/>
+    <path d="M-1.2-1.95H.1L.2-.6H-1.3Z" fill="#c98a5a"/>
+    <path d="M-1.22-1.62H.12M-1.25-1.29H.15M-1.27-.95H.17" fill="none" opacity=".75"/>
+    <path d="M.3-1.45H1.3L1.35-.62H.25Z" fill="#c98a5a"/>
+    <path d="M.28-1.18H1.32M.27-.9H1.33" fill="none" opacity=".75"/>
+    <path d="M-1.85-.75L-1.4-.42H1.45L1.95-.85Q1.85-.1 1.3.25H-1.25Q-1.75-.05-1.85-.75Z" fill="#6b4a32"/>
+    <path d="M-1.55-.12H1.62" fill="none" opacity=".6"/>
+    <path d="M-1.6.75q.3-.15.6 0t.6 0M.3.75q.3-.15.6 0t.6 0" fill="none" opacity=".6"/>
+  </g>
   <g id="art-wall" stroke="${INK}" stroke-width=".05" stroke-linejoin="round" stroke-linecap="round">
     <path d="M-1.7.5Q-1.2-.1-.6-.15T.55-.55T1.7-.3V.5Z" fill="#d9c8a4" stroke="none" opacity=".7"/>
     <path d="M-1.7.15L-.6-.4L.55-.8L1.7-.55V-.3L.55-.55L-.6-.15L-1.7.4Z" fill="#c8b08a"/>
@@ -399,10 +442,10 @@ export function mapArt(grid, { keepClear = [], seaLines = [], compass = null } =
   const use = (id, x, y, scale = 1) => `<use href="#art-${id}" transform="translate(${x.toFixed(2)} ${y.toFixed(2)}) scale(${scale})"/>`;
   const ship = (x, y) => use(grid.SHIP ?? 'ship', x, y, 1.5);
   const jitter = (h, shift) => (((h >>> shift) % 100) / 100 - 0.5) * 0.5;
-  const DENSITY = { mountains: 3, forest: 4, spruce: 4, oak: 4, desert: 3, savanna: 5 }; // one cell in this many gets a drawing
+  const DENSITY = { mountains: 3, forest: 4, spruce: 4, oak: 4, desert: 3, savanna: 5, steppe: 5 }; // one cell in this many gets a drawing
   // Each kind has a few drawings, chosen by the cell: ranges and single peaks; spruce in the north, oak
   // (and the broadleaf of the rainforest) in the south, and between them forest, the three mixed; dunes,
-  // now and then a palm; on the savanna acacias and now and then a baobab.
+  // now and then a palm; on the savanna acacias and now and then a baobab; on the steppe tufts of grass.
   const ART = {
     mountains: ['mountain', 'mountain', 'peak'],
     spruce: ['spruce-wood'],
@@ -410,6 +453,7 @@ export function mapArt(grid, { keepClear = [], seaLines = [], compass = null } =
     forest: ['spruce-wood', 'oak-wood', 'mixed-wood'],
     desert: ['dunes', 'dunes', 'dunes', 'palm'],
     savanna: ['acacia', 'acacia', 'baobab'],
+    steppe: ['grass'],
   };
   let land = '';
   let sea = '';
@@ -421,7 +465,7 @@ export function mapArt(grid, { keepClear = [], seaLines = [], compass = null } =
   }
   // Ships sail beside the longest sea routes (not those round the back of the map), a little to
   // one side of the dashed line, on open sea. grid.SHIP names the kind ('ship', 'longship', 'galley', 'atakebune',
-  // 'lineship', 'frigate', 'sidewheeler', 'cruiser', 'towership', 'carrack', 'kadirga', 'caravel' or 'balsa'), grid.SHIP_COUNT how many (3).
+  // 'lineship', 'frigate', 'sidewheeler', 'cruiser', 'towership', 'carrack', 'kadirga', 'junk', 'caravel' or 'balsa'), grid.SHIP_COUNT how many (3).
   const seaCell = (x, y) => {
     const r = Math.round((y - 1) / 1.5);
     const c = Math.round((x - Math.sqrt(3) / 2) / Math.sqrt(3) - 0.5 * (r & 1));

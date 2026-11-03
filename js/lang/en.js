@@ -137,6 +137,13 @@ export const EN = {
       story: 'King Edward the Confessor has died without children. Harold Godwinson takes the crown, but Harald Hardrada of Norway and William of Normandy both claim it, and both send fleets across the sea.',
       epilogue: 'Harold beat the Norwegians at Stamford Bridge, but had to march south and fell at Hastings on 14 October. William was crowned on Christmas Day 1066 and has been called the Conqueror ever since.',
     },
+    genghis: {
+      year: '1206',
+      goal: 'Conquer the Tangut Xi Xia, Hebei of the Jin and Transoxiana of Khwarazm.',
+      teaser: 'Genghis Khan against the Jin emperor, Xi Xia and the shah of Khwarazm.',
+      story: 'By the Onon river the tribes have just proclaimed Temüjin Genghis Khan, ruler of all who live in felt tents. To the south lie the Tangut Xi Xia and the Jin empire, whose emperor demands tribute from the steppe. To the west the Kara Khitai rule the oases of the Silk Road, and behind them waits Shah Muhammad of Khwarazm with Samarkand and Bukhara.',
+      epilogue: 'Xi Xia submitted in 1210, and in 1215 Zhongdu, the Jin capital and later Beijing, fell. When the shah of Khwarazm had a Mongol caravan killed at Otrar, Genghis rode west and took Bukhara and Samarkand in 1220. When he died in 1227, his empire reached from the Caspian to the Yellow Sea. Xi Xia vanished that same year, and the Jin fell in 1234.',
+    },
     inka: {
       year: '1438',
       goal: 'Beat the Chanka, the Colla and Chimú, and build an empire along the Andes.',

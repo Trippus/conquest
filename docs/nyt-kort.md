@@ -15,7 +15,7 @@ Claude tegner, måler og retter.
 
 **Tidstypisk som udgangspunkt:** skibe, modstandernes navne, vinderens titel, terræn og navne på steder
 følger perioden og stedet. Findes der ikke et tidstypisk skib i spillet, tegner vi et nyt (galejen til
-Rom, et atakebune til Japan, en hjuldamper til Vesten, en karavel ud for Songhai, en balsaflåde til Inkariget, en fregat til Befrielsen, en krydser til Etiopien, et tårnskib til De tre kongeriger, en portugisisk karak til Akbar, en osmannisk galej (kadirga) til Konstantinopel) i stedet for at låne et fra
+Rom, et atakebune til Japan, en hjuldamper til Vesten, en karavel ud for Songhai, en balsaflåde til Inkariget, en fregat til Befrielsen, en krydser til Etiopien, et tårnskib til De tre kongeriger, en portugisisk karak til Akbar, en osmannisk galej (kadirga) til Konstantinopel, en dsjunke til Djengis Khan) i stedet for at låne et fra
 en anden tid. Er der ikke meget hav, kan andet pynt bære tiden: floder, karavaner, kanoer (se Songhai).
 
 ## 2. Udkast til inddeling (Claude → Martin godkender)
@@ -57,13 +57,13 @@ Kopiér `js/maps/england.js` til `js/maps/<kort>.js` og ret: regioner, områder,
 `js/maps/index.js`, så kommer det med i appen, simulatoren og værktøjerne.
 
 Terræn (`TERRAIN`) følger sted og tid: `spruce` (gran) mod nord, `oak` (eg, også regnskov) mod syd,
-`forest` (blandet) imellem, `savanna` (akacier og baobabtræer), `mountains` og `desert` (klitter og en
+`forest` (blandet) imellem, `savanna` (akacier og baobabtræer), `steppe` (græs), `mountains` og `desert` (klitter og en
 palme ind imellem).
 
 Floder og karavaner tegnes, men spilles ikke: skriv dem i grid-filen (`RIVERS`, linjer af [bredde, længde]
 fra kilde til udløb, og `CARAVANS`), så skriver `tools/make-grid.mjs` dem i kortenheder til kortfilen.
 `RIVER_BOATS` sætter kanoer på den første flod. Veje (`ROADS`) tegnes stiplede som inkavejen, `CARAVAN:
-'llamas'` gør karavanerne til lamaer, og `SIGHTS` sætter en tegning lige der (sivbåden på Titicacasøen, llaneroen og gauchoen i Befrielsen, obelisken i Aksum og en dhow i Det Røde Hav, et stykke af Den Kinesiske Mur, en elefant ved Panipat, Mehmeds kanon ved Konstantinopel). En
+'llamas'` gør karavanerne til lamaer og `'gers'` til jurter på oksevogne, og `SIGHTS` sætter en tegning lige der (sivbåden på Titicacasøen, llaneroen og gauchoen i Befrielsen, obelisken i Aksum og en dhow i Det Røde Hav, et stykke af Den Kinesiske Mur, en elefant ved Panipat, Mehmeds kanon ved Konstantinopel, en bueskytte til hest og en kamelkaravane i Djengis Khan). En
 sø er `FORCE_SEA` inde i landet (Tchadsøen, Titicacasøen).
 
 Kortet bliver et togt: sæt det ind i `TOGTER` i `js/togter.js` på sin plads i tiden (ældst først) med

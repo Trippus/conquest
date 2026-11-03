@@ -137,6 +137,13 @@ export const DA = {
       story: 'Kong Edvard Bekenderen er død uden børn. Harold Godwinson tager kronen, men Harald Hårderåde fra Norge og Vilhelm af Normandiet gør begge krav på den, og begge sætter flåder over havet.',
       epilogue: 'Harold slog nordmændene ved Stamford Bridge, men måtte marchere sydpå og faldt ved Hastings den 14. oktober. Vilhelm blev kronet juledag 1066 og kaldes siden Erobreren.',
     },
+    genghis: {
+      year: '1206',
+      goal: 'Erobr tangutternes Xi Xia, Jin-rigets Hebei og Khwarizms Transoxanien.',
+      teaser: 'Djengis Khan mod Jin-kejseren, Xi Xia og shahen af Khwarizm.',
+      story: 'Ved Onon-floden har stammerne lige udråbt Temüjin til Djengis Khan, herskeren over alle, der bor i filttelte. Mod syd ligger tangutternes Xi Xia og Jin-riget, hvis kejser kræver skat af steppen. Mod vest hersker Kara Khitai over oaserne langs Silkevejen, og bag dem venter shah Muhammad af Khwarizm med Samarkand og Bukhara.',
+      epilogue: 'Xi Xia måtte bøje sig i 1210, og i 1215 faldt Jin-rigets hovedstad Zhongdu, det senere Beijing. Da shahen af Khwarizm lod en mongolsk karavane dræbe ved Otrar, red Djengis mod vest og tog Bukhara og Samarkand i 1220. Da han døde i 1227, gik hans rige fra Det Kaspiske Hav til Det Gule Hav. Xi Xia forsvandt samme år, og Jin faldt i 1234.',
+    },
     inka: {
       year: '1438',
       goal: 'Slå chankaerne, collaerne og Chimú, og byg et rige langs Andes.',

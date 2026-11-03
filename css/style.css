@@ -348,6 +348,8 @@ dialog .big { font-family: var(--title); font-size: 20px; margin: 8px 0; }
 .togt-list button:disabled { opacity: .55; }
 /* the togt's picture, small; dimmed until it can be played */
 .togt-thumb { flex: none; width: 76px; height: 76px; border-radius: 10px; background: 15% 50% / cover no-repeat; box-shadow: inset 0 0 14px rgb(0 0 0 / .45); }
+/* on a narrow phone the picture gives way, so a long name keeps to its line */
+@media (max-width: 420px) { .togt-list button { gap: 10px; } .togt-thumb { width: 56px; height: 56px; } }
 .togt-list li.locked .togt-thumb { filter: grayscale(.8) brightness(.75); }
 .togt-year { font: 700 15px/1.3 var(--title); color: var(--accent); }
 .togt-body { display: flex; flex-direction: column; gap: 2px; min-width: 0; }

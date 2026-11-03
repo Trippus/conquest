@@ -367,6 +367,16 @@ dialog .big { font-family: var(--title); font-size: 20px; margin: 8px 0; }
 /* with a picture, straight to dark, and the picture comes up out of it; the words wait for it */
 #chapter { --wait: 0s; }
 #chapter.has-art { background: #0c0703; animation: none; --wait: 1.5s; }
+/* a won game dims slowly into the end card; from there to the next togt the dark stays, only the
+   words and the picture go out, and the next togt's come up out of it */
+#chapter.ending { animation: rise-in 1.2s both; }
+#chapter .ch-card { transition: opacity .6s; }
+#chapter .ch-art { transition: filter .8s; }
+#chapter.fading .ch-card { opacity: 0; }
+#chapter.fading .ch-art { filter: brightness(0); }
+/* straight on from the dark: a togt without a picture lets its map come up through it slowly */
+#chapter.from-dark { animation: none; }
+#chapter.from-dark:not(.has-art) .ch-art { opacity: 1; background: #0c0703; animation: leave 1.2s both; }
 @keyframes rise-in { from { opacity: 0; } }
 /* The togt's picture: an old map by candlelight, drifting slowly, the candles flickering from the
    left. It is seen clearly first; then it darkens (::after) for the words to come. */
@@ -426,6 +436,7 @@ dialog .big { font-family: var(--title); font-size: 20px; margin: 8px 0; }
 @keyframes leave { to { opacity: 0; } }
 @media (prefers-reduced-motion: reduce) {
   #chapter, #chapter *, #chapter .ch-art::before { animation: none !important; }
+  #chapter.from-dark:not(.has-art) .ch-art { opacity: 0; }
 }
 
 /* ---------- the end of a togt ---------- */

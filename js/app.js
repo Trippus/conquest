@@ -244,8 +244,13 @@ function showEnding(id, news) {
 function openCard(id, end) {
   showChapterArt(togtOf(id).art);
   const box = $('chapter');
+  // Shown anew, so the words come in again one by one, also when the card was already up.
+  const fromDark = box.classList.contains('fading');
+  box.hidden = true;
+  void box.offsetWidth;
   box.classList.toggle('ending', end);
-  box.classList.remove('leave');
+  box.classList.toggle('from-dark', fromDark);
+  box.classList.remove('leave', 'fading');
   box.hidden = false;
   document.body.classList.add('telling'); // the players and the turn panel wait out of sight
   $('ch-go').focus({ preventScroll: true });
@@ -275,7 +280,7 @@ function showChapterArt(src) {
   if (src && art.dataset.src === src) return;
   art.classList.remove('shown');
   art.dataset.src = src ?? '';
-  if (!src) return;
+  if (!src) return (art.style.backgroundImage = '');
   preloadArt(src).then(() => {
     if (art.dataset.src !== src) return;
     art.style.backgroundImage = `url("${src}")`;
@@ -301,15 +306,14 @@ $('ch-home').addEventListener('click', home);
 $('ch-standings').addEventListener('click', () => $('game-over').showModal());
 $('ch-go').addEventListener('click', () => {
   const box = $('chapter');
-  box.classList.add('leave');
   if (box.classList.contains('ending')) {
-    setTimeout(() => {
-      box.hidden = true;
-      document.body.classList.remove('telling');
-      goOn(afterGame()?.value ?? 'home');
-    }, 450);
+    const next = afterGame()?.value;
+    if (!next) return goOn('home');
+    box.classList.add('fading');
+    setTimeout(() => goOn(next), 800);
     return;
   }
+  box.classList.add('leave');
   game.told = true;
   save();
   setTimeout(() => {

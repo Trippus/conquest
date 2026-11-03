@@ -265,7 +265,7 @@ function cardButtons(go, { standings = false, easy = false } = {}) {
 const showOpening = () => (game.togt ? showChapter(game.togt) : showDeal());
 // Every game ends as it began: its picture out of the dark, Victory or Defeat where the year was. A
 // win tells what really happened in history, a loss who won. The standings are a tap away; the button
-// goes on in the dark to the next togt or game (where a break, like the one between two films, would go).
+// goes on to the next togt or game, whose picture comes up over this one (a break for an ad would go between).
 function showEnding(e) {
   const id = grid.id;
   const i = TOGTER.findIndex((t) => t.map === id);
@@ -281,11 +281,12 @@ function openCard(art, kind) {
   showChapterArt(art);
   const box = $('chapter');
   // Shown anew, so the words come in again one by one, also when the card was already up.
-  const fromDark = box.classList.contains('fading');
+  const fromEnd = box.classList.contains('turning');
   box.hidden = true;
   void box.offsetWidth;
-  box.classList.remove('ending', 'deal', 'leave', 'fading');
-  box.classList.toggle('from-dark', fromDark);
+  box.classList.remove('ending', 'deal', 'leave', 'turning');
+  box.classList.toggle('from-end', fromEnd);
+  if (!fromEnd) box.style.removeProperty('--picture');
   if (kind) box.classList.add(kind);
   box.hidden = false;
   document.body.classList.add('telling'); // the players and the turn panel wait out of sight
@@ -340,17 +341,21 @@ $('chapter').addEventListener('click', (e) => {
 });
 $('ch-home').addEventListener('click', home);
 $('ch-standings').addEventListener('click', () => $('game-over').showModal());
-// On from the end: the words and the picture go out and the dark stays for what comes next.
-function onInDark(value) {
-  $('chapter').classList.add('fading');
-  setTimeout(() => goOn(value), 800);
+// On from the end card: its words go out, and the next card's picture comes up over its own.
+function onFromEnd(value) {
+  const box = $('chapter');
+  // a full address: in a CSS variable a relative one would be read from the style sheet's folder
+  const src = $('ch-art').dataset.src;
+  box.style.setProperty('--picture', src ? `url("${new URL(src, location.href)}")` : 'none');
+  box.classList.add('turning');
+  setTimeout(() => goOn(value), 600);
 }
-$('ch-easy').addEventListener('click', () => onInDark('easy'));
+$('ch-easy').addEventListener('click', () => onFromEnd('easy'));
 $('ch-go').addEventListener('click', () => {
   const box = $('chapter');
   if (box.classList.contains('ending')) {
     const next = afterGame()?.value;
-    return next ? onInDark(next) : goOn('home');
+    return next ? onFromEnd(next) : goOn('home');
   }
   game.told = true;
   save();

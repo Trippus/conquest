@@ -1,12 +1,12 @@
 // The grid for Djengis Khan (js/maps/genghis.js), drawn by tools/make-grid.mjs.
 
-// The window: Asia from the Caspian to Korea and from Siberia down to the Yangzi, with the Kipchak
-// steppe, Persia, India, Tibet, Song China, Korea and Japan round it as unexplored land.
+// The window: Asia from the Black Sea to Japan and from Siberia down to the Tropic, with the Kipchak
+// steppe, Persia, Arabia, India, Tibet, Song China, Korea and Japan round it as unexplored land.
 export const LAT_TOP = 57;
 export const LAT_STEP = 0.3;
-export const ROWS = 97;
-export const LON_WEST = 44;
-export const LON_EAST = 132;
+export const ROWS = 124;
+export const LON_WEST = 37;
+export const LON_EAST = 148;
 export const SQUASH_AT = 42;
 
 // Territory centres [lat, lon, letter], several for the large ones; '#' marks land outside the campaign.
@@ -70,6 +70,11 @@ export const CENTRES = [
   [35.6, 90, '#'], [36.6, 95, '#'], [35.5, 99.5, '#'], [33.5, 101.5, '#'], [30.5, 99.5, '#'], [36.3, 84.5, '#'],
   [32, 110.5, '#'], [32.3, 113.5, '#'], [31.5, 117, '#'], [32.6, 120.2, '#'], [30.5, 105.5, '#'], [29, 109, '#'], [29, 114, '#'],
   [29.5, 119.5, '#'], [28.8, 103, '#'], [32.3, 107, '#'],
+  [39, 39, '#'], [41, 41, '#'], [37.5, 42, '#'], [34.5, 40, '#'], [32, 44, '#'], [29, 47, '#'], [26, 44, '#'], [23, 48, '#'],
+  [21, 54, '#'], [22.5, 58, '#'], [27, 56, '#'], [27.5, 61, '#'], [26, 65, '#'], [26, 69, '#'], [24, 72.5, '#'], [27, 74, '#'],
+  [22.5, 76, '#'], [25, 80, '#'], [22, 81, '#'], [25.5, 85, '#'], [22.5, 87, '#'], [26, 89, '#'], [26, 92, '#'], [22, 94, '#'],
+  [25, 97, '#'], [21, 97, '#'], [25, 101, '#'], [22.5, 101, '#'], [24, 104, '#'], [21.5, 105, '#'], [26.5, 107, '#'], [24, 108, '#'],
+  [22, 108.5, '#'], [26.5, 111, '#'], [23.5, 112, '#'], [26, 114.5, '#'], [24, 116, '#'], [26.5, 118.5, '#'], [20, 110, '#'], [23.7, 121, '#'],
   [40.4, 127.2, '#'], [38.5, 126.5, '#'], [36.5, 127.6, '#'], [35.2, 128.6, '#'], [33, 130.8, '#'], [34.2, 131.6, '#'],
 ];
 export const FORCE_LAND = [];
@@ -98,22 +103,8 @@ export const FORCE_SEA = lake;
 export const ISLAND = 20;
 export const ISLAND_REACH = 8;
 
-// Drawn on the map, not played: the rivers [lat, lon] from source to mouth, yurts on their carts
-// on the steppe, a camel caravan on the Silk Road and a mounted archer.
-export const RIVERS = [
-  // the Orkhon past Karakorum and the Selenga to Lake Baikal
-  [[46.8, 101.8], [47.2, 102.8], [48.5, 103.5], [49.8, 106.2], [50.9, 106.5], [52.2, 106.3]],
-  // the Kerulen, from the Khentii past the Tatar lands to Hulun Lake
-  [[48.3, 108.8], [47.3, 110.7], [47.8, 114.0], [48.4, 116.0], [48.9, 117.3]],
-  // the Yellow River, round the Ordos and since 1194 south past Kaifeng into the Huai
-  [[34.6, 100.6], [36.0, 103.8], [37.5, 105.2], [39.4, 106.7], [40.6, 108.0], [40.3, 111.0], [38.6, 110.6], [35.6, 110.4],
-    [34.7, 110.4], [34.8, 113.0], [34.9, 114.5], [34.3, 117.2], [33.8, 119.0], [34.0, 120.2]],
-  // the Tarim, from Kashgar's river past Aksu to Lop Nur
-  [[38.4, 77.3], [40.5, 80.5], [41.0, 84.0], [40.8, 86.5], [40.3, 89.5]],
-  // the Amu Darya, past Termez and Urgench to the Aral Sea
-  [[37.0, 72.5], [37.2, 68.0], [37.2, 67.3], [37.8, 65.2], [39.1, 63.6], [40.6, 62.0], [41.5, 60.6], [42.5, 59.6], [43.6, 59.0]],
-  // the Syr Darya, from Fergana past Khujand and Otrar to the Aral Sea
-  [[40.8, 72.6], [40.3, 69.6], [40.9, 68.8], [42.85, 68.3], [44.8, 65.5], [45.8, 62.5], [46.0, 61.4]],
-];
-export const CARAVANS = [[47.6, 106.0], [46.6, 96.0], [45.8, 114.0]];
-export const SIGHTS = [[39.6, 85.0, 'caravan'], [44.3, 106.5, 'archer']];
+// Drawn on the map, not played: yurts on their carts on the steppe, a camel caravan on the Silk Road
+// and a mounted archer. No rivers: on a map this size they drew as loose lines.
+export const RIVERS = [];
+export const CARAVANS = [[46.4, 109.5], [46.6, 117.8], [46.0, 101.2]];
+export const SIGHTS = [[39.6, 85.0, 'caravan'], [44.6, 108.6, 'archer']];

@@ -32,10 +32,10 @@ test('the roads of the conquests: to Zhongdu past the Tangut, and west along the
   assert.ok(road('almalik', 'taraz', 'otrar', 'urgench'));
 });
 
-test('the rivers, the yurts, the caravan and the archer are drawn inside the map', () => {
+test('the yurts, the caravan and the archer are drawn inside the map, and no rivers', () => {
   const inside = ([x, y]) => x >= 0 && x <= K.GENGHIS_GRID.WIDTH && y >= 0 && y <= K.GENGHIS_GRID.HEIGHT;
-  assert.equal(K.RIVERS.length, 6);
-  assert.ok([...K.RIVERS.flat(), ...K.CARAVANS, ...K.SIGHTS].every(inside));
+  assert.equal(K.RIVERS.length, 0);
+  assert.ok([...K.CARAVANS, ...K.SIGHTS].every(inside));
   assert.deepEqual(K.SIGHTS.map((s) => s[2]), ['caravan', 'archer']);
 });
 

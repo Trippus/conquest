@@ -334,21 +334,21 @@ export const artDefs = (quarters = 'NØSV') => `
     <path d="M-.3.3Q-.32 0-.46-.2M-.22.3Q-.2-.05-.1-.3M-.14.3Q-.06.05.12-.12M.22.3Q.2.05.32-.12M.3.3Q.36.08.5.0" stroke="#7a8a4a"/>
     <path d="M-.5.3H.56" opacity=".45"/>
   </g>
-  <g id="art-ger" stroke="${INK}" stroke-width=".05" stroke-linejoin="round" stroke-linecap="round">
-    <path d="M-.7.12H.75" fill="none" stroke-width=".08"/>
-    <circle cx="-.42" cy=".28" r=".17" fill="#8a6a4a"/><circle cx=".42" cy=".28" r=".17" fill="#8a6a4a"/>
-    <path d="M-.55.12V-.3Q-.3-.62 0-.66Q.3-.62.55-.3V.12Z" fill="#efe4cc"/>
-    <path d="M-.55-.3H.55M-.12.12V-.16H.12V.12" fill="none"/>
-    <path d="M-.08-.66h.16v-.1h-.16Z" fill="#3b2f2a"/>
-  </g>
   <g id="art-ox" stroke="${INK}" stroke-width=".05" stroke-linejoin="round" stroke-linecap="round">
     <path d="M-.3.02L-.32.32M-.16.04L-.14.32M.16.04L.14.32M.28.02L.3.32" fill="none" stroke-width=".06"/>
     <path d="M-.42-.06Q-.42-.3-.2-.3H.26Q.36-.32.44-.26L.6-.2Q.64-.1.56-.04L.42-.02Q.36.06.24.06H-.32Q-.42.04-.42-.06Z" fill="#6b4a32"/>
     <path d="M.42-.28Q.46-.42.56-.42M.52-.24Q.62-.34.7-.3" fill="none"/>
   </g>
-  <g id="art-gers">
-    <use href="#art-ger" transform="translate(-.9 0)"/><use href="#art-ox" transform="translate(.35 .1)"/>
-    <use href="#art-ger" transform="translate(1.55 -.06) scale(.85)"/><use href="#art-ox" transform="translate(2.55 .02) scale(.9)"/>
+  <g id="art-gers" stroke="${INK}" stroke-width=".05" stroke-linejoin="round" stroke-linecap="round">
+    <path d="M-.05.08L.95-.02" fill="none" stroke-width=".07"/>
+    <path d="M-1.95 0H-.05V.12H-1.95Z" fill="#6b4a32"/>
+    <circle cx="-1.55" cy=".3" r=".22" fill="#8a6a4a"/><circle cx="-.45" cy=".3" r=".22" fill="#8a6a4a"/>
+    <path d="M-1.8 0V-.42Q-1.45-.95-1-1Q-.55-.95-.2-.42V0Z" fill="#efe4cc"/>
+    <path d="M-1.8-.42H-.2" fill="none"/>
+    <path d="M-1.15 0V-.3H-.85V0Z" fill="#a3261b"/>
+    <path d="M-1.08-1h.16v-.09h-.16Z" fill="#3b2f2a"/>
+    <use href="#art-ox" transform="translate(1.4 -.1) scale(1.25)" opacity=".85"/>
+    <use href="#art-ox" transform="translate(1.55 .06) scale(1.25)"/>
   </g>
   <g id="art-archer">
     <use href="#art-horse"/>

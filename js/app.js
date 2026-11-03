@@ -112,7 +112,7 @@ function saveSettings(settings) {
 }
 
 // The togter won and lost (js/togter.js). Someone with settings or a game saved from before there
-// were togter is a veteran: every map stays open in the free game.
+// were togter is a veteran: the maps there were then stay open in the free game.
 function loadProgress() {
   try {
     const saved = JSON.parse(localStorage.getItem(PROGRESS));
@@ -153,7 +153,7 @@ function startFromSettings(settings = loadSettings()) {
   const free = COLORS.map((_, i) => i).filter((i) => !settings.people.some((x) => x.look === i));
   const names = shuffled(mapIn(settings.map).RULERS ?? L.opponents);
   const bots = Array.from({ length: settings.opponents }, (_, i) => ({ kind: settings.level, name: names[i], color: free[i] }));
-  startGame(shuffled([...people, ...bots]), settings.speed, settings.mode, undefined, settings.map);
+  startGame(shuffled([...people, ...bots]), 'normal', settings.mode, undefined, settings.map);
 }
 
 // A togt: the one person at the phone against the togt's opponents, on the togter's level, starting
@@ -171,7 +171,7 @@ function startTogt(id, { intro = true } = {}) {
   useMap(id);
   const start = togtStart(map, togt, order.indexOf(you), order.length);
   const mode = settings.togtGoal === 'all' ? 'world' : 'mission';
-  startGame(order, settings.speed, mode, undefined, id, { togt: id, quiet: intro, ...start, bonus: togt.bonus ?? 0 });
+  startGame(order, 'normal', mode, undefined, id, { togt: id, quiet: intro, ...start, bonus: togt.bonus ?? 0 });
   if (intro) showChapter(id);
 }
 
@@ -693,7 +693,6 @@ const CHOICES = {
   // A map still to be won in the togter is shown locked.
   map: () => Object.keys(MAPS).map((id) => [id, mapIn(id).name, !isFree(id)]),
   mode: () => Object.entries(L.modes),
-  speed: () => Object.entries(L.speeds),
 };
 
 const andList = (list) => (list.length > 1 ? `${list.slice(0, -1).join(', ')} ${L.and} ${list.at(-1)}` : list[0]);
@@ -794,11 +793,11 @@ function renderSetup() {
         b.type = 'button';
         b.textContent = locked ? `🔒 ${label}` : label;
         b.disabled = !!locked;
-        // The maps are small pictures of themselves (tools/map-shots.mjs).
+        // The maps show their togt's picture, or a small picture of themselves (tools/map-shots.mjs).
         if (name === 'map') {
           const picture = document.createElement('span');
           picture.className = 'map-picture';
-          picture.style.backgroundImage = `url('assets/maps/${value}.jpg')`;
+          picture.style.backgroundImage = `url('${pictureOf(value)}')`;
           b.prepend(picture);
         }
         b.setAttribute('aria-pressed', String(draft[name] === value));
@@ -1157,7 +1156,9 @@ $('choose-free').addEventListener('click', () => {
 // The togter as a line of years, oldest first: won, the next one, or locked until the one before is
 // won. The opponents' level is chosen here, once for all of them.
 // A togt's picture (togter.js, art), or for a togt without one, its map (tools/map-shots.mjs).
-const pictureOf = (id) => togtOf(id)?.art ?? `assets/maps/${id}.jpg`;
+function pictureOf(id) {
+  return togtOf(id)?.art ?? `assets/maps/${id}.jpg`;
+}
 function openTogter() {
   renderTogter();
   $('togter').showModal();

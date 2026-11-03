@@ -42,8 +42,10 @@ export function togtStart(map, togt, seat, players) {
   return { home, goals };
 }
 
-// The free game always has the world. Someone who played before there were togter has every map.
+// The free game always has the world. Someone who played before there were togter keeps the maps
+// there were then (1 November 2026); the maps that came with the togter are won like everyone else's.
 const ALWAYS_FREE = ['world'];
+const VETERAN_MAPS = ['italy', 'alexander', 'vikings', 'england', 'japan', 'napoleon', 'world'];
 
 // What the player has done: welcomed (has seen the welcome), veteran (played before togter came),
 // won: { map: level } (the hardest level won on), lost: { map: losses since the last win }.
@@ -55,7 +57,7 @@ export const isOpen = (progress, i) => i === 0 || TOGTER.slice(i - 1).some((t) =
 
 export const nextTogt = (map) => TOGTER[TOGTER.findIndex((t) => t.map === map) + 1] ?? null;
 
-export const freeMaps = (progress, all) => all.filter((id) => progress.veteran || ALWAYS_FREE.includes(id) || progress.won[id]);
+export const freeMaps = (progress, all) => all.filter((id) => (progress.veteran && VETERAN_MAPS.includes(id)) || ALWAYS_FREE.includes(id) || progress.won[id]);
 
 const RANK = { novice: 0, medium: 1, hard: 2 };
 

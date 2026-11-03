@@ -44,9 +44,10 @@ test('a togt put in before one already won is open, and so is the one won', () =
   assert.ok(!isOpen(p, at('west')));
 });
 
-test('a veteran has every map in the free game, but begins the togter from the start', () => {
+test('a veteran keeps the maps from before the togter, but begins the togter from the start', () => {
   const p = newProgress(true);
-  assert.deepEqual(freeMaps(p, Object.keys(MAPS)), Object.keys(MAPS));
+  assert.deepEqual(freeMaps(p, Object.keys(MAPS)).sort(), ['alexander', 'england', 'italy', 'japan', 'napoleon', 'vikings', 'world']);
+  assert.ok(freeMaps({ ...p, won: { akbar: 'novice' } }, Object.keys(MAPS)).includes('akbar'));
   assert.ok(!isOpen(p, 1));
 });
 

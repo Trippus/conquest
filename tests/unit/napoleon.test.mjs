@@ -1,4 +1,4 @@
-// Napoleonskrigene (js/maps/napoleon.js). Run: npm test
+// Napoleon (js/maps/napoleon.js). Run: npm test
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import * as G from '../../js/engine.js';

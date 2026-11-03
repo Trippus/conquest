@@ -1,4 +1,4 @@
-// Napoleonskrigene, 1805–1812: from Austerlitz to Moscow Napoleon makes himself master of Europe,
+// Napoleon, 1805–1812: from Austerlitz to Moscow Napoleon makes himself master of Europe,
 // against Britain at sea, Austria, Prussia and Russia on land. The map shows North Africa, the
 // Ottoman Empire and the steppe round it. 33 territories in 9 regions, drawn as a hex grid (see
 // hex.js for what each part means). The coastlines are real (tools/make-grid.mjs); land outside the
@@ -220,7 +220,7 @@ export const TITLE = 'Emperor of Europe';
 
 // The names in English, where they differ (see inLanguage in index.js).
 export const EN = {
-  name: 'The Napoleonic Wars',
+  name: 'Napoleon',
   REGIONS: { fr: 'France', ib: 'Iberia', it: 'Italy', rh: 'Confederation of the Rhine', pr: 'Prussia', os: 'Austria', ru: 'Russia', br: 'Britain', no: 'Scandinavia' },
   TERRITORIES: {
     lissabon: 'Lisbon', milano: 'Milan', rom: 'Rome', napoli: 'Naples', muenchen: 'Munich', warszawa: 'Warsaw',
@@ -232,7 +232,7 @@ export const EN = {
 
 export const NAPOLEON_GRID = hexMap({
   id: 'napoleon',
-  name: 'Napoleons­krigene', // with a soft hyphen: too long for a line in the list of togter on a phone
+  name: 'Napoleon',
   GRID,
   REGIONS,
   TERRITORIES,

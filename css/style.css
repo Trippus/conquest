@@ -343,18 +343,18 @@ dialog .big { font-family: var(--title); font-size: 20px; margin: 8px 0; }
   background: var(--panel-solid); border: 2px solid var(--line); }
 .togt-list li.won::before { background: var(--accent); border-color: var(--accent); }
 .togt-list li.next::before { border-color: var(--accent); box-shadow: 0 0 0 4px rgb(255 210 90 / 0.35); }
-.togt-list button { display: flex; gap: 12px; align-items: flex-start; width: 100%; padding: 10px 12px 10px 10px; text-align: left; line-height: 1.3; }
+/* the year and the name right across, so a long name has the room; under them the words, and the
+   togt's picture beside them */
+.togt-list button { display: grid; grid-template-columns: 1fr 76px; gap: 2px 12px; align-items: start; width: 100%; padding: 10px 12px; text-align: left; line-height: 1.3; }
 .togt-list li.next button { border-color: var(--accent); }
 .togt-list button:disabled { opacity: .55; }
 /* the togt's picture, small; dimmed until it can be played */
-.togt-thumb { flex: none; width: 76px; height: 76px; border-radius: 10px; background: 15% 50% / cover no-repeat; box-shadow: inset 0 0 14px rgb(0 0 0 / .45); }
-/* on a narrow phone the picture gives way, so a long name keeps to its line */
-@media (max-width: 420px) { .togt-list button { gap: 10px; } .togt-thumb { width: 56px; height: 56px; } }
+.togt-thumb { grid-column: 2; grid-row: 3 / span 2; width: 76px; height: 76px; border-radius: 10px; background: 15% 50% / cover no-repeat; box-shadow: inset 0 0 14px rgb(0 0 0 / .45); }
 .togt-list li.locked .togt-thumb { filter: grayscale(.8) brightness(.75); }
-.togt-year { font: 700 15px/1.3 var(--title); color: var(--accent); }
-.togt-body { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
-.togt-body b { font: 700 16px var(--title); overflow-wrap: anywhere; }
-.togt-body small { font-size: 13px; color: var(--muted); }
+.togt-year { grid-column: 1 / -1; grid-row: 1; font: 700 15px/1.3 var(--title); color: var(--accent); }
+.togt-body { display: contents; }
+.togt-body b { grid-column: 1 / -1; grid-row: 2; margin-bottom: 6px; font: 700 17px var(--title); }
+.togt-body small { grid-column: 1; font-size: 13px; color: var(--muted); }
 .togt-body .togt-state { color: var(--ink); font-weight: 600; }
 #togter .field { margin-top: 4px; }
 

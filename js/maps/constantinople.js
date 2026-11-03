@@ -280,7 +280,7 @@ export const TITLE = 'Caesar of Rome';
 
 // The names in English, where they differ (see inLanguage in index.js).
 export const EN = {
-  name: 'Constan­tinople',
+  name: 'Constantinople',
   REGIONS: { tr: 'Thrace', an: 'Anatolia', bu: 'Bulgaria', gr: 'Greece', sr: 'Serbia', da: 'Dalmatia', hu: 'Hungary', wl: 'Wallachia' },
   TERRITORIES: { konstantinopel: 'Constantinople', adrianopel: 'Adrianople', trapezunt: 'Trebizond', athen: 'Athens', belgrad: 'Belgrade' },
   LANDMARKS: { Italien: 'Italy', Østrig: 'Austria', Polen: 'Poland', Krim: 'Crimea', 'Den Gyldne Horde': 'The Golden Horde', Georgien: 'Georgia',
@@ -290,7 +290,7 @@ export const EN = {
 
 export const CONSTANTINOPLE_GRID = hexMap({
   id: 'constantinople',
-  name: 'Konstan­tinopel', // may break there on the narrowest phones
+  name: 'Konstantinopel',
   GRID,
   REGIONS,
   TERRITORIES,

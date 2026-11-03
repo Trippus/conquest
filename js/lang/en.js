@@ -79,6 +79,8 @@ export const EN = {
   togtUpNext: (year, name) => `next: ${year}, ${name}`,
   togtAllWon: 'Every campaign won',
   chapterStep: (i, n) => `Campaign ${i} of ${n}`,
+  chapterWon: (i, n) => `Campaign ${i} of ${n} won`,
+  seeStandings: 'See the standings',
   toBattle: 'To battle',
   tryAgain: 'Try again',
   tryEasy: 'Try again with easy opponents',

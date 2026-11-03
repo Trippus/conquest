@@ -406,6 +406,10 @@ dialog .big { font-family: var(--title); font-size: 20px; margin: 8px 0; }
 .ch-mode button { min-height: 36px; padding: 0 16px; border: 0; border-radius: 999px; background: none; color: #e6d8bd; font-size: 15px; text-shadow: none; }
 .ch-mode button[aria-pressed='true'] { background: #e8c27a; color: #2a1d10; font-weight: 600; }
 #ch-go { min-width: 180px; }
+#ch-standings { margin-top: 14px; color: #b8a58c; }
+/* the end of a won togt: the same card, with what really happened in place of the story */
+#chapter.ending .ch-goal-h, #chapter.ending .ch-mode { display: none; }
+#chapter #ch-standings { animation: rise .6s calc(var(--wait) + 3.8s) both; }
 /* in one after another */
 #chapter .ch-step { animation: rise .7s calc(var(--wait) + .1s) both; }
 #chapter .ch-year { animation: year 1.1s calc(var(--wait) + .35s) both cubic-bezier(.2, .7, .2, 1); }
@@ -426,11 +430,7 @@ dialog .big { font-family: var(--title); font-size: 20px; margin: 8px 0; }
 
 /* ---------- the end of a togt ---------- */
 .togt-end { margin: 10px 0 4px; text-align: left; }
-/* a won togt: its picture, clear, over what really happened */
-.togt-picture { height: 150px; margin: 4px 0 12px; border-radius: 12px; background: 15% 55% / cover no-repeat; box-shadow: inset 0 0 40px rgb(0 0 0 / .5); }
-.togt-end h3 { font: 700 17px var(--title); color: var(--accent); margin: 8px 0 4px; }
 .togt-end p { margin: 0 0 8px; font-size: 15px; line-height: 1.5; }
-.togt-end .news { font-weight: 600; }
 p.togt-end { text-align: center; }
 .locked-note { margin: 6px 0 0; font-size: 13px; }
 .intro-buttons .intro-setup { margin-bottom: 6px; }

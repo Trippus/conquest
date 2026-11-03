@@ -223,8 +223,28 @@ function showChapter(id) {
   $('ch-title').textContent = mapIn(id).name;
   $('ch-story').textContent = text.story;
   tellGoal(id);
+  $('ch-go').textContent = L.toBattle;
+  $('ch-standings').hidden = true;
+  openCard(id, false);
+}
+// A won togt ends as it began: its picture out of the dark, "Victory" where the year was, and what
+// really happened in place of the story. The standings are a tap away; the button goes on to the next
+// togt (where a break between two togter, like the one between two films, would go).
+function showEnding(id, news) {
+  const i = TOGTER.findIndex((t) => t.map === id);
+  $('ch-step').textContent = L.chapterWon(i + 1, TOGTER.length);
+  $('ch-year').textContent = L.victory;
+  $('ch-title').textContent = mapIn(id).name;
+  $('ch-story').textContent = togtText(id).epilogue;
+  $('ch-goal').textContent = news.join(' ');
+  $('ch-go').textContent = afterGame()?.label ?? L.toStart;
+  $('ch-standings').hidden = false;
+  openCard(id, true);
+}
+function openCard(id, end) {
   showChapterArt(togtOf(id).art);
   const box = $('chapter');
+  box.classList.toggle('ending', end);
   box.classList.remove('leave');
   box.hidden = false;
   document.body.classList.add('telling'); // the players and the turn panel wait out of sight
@@ -278,9 +298,18 @@ $('chapter').addEventListener('click', (e) => {
   }
 });
 $('ch-home').addEventListener('click', home);
+$('ch-standings').addEventListener('click', () => $('game-over').showModal());
 $('ch-go').addEventListener('click', () => {
   const box = $('chapter');
   box.classList.add('leave');
+  if (box.classList.contains('ending')) {
+    setTimeout(() => {
+      box.hidden = true;
+      document.body.classList.remove('telling');
+      goOn(afterGame()?.value ?? 'home');
+    }, 450);
+    return;
+  }
   game.told = true;
   save();
   setTimeout(() => {
@@ -859,7 +888,8 @@ function openGameOver() {
   $('over-again').hidden = !after;
   if (after) Object.assign($('over-again'), { value: after.value, textContent: after.label });
   setTimeout(() => {
-    if ($('game-over').open) return;
+    if ($('game-over').open || !$('chapter').hidden) return;
+    if (ending) return showEnding(game.togt, ending);
     // The bar says the same with the same buttons; it waits until the winner screen is closed.
     $('bar').hidden = true;
     $('game-over').showModal();
@@ -872,7 +902,9 @@ $('game-over').addEventListener('close', () => {
 
 // A finished togt is counted once (the game remembers it has been), and the end tells what really
 // happened, what the win opened, or offers easier opponents after two lost tries.
+let ending = null; // what a won togt's end card says under the story, while it is the game shown
 function togtOver() {
+  ending = null;
   const won = game.seats[s.winner] === 'human';
   const level = game.seats.find((x) => x !== 'human');
   const wasFree = freeMaps(progress, Object.keys(MAPS)).includes(game.togt);
@@ -891,8 +923,8 @@ function togtOver() {
     !wasFree && L.newFreeMap(mapIn(game.togt).name),
     next ? L.nextUp(togtText(next.map).year, mapIn(next.map).name) : L.allTogterWon,
   ].filter(Boolean);
-  const picture = `<div class="togt-picture" style="background-image: url('${pictureOf(game.togt)}')"></div>`;
-  return `<div class="togt-end">${picture}<h3>${L.history}</h3><p>${togtText(game.togt).epilogue}</p><p class="news">${news.join(' ')}</p></div>`;
+  ending = news;
+  return '';
 }
 
 // What comes after a finished game: a togt won goes on to the next, a togt lost is tried again, a
@@ -1309,7 +1341,7 @@ function useLanguage(lang) {
   if (!$('intro').hidden && progress.welcomed) showIntro();
   if (!$('intro').hidden && !progress.welcomed) $('welcome-input').placeholder = L.yourName;
   if ($('togter').open) renderTogter();
-  if (!$('chapter').hidden && game?.togt) showChapter(game.togt);
+  if (!$('chapter').hidden && game?.togt) $('chapter').classList.contains('ending') ? showEnding(game.togt, ending) : showChapter(game.togt);
 }
 $('settings-btn').addEventListener('click', () => {
   renderSettings();

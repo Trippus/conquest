@@ -78,6 +78,8 @@ export const DA = {
   togtUpNext: (year, name) => `næste: ${year}, ${name}`,
   togtAllWon: 'Alle togter er vundet',
   chapterStep: (i, n) => `Togt ${i} af ${n}`,
+  chapterWon: (i, n) => `Togt ${i} af ${n} vundet`,
+  seeStandings: 'Se stillingen',
   toBattle: 'Til kamp',
   tryAgain: 'Prøv igen',
   tryEasy: 'Prøv igen med lette modstandere',

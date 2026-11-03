@@ -73,6 +73,7 @@ export const DA = {
   togtLevel: 'Modstandernes sværhedsgrad',
   togtWon: (level) => `✓ Vundet på ${level}`,
   togtNext: 'Næste togt',
+  togtOpen: 'Klar til at spille',
   togtLocked: 'Vind det forrige togt først',
   togtProgress: (won, all) => `${won} af ${all} vundet`,
   togtUpNext: (year, name) => `næste: ${year}, ${name}`,

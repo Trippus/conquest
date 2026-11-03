@@ -74,6 +74,7 @@ export const EN = {
   togtLevel: 'Opponents’ difficulty',
   togtWon: (level) => `✓ Won on ${level}`,
   togtNext: 'Next campaign',
+  togtOpen: 'Ready to play',
   togtLocked: 'Win the one before first',
   togtProgress: (won, all) => `${won} of ${all} won`,
   togtUpNext: (year, name) => `next: ${year}, ${name}`,

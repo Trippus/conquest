@@ -12,7 +12,7 @@ import { createBoard, PLAYER_COLORS as COLORS, sealIcon } from './board.js';
 import { mapShapes, regionShapes } from './map-shapes.js';
 import { Sound, Music } from './audio.js';
 import { LANGUAGES, pickLanguage, stringsFor, translatePage } from './i18n.js';
-import { TOGTER, newProgress, isOpen, nextTogt, freeMaps, record, offerEasy, togtStart } from './togter.js';
+import { TOGTER, newProgress, isOpen, upNext, nextTogt, freeMaps, record, offerEasy, togtStart } from './togter.js';
 
 // Saves only replay on the map they were played on: v1 was the test map, v2 the 30-territory world.
 const KEY = 'conquest.v3';
@@ -768,7 +768,8 @@ const CHOICES = {
     Array.from({ length: MAX_PLAYERS - draft.people.length - fewestBots() + 1 }, (_, i) => [fewestBots() + i, String(fewestBots() + i)]),
   level: () => Object.entries(L.levels),
   // A map still to be won in the togter is shown locked.
-  map: () => Object.keys(MAPS).map((id) => [id, mapIn(id).name, !isFree(id)]),
+  // the world first, the free game's own map; then the rest through history
+  map: () => ['world', ...Object.keys(MAPS).filter((id) => id !== 'world')].map((id) => [id, mapIn(id).name, !isFree(id)]),
   mode: () => Object.entries(L.modes),
 };
 
@@ -967,7 +968,7 @@ function togtOver() {
     save();
   }
   if (!won) return { news: [], easy: offerEasy(progress, game.togt, level) };
-  const next = nextTogt(game.togt);
+  const next = nextTogt(progress, game.togt);
   preloadArt(next?.art);
   const news = [
     !wasFree && L.newFreeMap(mapIn(game.togt).name),
@@ -981,11 +982,11 @@ function togtOver() {
 function afterGame() {
   if (!game.togt) return { value: 'again', label: L.playAgain };
   if (game.seats[s.winner] !== 'human') return { value: 'again', label: L.tryAgain };
-  return nextTogt(game.togt) ? { value: 'next', label: L.nextTogt } : null;
+  return nextTogt(progress, game.togt) ? { value: 'next', label: L.nextTogt } : null;
 }
 function goOn(value) {
   if (value === 'home') home();
-  else if (value === 'next') startTogt(nextTogt(game.togt).map);
+  else if (value === 'next') startTogt(nextTogt(progress, game.togt).map);
   else if (value === 'again') game.togt ? startTogt(game.togt) : startFromSettings();
   else if (value === 'easy') {
     saveSettings({ ...loadSettings(), togtLevel: 'novice' });
@@ -1153,7 +1154,7 @@ function showIntro() {
   $('intro-continue').hidden = !going;
   // With no game going, the togter come first until every one is won.
   const won = TOGTER.filter((t) => progress.won[t.map]).length;
-  const next = TOGTER.find((t, i) => !progress.won[t.map] && isOpen(progress, i));
+  const next = upNext(progress);
   $('intro-togter').classList.toggle('primary', !going && !!next);
   $('intro-new').classList.toggle('primary', !going && !next);
   $('togt-summary').textContent = next
@@ -1253,18 +1254,19 @@ function renderTogter() {
     saveSettings({ ...loadSettings(), togtLevel: lvl });
     renderTogter();
   });
+  const next = upNext(progress);
   $('togt-list').replaceChildren(
     ...TOGTER.map((t, i) => {
       const open = isOpen(progress, i);
       const won = progress.won[t.map];
       if (open) preloadArt(t.art);
       const li = document.createElement('li');
-      li.className = won ? 'won' : open ? 'next' : 'locked';
+      li.className = won ? 'won' : t === next ? 'next' : open ? '' : 'locked';
       const b = document.createElement('button');
       b.type = 'button';
       b.disabled = !open;
       const text = togtText(t.map);
-      const state = won ? L.togtWon(L.levels[won]) : open ? L.togtNext : `🔒 ${L.togtLocked}`;
+      const state = won ? L.togtWon(L.levels[won]) : t === next ? L.togtNext : open ? L.togtOpen : `🔒 ${L.togtLocked}`;
       b.innerHTML = `<span class="togt-thumb" style="background-image: url('${pictureOf(t.map)}')"></span>
         <span class="togt-body"><span class="togt-year">${text.year}</span><b>${mapIn(t.map).name}</b><small>${text.teaser}</small><small class="togt-state">${state}</small></span>`;
       b.addEventListener('click', () => {

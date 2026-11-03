@@ -2,7 +2,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { existsSync } from 'node:fs';
-import { TOGTER, newProgress, isOpen, nextTogt, freeMaps, record, offerEasy } from '../../js/togter.js';
+import { TOGTER, newProgress, isOpen, upNext, nextTogt, freeMaps, record, offerEasy } from '../../js/togter.js';
 import { MAPS } from '../../js/maps/index.js';
 import { DA } from '../../js/lang/da.js';
 import { EN } from '../../js/lang/en.js';
@@ -31,8 +31,27 @@ test('only the first togt is open at first; a win opens the next and its map', (
   assert.ok(isOpen(p, 1));
   assert.ok(!isOpen(p, 2));
   assert.ok(freeMaps(p, all).includes('italy'));
-  assert.equal(nextTogt('italy').map, 'alexander');
-  assert.equal(nextTogt('world'), null);
+  assert.equal(nextTogt(p, 'italy').map, 'alexander');
+});
+
+test('one togt is next, also with togter added earlier in history than one won', () => {
+  let p = newProgress();
+  for (const map of ['italy', 'alexander', 'vikings', 'england', 'japan', 'napoleon']) p = record(p, map, true, 'medium');
+  // Open and not won: Tre kongeriger, Djengis Khan, Inkariget ... and Befrielsen, after Napoleon.
+  assert.equal(upNext(p).map, 'threekingdoms');
+  assert.equal(nextTogt(p, 'threekingdoms').map, 'genghis');
+  // Playing an old one again goes on to what is still to be won, not to the one after it.
+  assert.equal(nextTogt(p, 'italy').map, 'threekingdoms');
+  assert.equal(nextTogt(p, 'napoleon').map, 'liberation');
+});
+
+test('when the last togt is won, the holes before it come next; then there is nothing', () => {
+  let p = newProgress();
+  for (const t of TOGTER) p = record(p, t.map, true, 'medium');
+  assert.equal(nextTogt(p, 'world'), null);
+  delete p.won.japan;
+  assert.equal(nextTogt(p, 'world').map, 'japan');
+  assert.equal(upNext(p).map, 'japan');
 });
 
 test('a togt put in before one already won is open, and so is the one won', () => {

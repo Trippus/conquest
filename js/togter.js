@@ -55,7 +55,16 @@ export const newProgress = (veteran = false) => ({ welcomed: false, veteran, won
 // one already won is open too, so no one is locked out of what they had reached.
 export const isOpen = (progress, i) => i === 0 || TOGTER.slice(i - 1).some((t) => progress.won[t.map]);
 
-export const nextTogt = (map) => TOGTER[TOGTER.findIndex((t) => t.map === map) + 1] ?? null;
+// The open togter not yet won. Togter added earlier in history than one already won are among them.
+const ahead = (progress) => TOGTER.filter((t, i) => !progress.won[t.map] && isOpen(progress, i));
+// The one togt that is next: the earliest of them.
+export const upNext = (progress) => ahead(progress)[0] ?? null;
+// After this togt: the first still to be won later in history, or else the earliest before it.
+export const nextTogt = (progress, map) => {
+  const here = TOGTER.findIndex((t) => t.map === map);
+  const left = ahead(progress);
+  return left.find((t) => TOGTER.indexOf(t) > here) ?? left[0] ?? null;
+};
 
 export const freeMaps = (progress, all) => all.filter((id) => (progress.veteran && VETERAN_MAPS.includes(id)) || ALWAYS_FREE.includes(id) || progress.won[id]);
 

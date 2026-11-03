@@ -1,12 +1,12 @@
 // The grid for De tre kongeriger (js/maps/threekingdoms.js), drawn by tools/make-grid.mjs.
 
 // The window: China of the Han from the Gobi to the Gulf of Tonkin, with the steppe, the Tibetan
-// plateau, Korea, the west of Japan and the north of Indochina round it as unexplored land.
+// plateau, the north of Korea, Japan and the north of Indochina round it as unexplored land.
 export const LAT_TOP = 47;
 export const LAT_STEP = 0.2;
 export const ROWS = 156;
 export const LON_WEST = 88;
-export const LON_EAST = 136;
+export const LON_EAST = 146;
 export const SQUASH_AT = 32;
 
 // Territory centres [lat, lon, letter], several for the large ones; '#' marks land outside the campaign.
@@ -28,10 +28,12 @@ export const CENTRES = [
   [36.8, 118.3, 'Q'], [37.3, 120.6, 'Q'],
   [35.6, 118.8, 'G'],
   [34.3, 117.9, 'P'], [33.3, 119.2, 'P'],
-  // Liaodong: Xiangping with the peninsula, Liaoxi, Lelang with Daifang in Korea
+  // Liaodong: Xiangping with the peninsula, Liaoxi, Lelang with Daifang in Korea, and Samhan, the
+  // chiefdoms of the south that paid Daifang tribute
   [41.3, 123.2, 'S'], [39.6, 122.1, 'S'],
   [41.3, 120.6, 'R'],
   [39.0, 125.7, 'U'], [38.2, 126.4, 'U'],
+  [35.8, 127.4, 'M'], [36.8, 127.2, 'M'], [35.3, 128.7, 'M'],
   // Shu: Chengdu, Hanzhong with Yinping, Jiangzhou with Ba and Baidi
   [30.7, 104.1, 'D'], [31.5, 103.1, 'D'],
   [33.1, 107.0, 'H'], [32.7, 105.4, 'H'],
@@ -54,12 +56,11 @@ export const CENTRES = [
   [23.1, 113.3, 'p'], [23.2, 116.0, 'p'],
   [23.5, 111.3, 'g'], [22.8, 108.4, 'g'], [24.4, 110.0, 'g'],
   [21.0, 105.8, 'z'], [19.8, 105.6, 'z'],
-  // Unexplored: the steppe of the Xianbei, the Ordos, Manchuria, Goguryeo, the south of Korea and
+  // Unexplored: the steppe of the Xianbei, the Ordos, Manchuria, Goguryeo and
   // Japan; the Western Regions and the plateau of the Qiang; Burma, Laos and the south of Vietnam;
   // Hainan and Taiwan.
   [44.5, 105, '#'], [45, 112, '#'], [46, 120, '#'], [43, 96, '#'], [42.6, 116.5, '#'], [41.6, 108.5, '#'], [39.6, 107.6, '#'],
   [42.2, 101.5, '#'], [42.3, 92.5, '#'], [44.5, 125, '#'], [46, 131, '#'], [43.5, 129, '#'], [41.6, 126.6, '#'], [43.2, 122.5, '#'],
-  [36.5, 127.6, '#'], [35.2, 128.8, '#'], [35.5, 126.8, '#'],
   [39, 90, '#'], [36.5, 92, '#'], [36.2, 98.3, '#'], [33.5, 96.5, '#'], [31, 92, '#'], [29, 90, '#'], [31.6, 100.6, '#'], [28.6, 98.6, '#'],
   [34.4, 101.5, '#'],
   [22.5, 97, '#'], [20, 99.5, '#'], [17.5, 98, '#'], [22.2, 102.4, '#'], [19.3, 102.8, '#'], [17, 104.6, '#'], [16.5, 107, '#'],

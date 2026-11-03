@@ -15,19 +15,21 @@ const road = (...ids) => ids.slice(1).every((id, i) => t[ids[i]].adj.includes(id
 const touch = (a, b) =>
   K.GRID.some((line, r) => [...line].some((x, c) => x === a && K.THREEKINGDOMS_GRID.hexNeighbours(r, c).some(([nr, nc]) => K.GRID[nr]?.[nc] === b)));
 
-test('the De tre kongeriger map is valid: 33 territories in 10 regions, every letter on the grid', () => {
+test('the De tre kongeriger map is valid: 34 territories in 10 regions, every letter on the grid', () => {
   assert.deepEqual(G.validateMap(K.THREEKINGDOMS), []);
-  assert.equal(Object.keys(K.THREEKINGDOMS.territories).length, 33);
+  assert.equal(Object.keys(K.THREEKINGDOMS.territories).length, 34);
   assert.equal(Object.keys(K.THREEKINGDOMS.regions).length, 10);
   const used = new Set(K.GRID.join('').replace(/[.#]/g, ''));
   assert.deepEqual([...used].sort(), Object.keys(K.TERRITORIES).sort());
   assert.ok(K.GRID.every((row) => row.length === K.GRID[0].length), 'all rows equally long');
 });
 
-test('one sea route, over the Bohai strait from Linzi to Liaodong', () => {
-  assert.equal(mapShapes(K.THREEKINGDOMS_GRID).sea.length, 1);
+test('two sea routes: over the Bohai strait from Linzi to Liaodong, and over the Yellow Sea to Samhan', () => {
+  assert.equal(mapShapes(K.THREEKINGDOMS_GRID).sea.length, 2);
   assert.ok(!touch('Q', 'S'), 'Linzi and Xiangping touch by land');
   assert.ok(t.linzi.adj.includes('xiangping'));
+  assert.ok(!touch('G', 'M'), 'Langya and Samhan touch by land');
+  assert.deepEqual(t.samhan.adj.sort(), ['langya', 'lelang']);
 });
 
 test('the roads of the war: Luoyang to Chengdu over the passes, and down the Yangzi to Jianye', () => {

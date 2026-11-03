@@ -351,7 +351,7 @@ dialog .big { font-family: var(--title); font-size: 20px; margin: 8px 0; }
 .togt-list li.locked .togt-thumb { filter: grayscale(.8) brightness(.75); }
 .togt-year { font: 700 15px/1.3 var(--title); color: var(--accent); }
 .togt-body { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
-.togt-body b { font: 700 16px var(--title); }
+.togt-body b { font: 700 16px var(--title); overflow-wrap: anywhere; }
 .togt-body small { font-size: 13px; color: var(--muted); }
 .togt-body .togt-state { color: var(--ink); font-weight: 600; }
 #togter .field { margin-top: 4px; }

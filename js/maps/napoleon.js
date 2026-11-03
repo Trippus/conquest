@@ -232,7 +232,7 @@ export const EN = {
 
 export const NAPOLEON_GRID = hexMap({
   id: 'napoleon',
-  name: 'Napoleonskrigene',
+  name: 'Napoleons­krigene', // with a soft hyphen: too long for a line in the list of togter on a phone
   GRID,
   REGIONS,
   TERRITORIES,

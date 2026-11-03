@@ -377,9 +377,6 @@ dialog .big { font-family: var(--title); font-size: 20px; margin: 8px 0; }
 /* straight on from the dark: a togt without a picture lets its map come up through it slowly */
 #chapter.from-dark { animation: none; }
 #chapter.from-dark:not(.has-art) .ch-art { opacity: 1; background: #0c0703; animation: leave 1.2s both; }
-/* coming from an end card, or to one, the picture comes up already dimmed for the words, sooner */
-#chapter:is(.from-dark, .ending) .ch-art::after { animation: none; }
-#chapter.has-art:is(.from-dark, .ending) { --wait: .8s; }
 @keyframes rise-in { from { opacity: 0; } }
 /* The togt's picture: an old map by candlelight, drifting slowly, the candles flickering from the
    left. It is seen clearly first; then it darkens (::after) for the words to come. */

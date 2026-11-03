@@ -1,12 +1,12 @@
 // The grid for Akbar den Store (js/maps/akbar.js), drawn by tools/make-grid.mjs.
 
-// The window: India from the Hindu Kush to Ceylon, with Persia, Central Asia, Tibet and Burma round it
-// as unexplored land.
-export const LAT_TOP = 38;
+// The window: India from the Hindu Kush to Ceylon, with Persia, the Gulf and Oman, Central Asia, Tibet
+// and Burma round it as unexplored land.
+export const LAT_TOP = 40;
 export const LAT_STEP = 0.2;
-export const ROWS = 161;
-export const LON_WEST = 59;
-export const LON_EAST = 98;
+export const ROWS = 171;
+export const LON_WEST = 50;
+export const LON_EAST = 100;
 export const SQUASH_AT = 22;
 
 // Territory centres [lat, lon, letter], several for the large ones; '#' marks land outside the campaign.
@@ -57,18 +57,23 @@ export const CENTRES = [
   [15.45, 73.9, 'x'],
   [13.6, 79.3, 'n'], [12.8, 79.7, 'n'], [15.0, 79.5, 'n'],
   [9.9, 78.1, 'z'], [11.0, 77.0, 'z'], [10.5, 76.3, 'z'],
+  // Kotte, the kingdom of Ceylon, with Jaffna in the north
+  [6.9, 79.9, 'k'], [7.8, 80.7, 'k'], [9.3, 80.4, 'k'],
   // Unexplored: Persia, Baluchistan, Central Asia, the mountains from Gilgit to Bhutan with Nepal and
   // Tibet, Assam, Arakan and Burma, and Ceylon.
   [36, 62, '#'], [33, 62, '#'], [29.5, 61.5, '#'], [26, 62, '#'], [27.5, 64.5, '#'], [29.8, 66.8, '#'], [26.3, 65.5, '#'],
   [37.3, 66, '#'], [37, 70.5, '#'], [36.8, 73.5, '#'], [36, 74.8, '#'], [34.2, 77.5, '#'], [33, 79.5, '#'], [32.3, 77.4, '#'],
   [30.6, 79.4, '#'], [29.6, 81.8, '#'], [28.4, 83.5, '#'], [27.7, 85.5, '#'], [27.4, 87.5, '#'], [31, 82, '#'], [31, 86, '#'],
   [30, 91, '#'], [33, 85, '#'], [27.3, 90.5, '#'], [26.3, 92.5, '#'], [27.3, 94.8, '#'], [23.8, 91.6, '#'], [21.8, 92.3, '#'],
-  [19.5, 94, '#'], [22, 95.5, '#'], [25, 95.3, '#'], [18, 95.5, '#'], [16.5, 97, '#'], [7.8, 80.7, '#'], [9.3, 80.4, '#'],
+  [19.5, 94, '#'], [22, 95.5, '#'], [25, 95.3, '#'], [18, 95.5, '#'], [16.5, 97, '#'],
+  [36, 54, '#'], [33, 55, '#'], [30, 54, '#'], [27.5, 56, '#'], [33.5, 51, '#'], [30, 50.5, '#'], [23, 57, '#'], [39, 64, '#'], [39.5, 69, '#'],
+  [38.5, 73, '#'], [37.5, 78, '#'], [36, 82, '#'], [38.5, 84, '#'], [36.5, 90, '#'], [37, 94, '#'], [34, 92, '#'], [35, 97, '#'], [31, 97, '#'],
+  [28, 97.5, '#'], [23, 98.5, '#'], [20, 98.5, '#'], [16, 98.5, '#'], [13, 99, '#'], [10, 98.8, '#'],
 ];
 export const FORCE_LAND = [];
 export const FORCE_SEA = [];
 
-// Small islands join the territory nearest them; Ceylon, the Maldives and the Andamans are unexplored.
+// Small islands join the territory nearest them; the Maldives and the Andamans are unexplored.
 export const ISLAND = 30;
 export const ISLAND_REACH = 10;
 

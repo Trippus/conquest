@@ -263,7 +263,7 @@ export const MISSIONS = [
 
 // Where the region names and the compass go. A name may sit on unexplored land.
 export const REGION_PLACES = { tr: [130.15, 108], an: [173.7, 97], ka: [220.1, 147], pt: [243.05, 97], bu: [157.2, 82.5], gr: [113.75, 118], sr: [93.4, 67.3], da: [52.2, 84], hu: [57.55, 5.5], wl: [122.15, 11.5] };
-export const COMPASS = [151, 182, 2.4];
+export const COMPASS = [61, 182, 2.4];
 export const SHIP = 'kadirga'; // an Ottoman war galley with lateen sails
 export const OCEANS = [[50, 114], [96, 71], [96, 35]];
 export const LANDMARKS = [[26.4, 91, 'Italien'], [23.6, 9.8, 'Østrig'], [103.8, 4.8, 'Polen'], [209, 48.5, 'Krim'], [217, 17, 'Den Gyldne Horde'], [300, 86, 'Georgien'], [240.6, 169.8, 'Mamelukkerne'], [121.7, 172.9, 'Kreta'], [201, 174.8, 'Cypern'], [278, 132, 'Ak Koyunlu']];

@@ -11,17 +11,18 @@ const rules = { ...MODERN, ...K.RULES };
 const t = K.AKBAR.territories;
 const road = (...ids) => ids.slice(1).every((id, i) => t[ids[i]].adj.includes(id));
 
-test('the Akbar den Store map is valid: 35 territories in 10 regions, every letter on the grid', () => {
+test('the Akbar den Store map is valid: 36 territories in 10 regions, every letter on the grid', () => {
   assert.deepEqual(G.validateMap(K.AKBAR), []);
-  assert.equal(Object.keys(K.AKBAR.territories).length, 35);
+  assert.equal(Object.keys(K.AKBAR.territories).length, 36);
   assert.equal(Object.keys(K.AKBAR.regions).length, 10);
   const used = new Set(K.GRID.join('').replace(/[.#]/g, ''));
   assert.deepEqual([...used].sort(), Object.keys(K.TERRITORIES).sort());
   assert.ok(K.GRID.every((row) => row.length === K.GRID[0].length), 'all rows equally long');
 });
 
-test('no sea routes: all of India hangs together by land', () => {
-  assert.equal(mapShapes(K.AKBAR_GRID).sea.length, 0);
+test('India hangs together by land; the one sea route goes over the Palk Strait to Ceylon', () => {
+  assert.equal(mapShapes(K.AKBAR_GRID).sea.length, 1);
+  assert.deepEqual(t.kotte.adj, ['madurai']);
 });
 
 test("Akbar's road: from Kabul over the Khyber to Lahore and Delhi, and on to Gujarat", () => {

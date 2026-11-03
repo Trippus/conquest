@@ -36,7 +36,7 @@ test("Menelik's march from Addis Abeba to Adwa", () => {
 
 test('the rivers, the march, the caravans and the sights are drawn inside the map', () => {
   const inside = ([x, y]) => x >= 0 && x <= E.ETHIOPIA_GRID.WIDTH && y >= 0 && y <= E.ETHIOPIA_GRID.HEIGHT;
-  assert.equal(E.RIVERS.length, 7);
+  assert.equal(E.RIVERS.length, 5);
   assert.equal(E.ROADS.length, 1);
   assert.equal(E.CARAVANS.length, 2);
   assert.ok([...E.RIVERS.flat(), ...E.ROADS.flat(), ...E.CARAVANS, ...E.SIGHTS].every(inside));

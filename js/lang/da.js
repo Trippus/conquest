@@ -125,7 +125,7 @@ export const DA = {
     threekingdoms: {
       year: '220',
       goal: 'Erobr Shu i vest og hele Yangzi-landet: Jingzhou og Jiangdong.',
-      teaser: 'Wei mod Liu Beis Shu, Sun Quans Wu og stammerne i syd.',
+      teaser: 'Kina er delt efter Han-rigets fald: Wei mod Shu og Wu.',
       story: 'Han-dynastiet har styret Kina i 400 år, men nu er det forbi. Cao Pi har taget kejsertitlen i Luoyang og grundlagt Wei, der holder hele norden. Men Liu Bei kalder sig også kejser i Chengdu, og Sun Quan hersker over Yangzi fra Jianye. Tre kongeriger, og kun én kan blive Himlens søn.',
       epilogue: 'De tre kongeriger kæmpede i 60 år. Zhuge Liang angreb Wei fra Shu fem gange uden at vinde. Wei erobrede Shu i 263, men to år senere tog Sima-slægten magten og grundlagde Jin. I 280 sejlede Jins flåde ned ad Yangzi og tog Jianye, og Kina var samlet igen. Fortællingen om de tre kongeriger er stadig en af Kinas mest elskede.',
     },
@@ -167,7 +167,7 @@ export const DA = {
     songhai: {
       year: '1468',
       goal: 'Tag Timbuktu og Jenné, og gør Songhai til herre over Niger.',
-      teaser: 'Sunni Ali mod tuaregerne, det gamle Mali og mossierne.',
+      teaser: 'Vestafrika: Sunni Ali kæmper om Timbuktu, guldet og saltet.',
       story: 'Mali-riget, der engang var rigt på guld, er ved at falde fra hinanden. Fra Gao ved floden Niger har kong Sunni Ali gjort Songhai stærkt, men tuaregerne holder Timbuktu, og mossiernes ryttere hærger fra syd. Den, der ejer floden, ejer handlen med guld og salt.',
       epilogue: 'Sunni Ali tog Timbuktu i 1468 og Jenné efter en lang belejring i 1473. Under Askia Muhammad blev Songhai det største rige i Vestafrikas historie, og Timbuktus lærde var berømte. I 1591 kom en marokkansk hær med musketter over Sahara og slog Songhai ved Tondibi.',
     },

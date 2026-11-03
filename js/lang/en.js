@@ -125,7 +125,7 @@ export const EN = {
     threekingdoms: {
       year: '220',
       goal: 'Conquer Shu in the west and all the Yangzi lands: Jingzhou and Jiangdong.',
-      teaser: 'Wei against Liu Bei’s Shu, Sun Quan’s Wu and the tribes of the south.',
+      teaser: 'China split after the fall of the Han: Wei against Shu and Wu.',
       story: 'The Han dynasty has ruled China for 400 years, but now it is over. Cao Pi has taken the title of emperor in Luoyang and founded Wei, which holds all the north. But Liu Bei calls himself emperor too, in Chengdu, and Sun Quan rules the Yangzi from Jianye. Three kingdoms, and only one can become the Son of Heaven.',
       epilogue: 'The three kingdoms fought for 60 years. Zhuge Liang attacked Wei from Shu five times without winning. Wei conquered Shu in 263, but two years later the Sima family took power and founded the Jin. In 280 the Jin fleet sailed down the Yangzi and took Jianye, and China was one again. The story of the three kingdoms is still one of China’s best loved.',
     },
@@ -167,7 +167,7 @@ export const EN = {
     songhai: {
       year: '1468',
       goal: 'Take Timbuktu and Jenné, and make Songhai master of the Niger.',
-      teaser: 'Sunni Ali against the Tuareg, old Mali and the Mossi.',
+      teaser: 'West Africa: Sunni Ali fights for Timbuktu, the gold and the salt.',
       story: 'The Mali empire, once rich in gold, is falling apart. From Gao on the river Niger, King Sunni Ali has made Songhai strong, but the Tuareg hold Timbuktu, and the Mossi horsemen raid from the south. Whoever holds the river holds the trade in gold and salt.',
       epilogue: 'Sunni Ali took Timbuktu in 1468 and Jenné after a long siege in 1473. Under Askia Muhammad, Songhai became the largest empire in West African history, and the scholars of Timbuktu were famous. In 1591 a Moroccan army with muskets crossed the Sahara and beat Songhai at Tondibi.',
     },

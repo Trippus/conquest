@@ -15,10 +15,10 @@
 export const TOGTER = [
   { map: 'italy', opponents: 2, home: 'la', goal: ['la', 'sa', 'mg', 'um'], bonus: 0.5, art: 'assets/togter/italy.jpg' },
   { map: 'alexander', opponents: 2, home: 'hl', goal: ['la', 'me', 'pe'], art: 'assets/togter/alexander.jpg' },
-  { map: 'threekingdoms', opponents: 3, home: 'zy', goal: ['sh', 'jz', 'jd'], bonus: 0.8 },
+  { map: 'threekingdoms', opponents: 3, home: 'zy', goal: ['sh', 'jz', 'jd'], bonus: 0.8, art: 'assets/togter/threekingdoms.jpg' },
   { map: 'vikings', opponents: 2, home: 'dk', goal: ['dk', 'br', 'no'], bonus: 0.2, art: 'assets/togter/vikings.jpg' },
   { map: 'england', opponents: 3, home: 'nm', goal: ['wx', 'me', 'ea'], art: 'assets/togter/england.jpg' },
-  { map: 'genghis', opponents: 3, home: 'mo', goal: ['xx', 'hb', 'tx'], bonus: 0.65 },
+  { map: 'genghis', opponents: 3, home: 'mo', goal: ['xx', 'hb', 'tx'], bonus: 0.65, art: 'assets/togter/genghis.jpg' },
   { map: 'inka', opponents: 3, home: 'hd', goal: ['ch', 'co', 'cm'], bonus: 0.5 },
   { map: 'constantinople', opponents: 3, home: 'an', goal: ['tr', 'gr', 'sr'], bonus: 0.5 },
   { map: 'songhai', opponents: 3, home: 'so', goal: ['nb', 'nd'], plusOne: true, bonus: 0.6 },

@@ -23,11 +23,11 @@ export const TOGTER = [
   { map: 'constantinople', opponents: 3, home: 'an', goal: ['tr', 'gr', 'sr'], bonus: 0.5, art: 'assets/togter/constantinople.jpg' },
   { map: 'songhai', opponents: 3, home: 'so', goal: ['nb', 'nd'], plusOne: true, bonus: 0.6, art: 'assets/togter/songhai.jpg' },
   { map: 'akbar', opponents: 3, home: 'pj', goal: ['hi', 'rj', 'gu'], bonus: 0.6, art: 'assets/togter/akbar.jpg' },
-  { map: 'japan', opponents: 3, home: 'to', goal: ['to', 'ks', 'ki'], bonus: 0.5 },
-  { map: 'napoleon', opponents: 3, home: 'fr', goal: ['fr', 'os', 'pr'], bonus: 0.6 },
+  { map: 'japan', opponents: 3, home: 'to', goal: ['to', 'ks', 'ki'], bonus: 0.5, art: 'assets/togter/japan.jpg' },
+  { map: 'napoleon', opponents: 3, home: 'fr', goal: ['fr', 'os', 'pr'], bonus: 0.6, art: 'assets/togter/napoleon.jpg' },
   { map: 'liberation', opponents: 3, home: 've', goal: ['ng', 'qu', 'pe'], bonus: 0.45, art: 'assets/togter/liberation.jpg' },
   { map: 'west', opponents: 3, home: 'mi', goal: ['tx', 'ca', 'or'], bonus: 0.3, art: 'assets/togter/west.jpg' },
-  { map: 'ethiopia', opponents: 3, home: 'sh', goal: ['ti', 'kf', 'og'], bonus: 0.55 },
+  { map: 'ethiopia', opponents: 3, home: 'sh', goal: ['ti', 'kf', 'og'], bonus: 0.55, art: 'assets/togter/ethiopia.jpg' },
   { map: 'world', opponents: 3, goal: ['eu'], plusOne: true, bonus: 0.4 },
 ];
 

@@ -11,6 +11,8 @@ import { EN } from '../../js/lang/en.js';
 
 test('every togt picture is there, and every map has its small picture (npm run map-shots)', () => {
   for (const t of TOGTER) if (t.art) assert.ok(existsSync(new URL(`../../${t.art}`, import.meta.url)), t.art);
+  // and its small copy for the lists (tools/make-thumbs.ps1)
+  for (const t of TOGTER) if (t.art) assert.ok(existsSync(new URL(`../../${t.art.replace('togter/', 'togter/small/')}`, import.meta.url)), `small ${t.art}`);
   for (const id of Object.keys(MAPS)) assert.ok(existsSync(new URL(`../../assets/maps/${id}.jpg`, import.meta.url)), id);
 });
 

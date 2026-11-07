@@ -976,7 +976,7 @@ function renderSetup() {
         if (name === 'map') {
           const picture = document.createElement('span');
           picture.className = 'map-picture';
-          picture.style.backgroundImage = `url('${pictureOf(value)}')`;
+          picture.style.backgroundImage = `url('${thumbOf(value)}')`;
           b.prepend(picture);
         }
         b.setAttribute('aria-pressed', String(draft[name] === value));
@@ -1428,6 +1428,11 @@ $('choose-free').addEventListener('click', () => {
 function pictureOf(id) {
   return togtOf(id)?.art ?? `assets/maps/${id}.jpg`;
 }
+// The same, small, for the lists: sixteen full pictures at once are more than a phone keeps while
+// scrolling (tools/make-thumbs.ps1).
+function thumbOf(id) {
+  return togtOf(id)?.art?.replace('assets/togter/', 'assets/togter/small/') ?? `assets/maps/${id}.jpg`;
+}
 function openTogter() {
   renderTogter();
   $('togter').showModal();
@@ -1451,7 +1456,7 @@ function renderTogter() {
       b.disabled = !open;
       const text = togtText(t.map);
       const state = won ? `${medalIcon(won)}${L.togtWon(L.levels[won])}` : t === next ? L.togtNext : open ? L.togtOpen : `🔒 ${L.togtLocked}`;
-      b.innerHTML = `<span class="togt-thumb" style="background-image: url('${pictureOf(t.map)}')"></span>
+      b.innerHTML = `<span class="togt-thumb" style="background-image: url('${thumbOf(t.map)}')"></span>
         <span class="togt-body"><span class="togt-year">${text.year}</span><b>${mapIn(t.map).name}</b><small>${text.teaser}</small><small class="togt-state">${state}</small></span>`;
       b.addEventListener('click', () => {
         $('togter').close();

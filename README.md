@@ -39,6 +39,7 @@ npm run design-shots                          # stilprøverne som PNG (kræver n
 | `js/board.js` | Verdenskortet i papirkort-stil: farver, laksegl med hære, markeringer, træk og zoom (knib, hjul, +/−) |
 | `tools/simulate.mjs` | Mange bot-spil til balance |
 | `tools/make-icons.mjs`, `manifest.webmanifest` | Ikonet (et rødt segl med kronen) til browserfanen og hjemmeskærmen, og manifestet, så spillet kan lægges på hjemmeskærmen som en app |
+| `tools/make-thumbs.ps1` | Små udgaver af togtbillederne til listerne (`assets/togter/small`), så telefonen ikke taber billeder, mens man scroller |
 | `tools/map-shots.mjs`, `tools/smudge.mjs` | `npm run map-shots` tager de små billeder af kortene (`assets/maps/`); `npm run smudge -- <billede> x,y,w,h …` visker ord ud af et AI-billede |
 | `tools/map-report.mjs`, `tools/balance.mjs` | `npm run map-report -- <kort>` og `npm run balance -- <kort>`: tjek af et korts grænser og balance. Hele opskriften på et nyt kort står i `docs/nyt-kort.md` |
 | `tools/make-grid.mjs` | Tegner et korts gitter ud fra rigtige kystlinjer (Natural Earth, public domain) med opsætningen i `tools/grids/<kort>.mjs`; land uden for spillet bliver `#`, tegnet som uudforsket |

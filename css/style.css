@@ -218,6 +218,16 @@ body.clear-colors #board .washes path { opacity: .62; }
 #intro h1 span, .slide-title span { display: block; white-space: nowrap; }
 .intro-sub { margin: 8px 0 20px; color: #e6d8bd; text-wrap: balance; }
 .intro-buttons { margin-top: auto; display: flex; flex-direction: column; gap: 10px; align-items: center; }
+/* the title comes down from the top edge on tall phones, so it does not sit under the status bar */
+#intro #intro-title { margin-top: clamp(4px, calc(16dvh - 80px), 80px); }
+/* a way to play, and under its name what it holds: the next togt, the map and players, the game going */
+.intro-buttons button.two-line { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px; min-height: 58px; padding: 8px 16px; line-height: 1.25; }
+.two-line > span { font-size: 17px; }
+.two-line small { font-size: 13.5px; font-weight: 400; color: var(--muted); text-shadow: none; }
+.two-line.primary small { color: var(--primary-ink); opacity: .75; }
+.intro-progress { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 4px 14px; margin: 0 0 2px; font-size: 15px; color: #e6d8bd; }
+.intro-progress .medal-count { display: inline-flex; align-items: center; gap: 4px; font-weight: 600; }
+.intro-progress .medal { width: 15px; height: 20px; }
 .intro-setup { margin: 0; font-size: 15px; line-height: 1.45; color: #e6d8bd; text-wrap: balance; }
 .intro-setup .link { min-height: 0; padding: 0 4px; font-size: 15px; line-height: inherit; vertical-align: baseline; }
 .intro-links { display: flex; justify-content: center; gap: 22px; margin-top: 10px; }
@@ -625,6 +635,5 @@ dialog .big { font-family: var(--title); font-size: 20px; margin: 8px 0; }
 
 /* ---------- the end of a togt ---------- */
 .locked-note { margin: 6px 0 0; font-size: 13px; }
-.intro-buttons .intro-setup { margin-bottom: 6px; }
 #hud, #bar { transition: opacity .6s; }
 body.telling #hud, body.telling #bar { opacity: 0; pointer-events: none; }

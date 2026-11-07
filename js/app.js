@@ -1303,10 +1303,14 @@ function showIntro() {
   const next = upNext(progress);
   $('intro-togter').classList.toggle('primary', !going && !!next);
   $('intro-new').classList.toggle('primary', !going && !next);
-  $('togt-summary').textContent = next
-    ? `${L.togtProgress(won, TOGTER.length)} · ${L.togtUpNext(togtText(next.map).year, mapIn(next.map).name)}`
-    : L.togtAllWon;
+  // Over the buttons: the togter won and their medals; nothing yet for someone who has won none.
+  const counts = medalCounts(progress.won);
+  $('intro-progress').hidden = !won;
+  $('intro-progress').innerHTML = `<span>${L.togterWon(won, TOGTER.length)}</span>${MEDALS.filter((m) => counts[m])
+    .map((m) => `<span class="medal-count">${medalIcon(m)}${counts[m]}</span>`).join('')}`;
+  $('togt-summary').textContent = next ? L.togtUpNext(togtText(next.map).year, mapIn(next.map).name) : L.togtAllWon;
   $('intro-summary').textContent = summary(loadSettings());
+  if (going) $('continue-summary').textContent = `${mapIn(game.map).name} · ${L.round(s.round)}`;
   $('intro').hidden = false;
   // The picture of the game you are in or played last, else of the next togt.
   showIntroArt(togtOf(game?.map)?.art ?? next?.art ?? pictureOf('world'));

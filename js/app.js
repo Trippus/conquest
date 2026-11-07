@@ -1150,6 +1150,7 @@ function showIntro() {
   const going = game && s.phase !== 'over';
   $('welcome').hidden = progress.welcomed;
   $('menu').hidden = !progress.welcomed;
+  $('intro').classList.toggle('first', !progress.welcomed);
   if (!progress.welcomed) return showWelcome();
   $('intro-continue').hidden = !going;
   // With no game going, the togter come first until every one is won.
@@ -1162,21 +1163,52 @@ function showIntro() {
     : L.togtAllWon;
   $('intro-summary').textContent = summary(loadSettings());
   $('intro').hidden = false;
+  // The picture of the game you are in or played last, else of the next togt.
+  showIntroArt(togtOf(game?.map)?.art ?? next?.art ?? pictureOf('world'));
+}
+
+// The start screen's picture. A new one comes up over the old, so nothing goes dark between them.
+function showIntroArt(src) {
+  const box = $('intro-art');
+  if (box.dataset.src === src) return;
+  box.dataset.src = src;
+  preloadArt(src).then(() => {
+    if (box.dataset.src !== src) return;
+    while (box.children.length > 1) box.firstChild.remove();
+    const picture = document.createElement('div');
+    picture.style.backgroundImage = `url("${src}")`;
+    box.append(picture);
+  });
 }
 
 /* ---------- welcome ---------- */
 
-// Two steps: your name and coat of arms, then the two ways to play. The name is the first person's
-// in the free game's setup too.
+// Cards to swipe through (index.html): what the game is, the two ways to play, a turn, and last your
+// name and coat of arms and how to begin. The name is the first person's in the free game's setup too.
 let welcomeLooks = false;
+const slides = [...document.querySelectorAll('.slide')];
+let slide = 0;
+$('slide-dots').replaceChildren(...slides.map(() => document.createElement('i')));
+function onSlide(i) {
+  slide = i;
+  [...$('slide-dots').children].forEach((dot, k) => dot.classList.toggle('on', k === i));
+  $('slide-next').hidden = $('slide-skip').hidden = i === slides.length - 1;
+  showIntroArt(slides[i].dataset.art);
+}
+const toSlide = (i) => $('slides').scrollTo({ left: i * $('slides').clientWidth, behavior: 'smooth' });
+$('slides').addEventListener('scroll', () => {
+  const i = Math.round($('slides').scrollLeft / $('slides').clientWidth);
+  if (i !== slide) onSlide(i);
+}, { passive: true });
+$('slide-next').addEventListener('click', () => toSlide(slide + 1));
+$('slide-skip').addEventListener('click', () => toSlide(slides.length - 1));
 function showWelcome() {
-  const person = loadSettings().people[0];
-  $('welcome-name').hidden = false;
-  $('welcome-ways').hidden = true;
-  $('welcome-input').value = person.name;
+  $('welcome-input').value = loadSettings().people[0].name;
   $('welcome-input').placeholder = L.yourName;
   renderWelcomeLook();
   $('intro').hidden = false;
+  $('slides').scrollLeft = 0;
+  onSlide(0);
 }
 function renderWelcomeLook() {
   const person = loadSettings().people[0];
@@ -1215,21 +1247,15 @@ $('welcome-input').addEventListener('keydown', (e) => {
     $('welcome-input').blur();
   }
 });
-$('welcome-next').addEventListener('click', () => {
-  const name = $('welcome-input').value.trim().slice(0, NAME_LENGTH);
-  setPerson({ name });
-  $('welcome-hello').textContent = L.hello(name);
-  $('welcome-name').hidden = true;
-  $('welcome-ways').hidden = false;
-});
 function welcomed() {
+  setPerson({ name: $('welcome-input').value.trim().slice(0, NAME_LENGTH) });
   progress = { ...progress, welcomed: true };
   saveProgress(progress);
   showIntro();
 }
 $('choose-togter').addEventListener('click', () => {
   welcomed();
-  openTogter();
+  startTogt(TOGTER[0].map);
 });
 $('choose-free').addEventListener('click', () => {
   welcomed();

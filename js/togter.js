@@ -5,41 +5,52 @@
 
 // map: the map's id (js/maps/index.js); opponents: how many computer players; home: the region you
 // start with, where history began; goal: the regions to hold, what history's winner took (plusOne:
-// and any one more); bonus: the share of start armies you get extra; art: the togt's picture, behind
-// the year card, small in the list and over the end of a won togt (assets/togter, see LICENSES.md); a
+// and any one more); bonus: the share of start armies you get extra; easy: what is different on Let
+// (togtArmies below); art: the togt's picture, behind the year card, small in the list and over the end of a won togt (assets/togter, see LICENSES.md); a
 // togt without one shows its map (assets/maps). The opponents keep secret missions,
 // so it is a race.
 //
-// Measured with npm run togt-balance (a hard bot for the player, 400 games): Let 91–100%, Normal
-// 50–63%, Svær 19–42%. Svær is meant for players who beat Normal easily.
+// Measured with npm run togt-balance (a hard bot for the player, 400 games): Let 81–93%, Normal
+// 50–63%, Svær 19–42%. Svær is meant for players who beat Normal easily. A person playing for the
+// goal is far quicker than that bot, so Let is tuned against a rush as well: a togt should not fall
+// in the first round, and take some four rounds or more.
 export const TOGTER = [
-  { map: 'italy', opponents: 2, home: 'la', goal: ['la', 'sa', 'mg', 'um'], bonus: 0.5, art: 'assets/togter/italy.jpg' },
-  { map: 'alexander', opponents: 2, home: 'hl', goal: ['la', 'me', 'pe'], art: 'assets/togter/alexander.jpg' },
-  { map: 'threekingdoms', opponents: 3, home: 'zy', goal: ['sh', 'jz', 'jd'], bonus: 0.8, art: 'assets/togter/threekingdoms.jpg' },
-  { map: 'vikings', opponents: 2, home: 'dk', goal: ['dk', 'br', 'no'], bonus: 0.2, art: 'assets/togter/vikings.jpg' },
-  { map: 'england', opponents: 3, home: 'nm', goal: ['wx', 'me', 'ea'], art: 'assets/togter/england.jpg' },
-  { map: 'genghis', opponents: 3, home: 'mo', goal: ['xx', 'hb', 'tx'], bonus: 0.65, art: 'assets/togter/genghis.jpg' },
-  { map: 'inka', opponents: 3, home: 'hd', goal: ['ch', 'co', 'cm'], bonus: 0.5, art: 'assets/togter/inka.jpg' },
-  { map: 'constantinople', opponents: 3, home: 'an', goal: ['tr', 'gr', 'sr'], bonus: 0.5, art: 'assets/togter/constantinople.jpg' },
-  { map: 'songhai', opponents: 3, home: 'so', goal: ['nb', 'nd'], plusOne: true, bonus: 0.6, art: 'assets/togter/songhai.jpg' },
-  { map: 'akbar', opponents: 3, home: 'pj', goal: ['hi', 'rj', 'gu'], bonus: 0.6, art: 'assets/togter/akbar.jpg' },
-  { map: 'japan', opponents: 3, home: 'to', goal: ['to', 'ks', 'ki'], bonus: 0.5, art: 'assets/togter/japan.jpg' },
-  { map: 'napoleon', opponents: 3, home: 'fr', goal: ['fr', 'os', 'pr'], bonus: 0.6, art: 'assets/togter/napoleon.jpg' },
-  { map: 'liberation', opponents: 3, home: 've', goal: ['ng', 'qu', 'pe'], bonus: 0.45, art: 'assets/togter/liberation.jpg' },
-  { map: 'west', opponents: 3, home: 'mi', goal: ['tx', 'ca', 'or'], bonus: 0.3, art: 'assets/togter/west.jpg' },
-  { map: 'ethiopia', opponents: 3, home: 'sh', goal: ['ti', 'kf', 'og'], bonus: 0.55, art: 'assets/togter/ethiopia.jpg' },
+  { map: 'italy', opponents: 2, home: 'la', goal: ['la', 'sa', 'mg', 'um'], bonus: 0.5, easy: { bonus: 0.4, guard: 1 }, art: 'assets/togter/italy.jpg' },
+  { map: 'alexander', opponents: 2, home: 'hl', goal: ['la', 'me', 'pe'], easy: { guard: 1 }, art: 'assets/togter/alexander.jpg' },
+  { map: 'threekingdoms', opponents: 3, home: 'zy', goal: ['sh', 'jz', 'jd'], bonus: 0.8, easy: { bonus: 0.6, guard: 1 }, art: 'assets/togter/threekingdoms.jpg' },
+  { map: 'vikings', opponents: 2, home: 'dk', goal: ['dk', 'br', 'no'], bonus: 0.2, easy: { bonus: 0.1, guard: 2 }, art: 'assets/togter/vikings.jpg' },
+  { map: 'england', opponents: 3, home: 'nm', goal: ['wx', 'me', 'ea'], easy: { bonus: 0.3 }, art: 'assets/togter/england.jpg' },
+  { map: 'genghis', opponents: 3, home: 'mo', goal: ['xx', 'hb', 'tx'], bonus: 0.65, easy: { bonus: 0.3 }, art: 'assets/togter/genghis.jpg' },
+  { map: 'inka', opponents: 3, home: 'hd', goal: ['ch', 'co', 'cm'], bonus: 0.5, easy: { bonus: 0.1 }, art: 'assets/togter/inka.jpg' },
+  { map: 'constantinople', opponents: 3, home: 'an', goal: ['tr', 'gr', 'sr'], bonus: 0.5, easy: { bonus: 0.3, guard: 1 }, art: 'assets/togter/constantinople.jpg' },
+  { map: 'songhai', opponents: 3, home: 'so', goal: ['nb', 'nd'], plusOne: true, bonus: 0.6, easy: { novice: 0.3, bonus: 0.4, guard: 3 }, art: 'assets/togter/songhai.jpg' },
+  { map: 'akbar', opponents: 3, home: 'pj', goal: ['hi', 'rj', 'gu'], bonus: 0.6, easy: { bonus: 0.2, guard: 1 }, art: 'assets/togter/akbar.jpg' },
+  { map: 'japan', opponents: 3, home: 'to', goal: ['to', 'ks', 'ki'], bonus: 0.5, easy: { novice: 0.15, bonus: 0.45, guard: 3 }, art: 'assets/togter/japan.jpg' },
+  { map: 'napoleon', opponents: 3, home: 'fr', goal: ['fr', 'os', 'pr'], bonus: 0.6, easy: { bonus: 0.6, guard: 2 }, art: 'assets/togter/napoleon.jpg' },
+  { map: 'liberation', opponents: 3, home: 've', goal: ['ng', 'qu', 'pe'], bonus: 0.45, easy: { bonus: 0.2, guard: 1 }, art: 'assets/togter/liberation.jpg' },
+  { map: 'west', opponents: 3, home: 'mi', goal: ['tx', 'ca', 'or'], bonus: 0.3, easy: { bonus: 0.2, guard: 1 }, art: 'assets/togter/west.jpg' },
+  { map: 'ethiopia', opponents: 3, home: 'sh', goal: ['ti', 'kf', 'og'], bonus: 0.55, easy: { bonus: 0.6, guard: 2 }, art: 'assets/togter/ethiopia.jpg' },
   { map: 'world', opponents: 3, goal: ['eu'], plusOne: true, bonus: 0.4 },
 ];
 
+// The armies of a togt on a level. On Let the opponents start in full (novice: or weaker by that
+// share, for the togter whose goal is so near that nothing else leaves a game), you get easy.bonus,
+// and each territory of the goal you do not start with has easy.guard armies more.
+export function togtArmies(togt, level, noviceHandicap) {
+  const easy = level === 'novice' ? togt.easy : undefined;
+  return { bonus: easy?.bonus ?? togt.bonus ?? 0, novice: easy ? easy.novice ?? 0 : noviceHandicap, guard: easy?.guard ?? 0 };
+}
+
 // A togt's start for a game on the prepared map: you (seat) get the home region's territories and
-// the goal as your mission. As newGame's home and goals (js/engine.js).
-export function togtStart(map, togt, seat, players) {
+// the goal as your mission, its territories guarded. As newGame's home, goals and guard (js/engine.js).
+export function togtStart(map, togt, seat, players, guard = 0) {
   const region = (id) => map.regions.findIndex((r) => r.id === id);
   const home = Array(players).fill(null);
   const goals = Array(players).fill(null);
   if (togt.home) home[seat] = [...map.regions[region(togt.home)].members];
   goals[seat] = { type: 'regions', regions: togt.goal.map(region), ...(togt.plusOne ? { plusOne: true } : {}) };
-  return { home, goals };
+  const territories = togt.goal.flatMap((id) => map.regions[region(id)].members);
+  return { home, goals, ...(guard ? { guard: { player: seat, territories, armies: guard } } : {}) };
 }
 
 // The free game always has the world. Someone who played before there were togter keeps the maps
@@ -47,9 +58,10 @@ export function togtStart(map, togt, seat, players) {
 const ALWAYS_FREE = ['world'];
 const VETERAN_MAPS = ['italy', 'alexander', 'vikings', 'england', 'japan', 'napoleon', 'world'];
 
-// What the player has done: welcomed (has seen the welcome), veteran (played before togter came),
+// What the player has done: welcomed (has seen the welcome), guided (has been through the first
+// game's guide), veteran (played before togter came),
 // won: { map: level } (the hardest level won on), lost: { map: losses since the last win }.
-export const newProgress = (veteran = false) => ({ welcomed: false, veteran, won: {}, lost: {} });
+export const newProgress = (veteran = false) => ({ welcomed: false, guided: false, veteran, won: {}, lost: {} });
 
 // A togt can be played once the one before it is won. A togt that came later and was put in before
 // one already won is open too, so no one is locked out of what they had reached.

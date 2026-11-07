@@ -9,7 +9,7 @@ import { MAPS, inLanguage } from '../../js/maps/index.js';
 test('Danish and English have the same texts, of the same kind', () => {
   assert.deepEqual(Object.keys(EN).sort(), Object.keys(DA).sort());
   for (const k of Object.keys(DA)) assert.equal(typeof EN[k], typeof DA[k], k);
-  for (const k of ['errors', 'levels', 'modes', 'themes', 'phases', 'phaseNames', 'modeShort', 'togter']) {
+  for (const k of ['errors', 'levels', 'modes', 'themes', 'phases', 'phaseNames', 'togter', 'guide']) {
     assert.deepEqual(Object.keys(EN[k]).sort(), Object.keys(DA[k]).sort(), k);
   }
   assert.equal(EN.opponents.length, DA.opponents.length);

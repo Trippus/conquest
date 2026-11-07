@@ -12,8 +12,9 @@ import { createBoard, PLAYER_COLORS as COLORS, sealIcon } from './board.js';
 import { mapShapes, regionShapes } from './map-shapes.js';
 import { Sound, Music } from './audio.js';
 import { openHowTo } from './how-to.js';
+import { guideNote, guideDone } from './guide.js';
 import { LANGUAGES, pickLanguage, stringsFor, translatePage } from './i18n.js';
-import { TOGTER, newProgress, isOpen, upNext, nextTogt, freeMaps, record, offerEasy, togtStart } from './togter.js';
+import { TOGTER, newProgress, isOpen, upNext, nextTogt, freeMaps, record, offerEasy, togtArmies, togtStart } from './togter.js';
 
 // Saves only replay on the map they were played on: v1 was the test map, v2 the 30-territory world.
 const KEY = 'conquest.v3';
@@ -154,7 +155,9 @@ function startFromSettings(settings = loadSettings(), { intro = true } = {}) {
   const free = COLORS.map((_, i) => i).filter((i) => !settings.people.some((x) => x.look === i));
   const names = shuffled(mapIn(settings.map).RULERS ?? L.opponents);
   const bots = Array.from({ length: settings.opponents }, (_, i) => ({ kind: settings.level, name: names[i], color: free[i] }));
-  startGame(shuffled([...people, ...bots]), 'normal', settings.mode, undefined, settings.map, { quiet: intro });
+  const guide = people.length === 1 && newcomer();
+  const order = guide ? [people[0], ...shuffled(bots)] : shuffled([...people, ...bots]);
+  startGame(order, 'normal', settings.mode, undefined, settings.map, { quiet: intro, guide });
   if (intro) showDeal();
 }
 
@@ -169,35 +172,39 @@ function startTogt(id, { intro = true } = {}) {
   const free = COLORS.map((_, i) => i).filter((i) => i !== person.look);
   const you = { kind: 'human', name: person.name.trim() || L.you, color: person.look };
   const bots = Array.from({ length: togt.opponents }, (_, i) => ({ kind: settings.togtLevel, name: names[i], color: free[i] }));
-  const order = shuffled([you, ...bots]);
+  const guide = newcomer();
+  const order = guide ? [you, ...shuffled(bots)] : shuffled([you, ...bots]);
   useMap(id);
-  const start = togtStart(map, togt, order.indexOf(you), order.length);
+  const { bonus, novice, guard } = togtArmies(togt, settings.togtLevel, rules.noviceHandicap);
+  const start = togtStart(map, togt, order.indexOf(you), order.length, guard);
   const mode = settings.togtGoal === 'all' ? 'world' : 'mission';
-  startGame(order, 'normal', mode, undefined, id, { togt: id, quiet: intro, ...start, bonus: togt.bonus ?? 0 });
+  startGame(order, 'normal', mode, undefined, id, { togt: id, quiet: intro, guide, ...start, bonus, novice });
   if (intro) showChapter(id);
 }
 
 // order: [{ kind: 'human' | 'novice' | 'medium' | 'hard', name, color }] in turn order.
-// togt: the togt this game is (js/togter.js), with the start at home, the goals and the bonus for
-// the person playing it; quiet: the game waits, showing the whole map, while the story is told.
-function startGame(order, speed, mode = 'mission', seed = (Math.random() * 2 ** 31) | 0, mapId = 'world', { togt, quiet = false, home, goals, bonus = 0 } = {}) {
+// togt: the togt this game is (js/togter.js), with the start at home, the goals, the guard and the
+// bonus for the person playing it, and how much weaker the easy computer players start; quiet: the game waits, showing the whole map, while the story is told;
+// guide: the first game, with notes on what to do (js/guide.js).
+function startGame(order, speed, mode = 'mission', seed = (Math.random() * 2 ** 31) | 0, mapId = 'world', { togt, quiet = false, home, goals, guard, bonus = 0, novice, guide = false } = {}) {
   const humans = order.filter((x) => x.kind === 'human').length;
   $('intro').hidden = true;
   stepAway();
   useMap(mapId);
   // Easy computer players start weaker, by how much the map's rules say; hard ones start stronger.
   const start = G.startArmies(rules, map.territories.length, order.length);
-  const extra = { novice: -rules.noviceHandicap, hard: rules.hardBonus, human: bonus };
+  const extra = { novice: -(novice ?? rules.noviceHandicap), hard: rules.hardBonus, human: bonus };
   const handicap = order.map((x) => Math.round(start * (extra[x.kind] ?? 0)));
   game = {
     map: grid.id,
-    setup: { players: order.map((x) => x.name), seed, mode, handicap, ...(home ? { home, goals } : {}) },
+    setup: { players: order.map((x) => x.name), seed, mode, handicap, ...(home ? { home, goals } : {}), ...(guard ? { guard } : {}) },
     seats: order.map((x) => x.kind),
     colors: order.map((x) => x.color),
     speed,
     actions: [],
     // told: the opening card has been read (or skipped); until then, continuing shows it again
     ...(togt ? { togt } : {}),
+    ...(guide ? { guide } : {}),
     ...(quiet ? { told: false } : {}),
   };
   s = G.newGame(map, rules, game.setup);
@@ -387,6 +394,7 @@ function act(a) {
   s = r.state;
   game.actions.push(a);
   save();
+  if (game.guide && guideDone(s)) endGuide();
   if (r.events.some((e) => e.type === 'turn' || e.type === 'win')) clearSel();
   // A new phase starts with nothing chosen. The one exception: the territory the armies were just
   // placed on stays chosen for the attack, if it can attack.
@@ -511,6 +519,8 @@ function render() {
     if (s.phase === 'attack') G.attackTargets(map, s, sel.from).forEach((t) => targets.add(t));
     if (s.phase === 'fortify') G.fortifyTargets(map, rules, s, sel.from).forEach((t) => targets.add(t));
   }
+  const note = game.guide ? guideNote(map, s, sel, game.actions) : null;
+  note?.marks?.forEach((t) => targets.add(t));
   const occ = s.occupy;
   // While choosing how many move in, the seals already show the split being chosen.
   const shownState = occ && !isBot() ? { ...s, armies: s.armies.map((n, t) => (t === occ.to ? n + sel.n : t === occ.from ? n - sel.n : n)) } : s;
@@ -537,11 +547,11 @@ function render() {
       return li;
     }),
   );
-  renderBar();
+  renderBar(note);
   renderHudButtons();
 }
 
-function renderBar() {
+function renderBar(note) {
   const p = s.current;
   const name = s.players[p].name;
   const buttons = [];
@@ -550,6 +560,7 @@ function renderBar() {
     b.textContent = label;
     b.className = [opts.primary && 'primary', opts.wide && 'wide'].filter(Boolean).join(' ');
     b.disabled = !!opts.disabled;
+    if (opts.key) b.dataset.key = opts.key;
     b.addEventListener('click', fn);
     buttons.push(b);
   };
@@ -579,12 +590,12 @@ function renderBar() {
     const stars = s.players[p].stars;
     if (stars) {
       text += L.starsOffer(starCount(stars), armies(worth(stars)), starCount(stars + 1), armies(worth(stars + 1)));
-      button(L.cashStars(starCount(stars), armies(worth(stars))), () => act({ type: 'luck' }), { wide: true });
+      button(L.cashStars(starCount(stars), armies(worth(stars))), () => act({ type: 'luck' }), { wide: true, key: 'cash' });
     }
     if (s.reserve && sel.from >= 0 && s.owner[sel.from] === p) {
-      button(L.restOn(names(sel.from)), () => act({ type: 'place', t: sel.from, n: s.reserve }));
+      button(L.restOn(names(sel.from)), () => act({ type: 'place', t: sel.from, n: s.reserve }), { key: 'rest' });
     }
-    button(L.toAttack, () => act({ type: 'end' }), { primary: true, disabled: s.reserve > 0 });
+    button(L.toAttack, () => act({ type: 'end' }), { primary: true, disabled: s.reserve > 0, key: 'toAttack' });
   } else if (s.phase === 'attack') {
     phase = turn;
     if (sel.from < 0) {
@@ -593,10 +604,10 @@ function renderBar() {
     } else if (sel.to < 0) text = L.attackFrom(names(sel.from));
     else text = L.versus(names(sel.from), s.armies[sel.from], names(sel.to), s.armies[sel.to]);
     if (sel.to >= 0) {
-      button(L.attack, () => act({ type: 'attack', from: sel.from, to: sel.to }), { primary: true });
-      button(L.blitz, () => act({ type: 'blitz', from: sel.from, to: sel.to }));
+      button(L.attack, () => act({ type: 'attack', from: sel.from, to: sel.to }), { primary: true, key: 'attack' });
+      button(L.blitz, () => act({ type: 'blitz', from: sel.from, to: sel.to }), { key: 'blitz' });
     }
-    button(L.endAttack, () => act({ type: 'end' }));
+    button(L.endAttack, () => act({ type: 'end' }), { key: 'endAttack' });
   } else if (s.phase === 'occupy') {
     phase = turn;
     const { from, to } = s.occupy;
@@ -604,7 +615,7 @@ function renderBar() {
     text = L.occupy(names(to), names(from), s.armies[from] - sel.n);
     stepper = [0, s.armies[from] - 1];
     shown = s.armies[to];
-    button(L.moveIn, () => act({ type: 'occupy', n: sel.n }), { primary: true });
+    button(L.moveIn, () => act({ type: 'occupy', n: sel.n }), { primary: true, key: 'moveIn' });
   } else if (s.phase === 'fortify') {
     phase = turn;
     if (sel.from < 0) text = L.fortifyPick;
@@ -615,7 +626,7 @@ function renderBar() {
       button(L.move, () => act({ type: 'fortify', from: sel.from, to: sel.to, n: sel.n }), { primary: true });
     }
     if (sel.from >= 0) button(L.otherStart, () => (clearSel(), render()));
-    button(L.endTurn, () => act({ type: 'end' }));
+    button(L.endTurn, () => act({ type: 'end' }), { key: 'endTurn' });
   }
 
   $('phase').textContent = phase;
@@ -630,8 +641,9 @@ function renderBar() {
       $('reserve').classList.add('bump');
     }
   }
-  $('hint').textContent = text;
+  $('hint').textContent = note ? '' : text;
   $('actions').replaceChildren(...buttons);
+  renderGuide(note);
   $('stepper').hidden = !stepper;
   if (stepper) {
     const [lo, hi] = stepper;
@@ -645,6 +657,37 @@ function renderBar() {
 }
 
 const hint = (text) => ($('hint').textContent = text);
+
+/* ---------- the first game's guide ---------- */
+
+// Someone new: nothing won, and the guide not yet seen through (or waved away).
+const newcomer = () => !progress.guided && !progress.veteran && !Object.keys(progress.won).length;
+
+function renderGuide(note) {
+  const box = $('guide');
+  box.hidden = !note;
+  document.querySelector('#bar .pulse')?.classList.remove('pulse');
+  if (!note) return;
+  const goal = $('mission-btn').hidden ? '' : L.guideGoal($('mission-btn').textContent);
+  $('guide-text').innerHTML = L.guide[note.id].replace('{goal}', goal);
+  if (box.dataset.id !== note.id) {
+    box.dataset.id = note.id;
+    box.classList.remove('show');
+    void box.offsetWidth;
+    box.classList.add('show');
+  }
+  if (note.button) document.querySelector(`#bar [data-key="${note.button}"]`)?.classList.add('pulse');
+}
+function endGuide() {
+  delete game.guide;
+  save();
+  progress = { ...progress, guided: true };
+  saveProgress(progress);
+}
+$('guide-skip').addEventListener('click', () => {
+  endGuide();
+  render();
+});
 
 // Messages are shown one after another, each for a few seconds.
 const toasts = [];
@@ -779,9 +822,9 @@ const andList = (list) => (list.length > 1 ? `${list.slice(0, -1).join(', ')} ${
 // Who plays at this device, for the folded list of them.
 const peopleNames = (x) => andList(x.people.map((_, i) => personName(x, i)));
 
+// The free game as it stands, under its button: the map and who is in it.
 function summary(x) {
-  const names = andList(x.people.map((_, i) => personName(x, i)));
-  return `${x.opponents ? L.against(names, L.bots(x.opponents, x.level)) : L.eachOther(names)} · ${mapIn(x.map).name} · ${L.modeShort[x.mode] ?? L.modeShort.world}`;
+  return [mapIn(x.map).name, ...(x.people.length > 1 ? [peopleNames(x)] : []), ...(x.opponents ? [L.bots(x.opponents)] : [])].join(' · ');
 }
 
 // One row per person: their coat of arms (tap to change it), their name, and × to remove them.
@@ -1185,8 +1228,8 @@ function showIntroArt(src) {
 /* ---------- welcome ---------- */
 
 // Cards to swipe through (index.html): what the game is, the two ways to play, a turn, and last your
-// name and coat of arms and how to begin. The name is the first person's in the free game's setup too.
-let welcomeLooks = false;
+// name, coat of arms and level, and how to begin. They are the first person's in the free game's setup
+// too. Each card's words come in the first time it is shown.
 const slides = [...document.querySelectorAll('.slide')];
 let slide = 0;
 $('slide-dots').replaceChildren(...slides.map(() => document.createElement('i')));
@@ -1194,6 +1237,7 @@ function onSlide(i) {
   slide = i;
   [...$('slide-dots').children].forEach((dot, k) => dot.classList.toggle('on', k === i));
   $('slide-next').hidden = $('slide-skip').hidden = i === slides.length - 1;
+  slides[i].classList.add('seen');
   showIntroArt(slides[i].dataset.art);
 }
 const toSlide = (i) => $('slides').scrollTo({ left: i * $('slides').clientWidth, behavior: 'smooth' });
@@ -1206,16 +1250,14 @@ $('slide-skip').addEventListener('click', () => toSlide(slides.length - 1));
 function showWelcome() {
   $('welcome-input').value = loadSettings().people[0].name;
   $('welcome-input').placeholder = L.yourName;
-  renderWelcomeLook();
+  renderWelcomeChoices();
   $('intro').hidden = false;
   $('slides').scrollLeft = 0;
   onSlide(0);
 }
-function renderWelcomeLook() {
-  const person = loadSettings().people[0];
-  $('welcome-look').innerHTML = sealIcon(person.look);
-  $('welcome-look').setAttribute('aria-expanded', String(welcomeLooks));
-  $('welcome-looks').hidden = !welcomeLooks;
+function renderWelcomeChoices() {
+  const settings = loadSettings();
+  const person = settings.people[0];
   $('welcome-looks').replaceChildren(
     ...COLORS.map((_, k) => {
       const b = document.createElement('button');
@@ -1225,12 +1267,15 @@ function renderWelcomeLook() {
       b.setAttribute('aria-pressed', String(person.look === k));
       b.addEventListener('click', () => {
         setPerson({ look: k });
-        welcomeLooks = false;
-        renderWelcomeLook();
+        renderWelcomeChoices();
       });
       return b;
     }),
   );
+  pills($('welcome-level'), Object.entries(L.levels), settings.togtLevel, (level) => {
+    saveSettings({ ...loadSettings(), togtLevel: level, level });
+    renderWelcomeChoices();
+  });
 }
 // Changes the first person at the phone and saves it.
 function setPerson(change) {
@@ -1238,10 +1283,6 @@ function setPerson(change) {
   settings.people[0] = { ...settings.people[0], ...change };
   saveSettings(settings);
 }
-$('welcome-look').addEventListener('click', () => {
-  welcomeLooks = !welcomeLooks;
-  renderWelcomeLook();
-});
 $('welcome-input').addEventListener('keydown', (e) => {
   if (e.key === 'Enter') {
     e.preventDefault();
@@ -1422,7 +1463,10 @@ function useLanguage(lang) {
     focusOnPlayer();
   } else showEmptyMap();
   if (!$('intro').hidden && progress.welcomed) showIntro();
-  if (!$('intro').hidden && !progress.welcomed) $('welcome-input').placeholder = L.yourName;
+  if (!$('intro').hidden && !progress.welcomed) {
+    $('welcome-input').placeholder = L.yourName;
+    renderWelcomeChoices();
+  }
   if ($('togter').open) renderTogter();
   if (!$('chapter').hidden && game) {
     const card = $('chapter').classList;

@@ -27,10 +27,14 @@
   <div id="toast" aria-live="polite" hidden></div>
 
   <footer id="bar">
+    <div id="guide" aria-live="polite" hidden>
+      <p id="guide-text"></p>
+      <button type="button" id="guide-skip" data-label="skipGuide">×</button>
+    </div>
     <div class="bar-top">
       <p id="phase"></p>
       <div id="hand-buttons">
-        <button id="mission-btn" hidden data-t="mission"></button>
+        <button id="mission-btn" hidden data-t="mission" data-key="mission"></button>
         <button id="luck-btn" hidden></button>
       </div>
     </div>
@@ -54,6 +58,10 @@
         <div class="slides" id="slides">
           <section class="slide" data-art="assets/togter/italy.jpg">
             <p class="slide-title"><span>Rulers</span> <span>of the Map</span></p>
+            <svg class="ch-rule" viewBox="0 0 220 12" aria-hidden="true">
+              <path d="M2 6H96M124 6H218" pathLength="1"/>
+              <path d="M110 1L116 6L110 11L104 6Z" pathLength="1"/>
+            </svg>
             <p class="slide-big" data-t="slideAim"></p>
           </section>
           <section class="slide" data-art="assets/togter/vikings.jpg">
@@ -80,10 +88,10 @@
             <h2 class="welcome-h" data-t="whatName"></h2>
             <p data-t="nameNote"></p>
             <div class="person welcome-person">
-              <button type="button" class="person-look" id="welcome-look" data-label="changeArms" aria-expanded="false"></button>
               <input type="text" id="welcome-input" maxlength="14" spellcheck="false" enterkeyhint="done" data-label="yourName">
             </div>
-            <div class="looks" id="welcome-looks" hidden></div>
+            <div class="looks" id="welcome-looks"></div>
+            <div class="field"><span data-t="togtLevel"></span><div class="pills" id="welcome-level"></div></div>
             <button type="button" class="primary wide" id="choose-togter" data-t="startFirst"></button>
             <button type="button" class="wide" id="choose-free" data-t="freeGame"></button>
           </section>

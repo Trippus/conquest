@@ -152,6 +152,7 @@ button.wide { width: 100%; }
 .bar-top { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 6px 8px; min-height: 32px; }
 #phase { margin: 0; font: italic 15px var(--title); color: var(--accent); letter-spacing: 0.02em; white-space: nowrap; }
 #hint { margin: 4px 0 10px; }
+#hint:empty { display: none; }
 #actions { display: flex; flex-wrap: wrap; gap: 8px; }
 #actions button { flex: 1 1 140px; }
 #stepper { display: flex; align-items: center; justify-content: center; gap: 12px; margin-bottom: 8px; }
@@ -318,6 +319,16 @@ dialog .big { font-family: var(--title); font-size: 20px; margin: 8px 0; }
 #reserve.bump b { animation: bump .35s ease-out; }
 @keyframes bump { from { transform: scale(1.4); } }
 #actions button.wide { flex-basis: 100%; }
+/* The first game's guide: a note on the booklet's paper over the bar. The map can be tapped through it. */
+#guide { position: absolute; left: 0; right: 0; bottom: calc(100% + 10px); padding: 10px 40px 11px 14px; border-radius: 12px; pointer-events: none;
+  background: #f2e3c2 url('../assets/paper.jpg') center top / 640px; background-blend-mode: multiply; color: #3a2a18; box-shadow: var(--shadow); }
+#guide[hidden] { display: none; }
+#guide.show { animation: rise .35s both ease-out; }
+#guide::after { content: ''; position: absolute; left: 50%; bottom: -7px; width: 14px; height: 14px; margin-left: -7px; transform: rotate(45deg); background: #e6d5b2; }
+#guide p { margin: 0; font: 16px/1.4 var(--title); }
+#guide b { font-weight: 700; color: #7a2e1d; }
+#guide-skip { position: absolute; top: 2px; right: 2px; width: 40px; height: 40px; min-height: 0; padding: 0; border: none; background: none; box-shadow: none; color: #6b5338; font-size: 22px; line-height: 1; pointer-events: auto; }
+#bar .pulse { animation: glow 1s ease-in-out infinite alternate; }
 
 /* Emblems: pressed into the wax as a darker relief, the number on top. */
 #board .emblem { fill: rgb(0 0 0 / 0.3); pointer-events: none; }
@@ -334,6 +345,9 @@ dialog .big { font-family: var(--title); font-size: 20px; margin: 8px 0; }
 .slide > * { width: min(420px, 100%); flex: none; }
 .slide p { margin: 0; }
 .slide > p { text-wrap: balance; }
+@media (prefers-reduced-motion: reduce) {
+  .slide.seen > *, .slide.seen .ch-rule path, .slide.seen .turn li { animation: none !important; }
+}
 .slide-big { margin-top: 16px !important; font: 20px/1.5 var(--title); color: #f1e6d0; }
 .welcome-h { font: 700 25px/1.2 var(--title); color: #e8c27a; margin: 0 0 12px; }
 .way { display: flex; gap: 12px; align-items: center; margin-top: 12px; text-align: left; }
@@ -353,10 +367,34 @@ dialog .big { font-family: var(--title); font-size: 20px; margin: 8px 0; }
 .scene em { font: 700 18px var(--title); color: #7a2e1d; }
 .scene .to { width: 24px; height: 12px; }
 .turn-goal { margin-top: 14px !important; font-size: 15px; line-height: 1.4; color: var(--muted); }
-.slide .welcome-person { margin: 14px 0 12px; text-align: left; }
-#welcome-looks { margin-bottom: 10px; }
+.slide .welcome-person { margin: 14px 0 10px; text-align: left; }
+/* every coat of arms in view, big enough to tell apart */
+#welcome-looks { max-width: none; padding: 5px; }
+#welcome-looks button { flex: 0 1 50px; }
+#welcome-looks button[aria-pressed='true'] { box-shadow: 0 0 0 3px #1a1007, 0 0 0 5px var(--accent); }
+.slide .field { margin: 6px 0 4px; }
+.slide .pills { justify-content: center; }
+.slide .pills button { flex: 1; }
+.slide .pills button[aria-pressed='true'] { color: #1a1007; background: var(--accent); border-color: var(--accent); }
 .slide button.wide { margin-top: 10px; }
-.slide .person + .primary { margin-top: 0; }
+/* A card's words come in as a togt's do, only quicker: the title first, then line by line. */
+.slide:not(.seen) > * { opacity: 0; }
+.slide.seen > * { animation: rise .55s both ease-out; }
+.slide.seen > :nth-child(2) { animation-delay: .12s; }
+.slide.seen > :nth-child(3) { animation-delay: .24s; }
+.slide.seen > :nth-child(4) { animation-delay: .36s; }
+.slide.seen > :nth-child(5) { animation-delay: .48s; }
+.slide.seen > :nth-child(6) { animation-delay: .6s; }
+.slide.seen .slide-title { animation: year .9s both ease-out; }
+.slide.seen .ch-rule { animation: none; }
+.slide.seen .ch-rule path { animation: draw .6s .55s both ease-out; }
+.slide.seen .slide-big { animation-delay: .95s; }
+.slide.seen .turn li { animation: rise .55s both ease-out; }
+.slide.seen .turn li:nth-child(1) { animation-delay: .15s; }
+.slide.seen .turn li:nth-child(2) { animation-delay: .35s; }
+.slide.seen .turn li:nth-child(3) { animation-delay: .55s; }
+.slide.seen .turn { animation: none; }
+.slide.seen .turn-goal { animation-delay: .8s; }
 .slide-foot { display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 0 20px; }
 .dots { display: flex; gap: 8px; }
 .dots i { width: 8px; height: 8px; border-radius: 50%; background: rgb(232 194 122 / .3); transition: background .3s; }

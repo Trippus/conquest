@@ -2,8 +2,10 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { existsSync } from 'node:fs';
-import { TOGTER, newProgress, isOpen, upNext, nextTogt, freeMaps, record, offerEasy } from '../../js/togter.js';
-import { MAPS } from '../../js/maps/index.js';
+import * as G from '../../js/engine.js';
+import { MAPS, rulesFor } from '../../js/maps/index.js';
+import { MODERN } from '../../js/rules/modern.js';
+import { TOGTER, newProgress, isOpen, upNext, nextTogt, freeMaps, record, offerEasy, togtArmies, togtStart } from '../../js/togter.js';
 import { DA } from '../../js/lang/da.js';
 import { EN } from '../../js/lang/en.js';
 
@@ -81,4 +83,29 @@ test('a win keeps the hardest level; two losses offer easy opponents, a win clea
   assert.ok(!offerEasy(p, 'alexander', 'novice'));
   p = record(p, 'alexander', true, 'medium');
   assert.equal(p.lost.alexander, undefined);
+});
+
+test('Let has its own armies; the other levels keep the togt\'s', () => {
+  const italy = TOGTER[0];
+  assert.deepEqual(togtArmies(italy, 'novice', 0.5), { bonus: italy.easy.bonus, novice: 0, guard: italy.easy.guard });
+  assert.deepEqual(togtArmies(italy, 'medium', 0.5), { bonus: italy.bonus, novice: 0.5, guard: 0 });
+  const world = TOGTER.at(-1);
+  assert.equal(world.easy, undefined);
+  assert.deepEqual(togtArmies(world, 'novice', 0), { bonus: world.bonus, novice: 0, guard: 0 });
+});
+
+test('a guard stands on the goal\'s territories that the player does not start with', () => {
+  const grid = MAPS.italy;
+  const map = G.prepareMap(grid.MAP);
+  const rules = rulesFor(grid, MODERN);
+  const togt = TOGTER[0];
+  const setup = { players: ['A', 'B', 'C'], seed: 5, mode: 'mission' };
+  const plain = G.newGame(map, rules, { ...setup, ...togtStart(map, togt, 1, 3) });
+  const guarded = G.newGame(map, rules, { ...setup, ...togtStart(map, togt, 1, 3, 2) });
+  const goal = new Set(togt.goal.flatMap((id) => map.regions.find((r) => r.id === id).members));
+  map.territories.forEach((_, t) => {
+    const extra = goal.has(t) && plain.owner[t] !== 1 ? 2 : 0;
+    assert.equal(guarded.armies[t], plain.armies[t] + extra);
+  });
+  assert.ok(guarded.armies.reduce((a, b) => a + b) > plain.armies.reduce((a, b) => a + b));
 });

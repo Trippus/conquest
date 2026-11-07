@@ -226,8 +226,9 @@ export function fortifyTargets(map, rules, s, from) {
 // start weaker this way.
 // home: per player, territories they start with (a togt starts you where history did); the rest
 // are dealt so everyone has as many as can be. goals: per player, a mission they get instead of a
-// dealt one (a togt's goal from history).
-export function newGame(map, rules, { players, seed = 1, mode = 'world', handicap = [], home = [], goals = [] }) {
+// dealt one (a togt's goal from history). guard: { player, territories, armies }: those armies more
+// on each of the territories that this player does not start with.
+export function newGame(map, rules, { players, seed = 1, mode = 'world', handicap = [], home = [], goals = [], guard = null }) {
   const n = players.length;
   if (n < 2 || n > 6) throw new Error('A game needs 2–6 players');
   const T = map.territories.length;
@@ -262,6 +263,7 @@ export function newGame(map, rules, { players, seed = 1, mode = 'world', handica
     const mine = start + p * seatArmies(rules, n) + (handicap[p] ?? 0);
     for (let k = own.length; k < mine; k++) s.armies[own[Math.floor(random(s) * own.length)]]++;
   }
+  for (const t of guard?.territories ?? []) if (s.owner[t] !== guard.player) s.armies[t] += guard.armies;
   s.deck = shuffle(s, [...Array(T + rules.wildCards).keys()]);
   if (mode === 'mission') {
     const pool = shuffle(s, missionPool(map, n));

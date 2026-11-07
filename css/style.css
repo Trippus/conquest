@@ -153,6 +153,7 @@ button.wide { width: 100%; }
 /* On a narrow phone the mission and war-luck buttons move down under the round and phase. */
 .bar-top { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 6px 8px; min-height: 32px; }
 #phase { margin: 0; font: italic 15px var(--title); color: var(--accent); letter-spacing: 0.02em; white-space: nowrap; }
+#undo { margin-left: auto; min-height: 34px; padding: 0 14px; border-radius: 999px; font-size: 14px; white-space: nowrap; }
 #hint { margin: 4px 0 10px; }
 #hint:empty { display: none; }
 #actions { display: flex; flex-wrap: wrap; gap: 8px; }

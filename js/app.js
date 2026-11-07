@@ -641,6 +641,7 @@ function renderBar(note) {
       $('reserve').classList.add('bump');
     }
   }
+  $('undo').hidden = !canUndo();
   $('hint').textContent = note ? '' : text;
   $('actions').replaceChildren(...buttons);
   renderGuide(note);
@@ -657,6 +658,17 @@ function renderBar(note) {
 }
 
 const hint = (text) => ($('hint').textContent = text);
+
+// An army placed on the wrong territory can be taken back, one at a time, while the turn's armies are
+// still being placed: the game is played again from the start without the last placing.
+const canUndo = () => s.phase === 'reinforce' && !isBot() && game.actions.at(-1)?.type === 'place';
+$('undo').addEventListener('click', () => {
+  if (!canUndo()) return;
+  game.actions.pop();
+  s = G.replay(map, rules, game.setup, game.actions);
+  save();
+  render();
+});
 
 /* ---------- the first game's guide ---------- */
 
@@ -965,7 +977,21 @@ $('new-game').addEventListener('close', () => {
   if ($('new-game').returnValue !== 'start') return;
   draft.people.forEach((x) => (x.name = x.name.trim().slice(0, NAME_LENGTH)));
   saveSettings({ ...loadSettings(), ...draft, sound: Sound.enabled });
-  startFromSettings(draft);
+  replaceGame(() => startFromSettings(draft));
+});
+
+// A new game takes the place of the one going on, so first ask, when there is one.
+let replacing = null;
+function replaceGame(start) {
+  if (!game || s.phase === 'over') return start();
+  replacing = start;
+  $('replace-dialog').returnValue = '';
+  $('replace-dialog').showModal();
+}
+$('replace-dialog').addEventListener('close', () => {
+  const start = replacing;
+  replacing = null;
+  if ($('replace-dialog').returnValue === 'new') start();
 });
 
 
@@ -1394,7 +1420,7 @@ function renderTogter() {
         <span class="togt-body"><span class="togt-year">${text.year}</span><b>${mapIn(t.map).name}</b><small>${text.teaser}</small><small class="togt-state">${state}</small></span>`;
       b.addEventListener('click', () => {
         $('togter').close();
-        startTogt(t.map);
+        replaceGame(() => startTogt(t.map));
       });
       li.append(b);
       return li;

@@ -5,6 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="color-scheme" content="dark">
   <title>Rulers of the Map – World Conquest</title>
+  <!-- The icon (tools/make-icons.mjs); with the manifest the game can lie on the home screen as an app. -->
+  <link rel="icon" href="assets/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="assets/icon-180.png">
+  <link rel="manifest" href="manifest.webmanifest">
+  <meta name="theme-color" content="#0c0703">
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
@@ -39,7 +44,7 @@
         <button id="luck-btn" hidden></button>
       </div>
     </div>
-    <p id="reserve" hidden><b></b><span></span></p>
+    <p id="reserve" hidden><b></b><span></span><button type="button" id="undo" data-t="undo" hidden></button></p>
     <p id="hint" aria-live="polite"></p>
     <div id="stepper" hidden>
       <button id="minus" data-label="fewer">−</button>
@@ -264,6 +269,17 @@
   </dialog>
 
   <!-- The menu in the corner of a game. The game waits while it is open. -->
+  <dialog id="replace-dialog">
+    <form method="dialog">
+      <h2 data-t="replaceTitle"></h2>
+      <p data-t="replaceText"></p>
+      <div class="buttons">
+        <button value="keep" data-t="replaceKeep"></button>
+        <button value="new" class="primary" data-t="replaceNew"></button>
+      </div>
+    </form>
+  </dialog>
+
   <dialog id="game-menu">
     <form method="dialog">
       <h2 data-t="menu"></h2>

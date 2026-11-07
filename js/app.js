@@ -1290,7 +1290,17 @@ $('slides').addEventListener('scroll', () => {
   if (i !== slide) onSlide(i);
 }, { passive: true });
 $('slide-next').addEventListener('click', () => toSlide(slide + 1));
-$('slide-skip').addEventListener('click', () => toSlide(slides.length - 1));
+// Skipping fades the cards out and in again on the last one, without passing the ones between.
+$('slide-skip').addEventListener('click', () => {
+  $('slides').classList.add('jump');
+  setTimeout(() => {
+    $('slides').scrollTo({ left: (slides.length - 1) * $('slides').clientWidth, behavior: 'instant' });
+    $('slides').classList.remove('jump');
+  }, 180);
+});
+// The other language, in the corner of the welcome: one tap and every word changes.
+const otherLanguage = () => Object.keys(LANGUAGES).find((lang) => lang !== L.lang);
+$('welcome-lang').addEventListener('click', () => pickLanguageNow(otherLanguage()));
 function showWelcome() {
   $('welcome-input').value = loadSettings().people[0].name;
   $('welcome-input').placeholder = L.yourName;
@@ -1300,6 +1310,7 @@ function showWelcome() {
   onSlide(0);
 }
 function renderWelcomeChoices() {
+  $('welcome-lang').lastChild.textContent = LANGUAGES[otherLanguage()];
   const settings = loadSettings();
   const person = settings.people[0];
   $('welcome-looks').replaceChildren(
@@ -1489,10 +1500,18 @@ function renderSettings() {
     applyTheme(theme);
     renderSettings();
   });
-  pills($('lang-pills'), Object.entries(LANGUAGES), L.lang, (lang) => {
-    saveSettings({ ...loadSettings(), lang });
-    useLanguage(lang);
-    renderSettings();
+  langPills($('lang-pills'), renderSettings);
+}
+
+// The language, saved and used at once; in the settings, in the game's menu and on the welcome.
+function pickLanguageNow(lang) {
+  saveSettings({ ...loadSettings(), lang });
+  useLanguage(lang);
+}
+function langPills(box, again) {
+  pills(box, Object.entries(LANGUAGES), L.lang, (lang) => {
+    pickLanguageNow(lang);
+    again();
   });
 }
 
@@ -1521,6 +1540,7 @@ function useLanguage(lang) {
 
 function renderMenu() {
   soundPills($('menu-sound'), $('menu-music'), renderMenu);
+  langPills($('menu-lang'), renderMenu);
 }
 function openMenu() {
   clearTimeout(botTimer);

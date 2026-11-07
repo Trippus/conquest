@@ -1520,8 +1520,15 @@ function stepAway() {
   if (!history.state?.away) history.pushState({ away: true }, '');
 }
 function home() {
-  if (history.state?.away) history.back();
-  else goHome();
+  if (!history.state?.away) return goHome();
+  history.back();
+  // Chrome skips a history step made without a tap, and in the installed app there is no page behind
+  // it to go back to, so back may do nothing: then go home here and mark the step as home.
+  setTimeout(() => {
+    if (!$('intro').hidden) return;
+    history.replaceState(null, '');
+    goHome();
+  }, 400);
 }
 addEventListener('popstate', () => {
   // A browser that takes back to close a dialog by going back: close it, and stay in the game.

@@ -207,13 +207,8 @@ button.wide { width: 100%; }
 .intro-buttons { margin-top: auto; display: flex; flex-direction: column; gap: 10px; align-items: center; }
 .intro-setup { margin: 0; font-size: 15px; line-height: 1.45; color: #e6d8bd; text-wrap: balance; }
 .intro-setup .link { min-height: 0; padding: 0 4px; font-size: 15px; line-height: inherit; vertical-align: baseline; }
-.intro-rules { text-align: left; font-size: 15px; margin-top: 4px; }
-.intro-rules:not([open]) { align-self: center; }
-.intro-rules[open] { padding: 2px 12px 10px; border-radius: 12px; background: rgb(16 10 5 / .78); }
-.intro-rules summary { justify-content: center; color: var(--ink); }
-.intro-rules ul { margin: 0; padding-left: 18px; }
-.intro-rules li { margin: 6px 0; }
-#settings-btn { margin-top: 8px; font-size: 15px; }
+.intro-links { display: flex; justify-content: center; gap: 22px; margin-top: 10px; }
+.intro-links button { font-size: 15px; }
 .publisher { display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 16px; text-align: left; }
 .pub-logo { width: 42px; height: auto; overflow: visible; }
 .publisher > span { display: flex; flex-direction: column; font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
@@ -369,6 +364,65 @@ dialog .big { font-family: var(--title); font-size: 20px; margin: 8px 0; }
 #slide-next { width: min(420px, 100%); }
 #slide-skip { min-height: 36px; }
 
+/* ---------- how to play: a booklet on paper, in every look ---------- */
+#how-to {
+  --ink: #3d2c1c; --muted: #6f5c48; --accent: #7a2e1d; --line: #c4b293;
+  width: 100%; height: 100dvh; max-width: none; max-height: none; margin: 0; padding: 0;
+  border: 0; border-radius: 0; outline: 0; color: var(--ink);
+  background: #f2e3c2 url('../assets/paper.jpg') center top / 640px; background-blend-mode: multiply;
+}
+#how-to > form { flex: 1; padding: 0 0 max(20px, env(safe-area-inset-bottom)); }
+.book-close { position: absolute; z-index: 1; top: max(8px, env(safe-area-inset-top)); right: var(--gap); min-width: 40px; min-height: 40px; border: 0; border-radius: 50%; background: rgb(42 33 27 / .92); color: #e8c27a; box-shadow: var(--shadow); }
+.book-cover { display: flex; align-items: flex-end; justify-content: center; box-sizing: border-box; height: min(26vh, 210px); padding: 14px 16px;
+  background: linear-gradient(rgb(12 7 3 / .1) 30%, rgb(12 7 3 / .85)), url('../assets/togter/italy.jpg') 15% 38% / cover no-repeat; }
+.book-cover h2 { margin: 0; font: 700 min(40px, 10.5vw)/1.1 var(--title); letter-spacing: .02em; color: #e8c27a; text-shadow: 0 2px 12px rgb(0 0 0 / .8); }
+.book { box-sizing: border-box; width: min(560px, 100%); margin: 0 auto; padding: 4px 20px; font: 17px/1.55 var(--title); }
+.book h3 { margin: 28px 0 8px; font: 700 26px/1.2 var(--title); color: var(--accent); }
+.book h4 { display: flex; align-items: center; gap: 10px; margin: 26px 0 10px; font: 700 21px/1.2 var(--title); color: var(--ink); }
+/* the three steps are numbered on wax */
+.book h4 i { flex: none; width: 32px; height: 32px; display: grid; place-items: center; border-radius: 50%; background: #a3261b; border: 2px solid #2b1d12; box-sizing: border-box; box-shadow: inset 0 0 0 2px rgb(244 232 204 / .4); font: 700 16px Georgia, serif; color: #f4e8cc; }
+.book p { margin: 0 0 10px; }
+.book-done { margin-top: 26px; }
+#game-menu .buttons button:first-child { flex: 1.6; white-space: nowrap; padding: 0 10px; }
+.book .credits { margin-top: 18px; font: 12px/1.5 var(--ui); }
+
+/* a bit of the map: the same land, washes and wax as on the board */
+.book-scene { margin: 0 0 12px; border-radius: 12px; overflow: hidden; background: #d8c6a0; box-shadow: inset 0 0 18px rgb(90 60 30 / .45), 0 0 0 1px var(--line); }
+.book-scene svg { display: block; width: 100%; height: auto; }
+.book-scene .land { fill: #f4e8cc; stroke: #4a3726; stroke-width: 3; stroke-linejoin: round; }
+.book-scene .wash { opacity: .4; transition: fill .3s; }
+.book-scene .wash.flood { animation: flood .7s; }
+.book-scene .wax { stroke: #2b1d12; stroke-width: 1.8; transition: fill .3s; transform-box: fill-box; transform-origin: center; }
+.book-scene .emblem { fill: rgb(0 0 0 / .3); }
+.book-scene .rim { fill: none; stroke: #f4e8cc; stroke-width: 1; opacity: .7; }
+.book-scene .count { font: 700 18px Georgia, serif; fill: #f4e8cc; text-anchor: middle; }
+.book-scene .seal.stamp .wax { animation: stamp .45s cubic-bezier(.3, 1.6, .5, 1); }
+.book-scene .tap { fill: rgb(43 29 18 / .3); stroke: #2b1d12; stroke-width: 1.5; transform-box: fill-box; transform-origin: center; animation: tap .6s ease-out both; }
+@keyframes tap { from { transform: scale(.3); opacity: 1; } to { transform: scale(1.3); opacity: 0; } }
+.book-scene .pick { fill: none; stroke: #2b1d12; stroke-width: 3; opacity: 0; transition: opacity .2s; }
+.book-scene .aim { fill: none; stroke: #a3261b; stroke-width: 3.5; stroke-linejoin: round; stroke-dasharray: 9 7; opacity: 0; transition: opacity .2s; animation: march-scene 1s linear infinite; }
+@keyframes march-scene { to { stroke-dashoffset: -16; } }
+.book-scene .arrow { fill: none; stroke: #a3261b; stroke-width: 3.5; stroke-linecap: round; stroke-linejoin: round; opacity: 0; transition: opacity .2s; }
+.book-scene .pick.on, .book-scene .aim.on, .book-scene .arrow.on { opacity: 1; }
+.book-scene .die { opacity: 0; }
+.book-scene .die.on { opacity: 1; transition: opacity .2s; }
+.book-scene .die.on.lost { opacity: .32; }
+.book-scene .die text { font: 700 17px Georgia, serif; fill: #fff; text-anchor: middle; }
+.book-scene .face { transform-box: fill-box; transform-origin: center; }
+.book-scene .rolling .face { animation: tumble .12s linear infinite; }
+.book-scene .dot { transition: opacity .25s; }
+.book-scene .dot.on { opacity: .18; }
+.book-scene .band { fill: none; stroke: #7a2e1d; stroke-width: 7; stroke-linejoin: round; opacity: .3; transition: opacity .4s, stroke .4s, stroke-width .4s; }
+.book-scene .band.on { stroke: #a3261b; stroke-width: 10; opacity: .8; }
+.book-scene .region-name { font: italic 18px Georgia, serif; letter-spacing: .08em; fill: #7a2e1d; opacity: .6; text-anchor: middle; transition: opacity .4s; }
+.book-scene .region-name.on { opacity: 1; }
+.book-scene .star { font: 44px Georgia, serif; fill: #b9a98a; text-anchor: middle; transition: fill .25s; }
+.book-scene .star.on { fill: #c98a12; }
+.book-scene .route { fill: none; stroke: #4a3726; stroke-width: 3; stroke-linecap: round; stroke-dasharray: 1 8; }
+@media (prefers-reduced-motion: reduce) {
+  .book-scene * { animation: none !important; transition: none !important; }
+}
+
 /* ---------- the togter: a line of years ---------- */
 .togt-list { list-style: none; margin: 8px 0 0; padding: 0; position: relative; }
 /* the line through the years */
@@ -437,7 +491,7 @@ dialog .big { font-family: var(--title); font-size: 20px; margin: 8px 0; }
   0%, 100% { opacity: .8; } 9% { opacity: 1; } 21% { opacity: .68; } 33% { opacity: .95; }
   47% { opacity: .74; } 61% { opacity: 1; } 74% { opacity: .82; } 88% { opacity: .93; }
 }
-/* the flag, where it is in the game: up to the start screen */
+/* the menu, where it is in the game */
 #ch-home { position: fixed; z-index: 1; top: max(8px, env(safe-area-inset-top)); left: var(--gap); }
 .ch-card { position: relative; margin: auto; width: min(460px, 100%); display: flex; flex-direction: column; align-items: center; text-shadow: 0 1px 10px rgb(0 0 0 / .75); }
 .ch-step { margin: 0 0 6px; font-size: 13px; letter-spacing: .22em; text-transform: uppercase; color: #b8a58c; }

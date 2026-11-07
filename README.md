@@ -27,6 +27,7 @@ npm run design-shots                          # stilprøverne som PNG (kræver n
 | `js/rules/*.js` | Regelsæt som data: starthære, terninger, kort-bytte, rundegrænse |
 | `js/app.js` | Brugerfladen: velkomst, startskærm, togternes indledning og afslutning, tryk → handlinger, bots spiller, terninger, lyd, gem/indlæs. `window.__conquest` er debug-hooket |
 | `sw.js` | Henter alle filer på ny hver gang (et hurtigt "uændret", når intet er ændret), så en telefon aldrig blander en ny side med gamle filer efter en opdatering |
+| `js/how-to.js` | Regelhæftet "Sådan spiller du": de små scener, der ligner bidder af kortet og spiller, mens de er i syne |
 | `js/togter.js` | Togterne i rækkefølge (ældst først), og hvad en sejr åbner: næste togt og kortet i Frit spil. Teksterne står i `js/lang/*.js` |
 | `js/audio.js` | Syntetiserede lyde (terninger, laksegl, horn, kort) og temamusikken, der går i løkke med en blød overgang |
 | `assets/music/`, `assets/togter/` | Temamusikken og billederne bag togternes årstal, lavet med AI (se `LICENSES.md`). AI'ens opdigtede ord på kortene er visket ud med `tools/smudge.mjs` |

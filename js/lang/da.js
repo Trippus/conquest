@@ -10,6 +10,7 @@ export const DA = {
   /* ---------- index.html ---------- */
   board: 'Kortet',
   home: 'Til startskærmen',
+  menu: 'Menu',
   players: 'Spillere',
   zoomIn: 'Zoom ind',
   zoomOut: 'Zoom ud',
@@ -21,11 +22,31 @@ export const DA = {
   continue: 'Fortsæt spillet',
   newGame: 'Nyt spil',
   howToPlay: 'Sådan spiller du',
-  rules: `<li><b>Forstærk:</b> du får nye hære hver tur, flere jo flere områder og hele kontinenter du har. Tryk på dine områder for at sætte dem ud.</li>
-    <li><b>Angrib:</b> vælg et af dine områder og en nabo. Terningerne afgør det, og den største hær har oftest held med sig.</li>
-    <li><b>Flyt:</b> til sidst må du flytte hære én gang mellem dine egne områder.</li>
-    <li><b>Krigslykke:</b> erobr mindst ét område i din tur, så får du en ★. Indløs stjernerne til ekstra hære, når du vil. Jo flere du sparer op, jo flere hære.</li>
-    <li><b>Sejr:</b> klar din hemmelige mission, eller erobr hele kortet.</li>`,
+  htGoalH: 'Målet',
+  htGoal: `<p>Du vinder, så snart du har nået dit mål i din egen tur. Dit mål kan du altid se i spillet, under <b>Mål</b> eller <b>Mission</b>.</p>
+    <p><b>I et togt</b> skal du holde de regioner, der står i målet. Modstanderne har hver en hemmelig mission, så det gælder om at nå det først.</p>
+    <p><b>I Frit spil</b> får hver spiller en hemmelig mission, eller I kæmper om at erobre hele kortet.</p>`,
+  htTurnH: 'Din tur',
+  htTurn: 'En tur har tre trin, altid i samme rækkefølge.',
+  htPlaceH: 'Forstærk',
+  htPlace: `<p>Du får mindst 3 nye hære: én for hver 3 områder, du holder, plus bonus for hele regioner.</p>
+    <p>Tryk på dine områder for at sætte dem ud, én ad gangen. <b>Resten på</b> sætter alle de sidste på ét område.</p>`,
+  htAttackH: 'Angrib',
+  htAttack: `<p>Vælg et af dine områder med mindst 2 hære, og derefter en nabo, der ikke er din. Du slår op til 3 terninger, forsvareren op til 2.</p>
+    <p>De højeste terninger sammenlignes parvis. Den laveste i hvert par koster sin ejer en hær, og ved lige vinder forsvareren.</p>
+    <p><b>Angrib</b> slår én gang. <b>Kæmp til enden</b> bliver ved, til området er dit, eller du ikke kan mere. Tager du området, vælger du, hvor mange hære der rykker ind.</p>
+    <p>Du må angribe så mange gange, du vil, eller slet ikke.</p>`,
+  htMoveH: 'Flyt',
+  htMove: `<p>Til sidst må du flytte hære én gang, fra et af dine områder til et andet, når der er vej gennem dine egne områder. Der skal blive mindst 1 hær tilbage.</p>`,
+  htRegionH: 'Regioner',
+  htRegion: `<p>Kortet er delt i regioner, og tallet ved regionens navn er dens bonus. Holder du hele regionen, når din tur begynder, får du så mange hære ekstra. Tager en anden blot ét område fra dig, er bonussen væk.</p>`,
+  htLuck: `<p>Erobr mindst ét område i din tur, så får du en ★. Indløs stjernerne, når du forstærker, eller spar op: 1&nbsp;★ giver 2 hære, 2&nbsp;★ giver 5, 3&nbsp;★ giver 9, og hver ★ mere giver 4 mere.</p>
+    <p>Slår du en spiller ud, får du deres stjerner.</p>`,
+  htSeaH: 'Søveje',
+  htSea: `<p>Stiplede linjer over havet forbinder to områder, som var de naboer. Du kan både angribe og flytte ad dem.</p>`,
+  htPeopleH: 'Flere om én skærm',
+  htPeople: `<p>I Frit spil kan I være flere om en telefon eller tablet. Læg den på bordet som et brætspil, og tag den, når det er jeres tur.</p>
+    <p>Hver har sin hemmelige mission. Tryk på <b>Mission</b> i din egen tur for at se den, så de andre ikke kigger med.</p>`,
   credits: `Tak til: emblemer af Lorc, <a href="https://game-icons.net" target="_blank" rel="noopener">game-icons.net</a> (CC BY 3.0) ·
     papir fra <a href="https://ambientcg.com" target="_blank" rel="noopener">ambientCG</a> (CC0)`,
   settings: 'Indstillinger',

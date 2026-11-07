@@ -11,6 +11,7 @@ import { MODERN } from './rules/modern.js';
 import { createBoard, PLAYER_COLORS as COLORS, sealIcon } from './board.js';
 import { mapShapes, regionShapes } from './map-shapes.js';
 import { Sound, Music } from './audio.js';
+import { openHowTo } from './how-to.js';
 import { LANGUAGES, pickLanguage, stringsFor, translatePage } from './i18n.js';
 import { TOGTER, newProgress, isOpen, upNext, nextTogt, freeMaps, record, offerEasy, togtStart } from './togter.js';
 
@@ -339,7 +340,7 @@ $('chapter').addEventListener('click', (e) => {
     if (a.effect.getTiming().iterations !== Infinity) a.playbackRate = 10;
   }
 });
-$('ch-home').addEventListener('click', home);
+$('ch-home').addEventListener('click', openMenu);
 $('ch-standings').addEventListener('click', () => $('game-over').showModal());
 // On from the end card: its words go out, and the next card's picture comes up over its own.
 function onFromEnd(value) {
@@ -436,7 +437,7 @@ const isBot = () => game.seats[s.current] !== 'human';
 // Bots play one action at a time, with a pause so you can follow them.
 function schedule() {
   clearTimeout(botTimer);
-  if (s.phase === 'over' || !isBot() || !$('intro').hidden || !$('chapter').hidden) return;
+  if (s.phase === 'over' || !isBot() || !$('intro').hidden || !$('chapter').hidden || $('game-menu').open) return;
   botTimer = setTimeout(() => act(botAction(map, rules, s, level(game.seats[s.current]))), DELAY[game.speed]);
 }
 
@@ -1138,7 +1139,7 @@ function renderHudButtons() {
 }
 $('mission-btn').addEventListener('click', openMission);
 $('luck-btn').addEventListener('click', openLuck);
-$('home-btn').addEventListener('click', home);
+$('home-btn').addEventListener('click', openMenu);
 
 /* ---------- start screen ---------- */
 
@@ -1325,7 +1326,7 @@ function hideIntro() {
   schedule();
 }
 
-// Up to the start screen: the flag, and the phone's back button. A togt's year card that was left
+// Up to the start screen: the menu, and the phone's back button. A togt's year card that was left
 // waits there; Continue brings it back.
 function goHome() {
   if (!$('chapter').hidden) {
@@ -1335,7 +1336,7 @@ function goHome() {
   showIntro();
 }
 // Leaving the start screen leaves a step in the history, so the back button comes up to it instead of
-// leaving the page; on the start screen, back leaves as on any page. The flag takes that step back.
+// leaving the page; on the start screen, back leaves as on any page. The menu takes that step back.
 function stepAway() {
   if (!history.state?.away) history.pushState({ away: true }, '');
 }
@@ -1378,21 +1379,26 @@ function pills(box, options, current, pick) {
   );
 }
 
-function renderSettings() {
-  const x = loadSettings();
-  pills($('sound-pills'), [[true, L.on], [false, L.off]], Sound.enabled, (on) => {
+// Sound and music, in the settings and in the game's menu.
+function soundPills(sound, music, again) {
+  pills(sound, [[true, L.on], [false, L.off]], Sound.enabled, (on) => {
     Sound.enabled = on;
     saveSettings({ ...loadSettings(), sound: on });
     if (on) Sound.play('place');
-    renderSettings();
+    again();
   });
-  pills($('music-pills'), [[true, L.on], [false, L.off]], Music.enabled, (on) => {
+  pills(music, [[true, L.on], [false, L.off]], Music.enabled, (on) => {
     Music.enabled = on;
     saveSettings({ ...loadSettings(), music: on });
     if (on) Music.play();
     else Music.pause();
-    renderSettings();
+    again();
   });
+}
+
+function renderSettings() {
+  const x = loadSettings();
+  soundPills($('sound-pills'), $('music-pills'), renderSettings);
   pills($('theme-pills'), Object.entries(L.themes), x.theme, (theme) => {
     saveSettings({ ...loadSettings(), theme });
     applyTheme(theme);
@@ -1423,6 +1429,24 @@ function useLanguage(lang) {
     card.contains('ending') ? showEnding(ending) : showOpening();
   }
 }
+/* ---------- the menu in the game, and how to play ---------- */
+
+function renderMenu() {
+  soundPills($('menu-sound'), $('menu-music'), renderMenu);
+}
+function openMenu() {
+  clearTimeout(botTimer);
+  renderMenu();
+  $('game-menu').returnValue = '';
+  $('game-menu').showModal();
+}
+$('game-menu').addEventListener('close', () => {
+  if ($('game-menu').returnValue === 'home') home();
+  else schedule();
+});
+$('menu-how-to').addEventListener('click', openHowTo);
+$('how-to-btn').addEventListener('click', openHowTo);
+
 $('settings-btn').addEventListener('click', () => {
   renderSettings();
   $('settings').showModal();

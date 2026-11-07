@@ -14,8 +14,8 @@
   </main>
 
   <header id="hud">
-    <button id="home-btn" class="icon" data-label="home">
-      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 21V4m0 1h11l-2 4 2 4H5" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/></svg>
+    <button id="home-btn" class="icon" data-label="menu">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
     </button>
     <ol id="players" data-label="players"></ol>
   </header>
@@ -44,7 +44,7 @@
     <div id="actions"></div>
   </footer>
 
-  <!-- The start screen. Also where you come back to from the flag in the corner. -->
+  <!-- The start screen. Also where you come back to from the menu in the corner. -->
   <section id="intro" data-label="startScreen">
     <div class="intro-art" id="intro-art" aria-hidden="true"></div>
     <div class="intro-shade" aria-hidden="true"></div>
@@ -104,12 +104,10 @@
           <button type="button" class="wide" id="intro-new" data-t="freeGame"></button>
           <p class="intro-setup" id="intro-summary"></p>
         </div>
-        <details class="fold intro-rules" id="intro-rules">
-          <summary data-t="howToPlay"></summary>
-          <ul data-html="rules"></ul>
-          <p class="credits" data-html="credits"></p>
-        </details>
-        <button type="button" class="link" id="settings-btn" data-t="settings"></button>
+        <div class="intro-links">
+          <button type="button" class="link" id="how-to-btn" data-t="howToPlay"></button>
+          <button type="button" class="link" id="settings-btn" data-t="settings"></button>
+        </div>
         <div class="publisher">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="64 24 424 432" class="pub-logo" aria-hidden="true">
             <ellipse cx="256" cy="412" rx="170" ry="34" fill="#F7ECD6" stroke="#123D30" stroke-width="14"/>
@@ -139,8 +137,8 @@
   <!-- A togt begins: the year, the war and the story, before the map comes into view. -->
   <section id="chapter" hidden>
     <div class="ch-art" id="ch-art" aria-hidden="true"></div>
-    <button id="ch-home" class="icon" data-label="home">
-      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 21V4m0 1h11l-2 4 2 4H5" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/></svg>
+    <button id="ch-home" class="icon" data-label="menu">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
     </button>
     <div class="ch-card">
       <p class="ch-step" id="ch-step"></p>
@@ -250,6 +248,62 @@
       <div class="buttons">
         <button value="home" data-t="toStart"></button>
         <button value="again" class="primary" id="over-again"></button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- The menu in the corner of a game. The game waits while it is open. -->
+  <dialog id="game-menu">
+    <form method="dialog">
+      <h2 data-t="menu"></h2>
+      <button type="button" class="wide" id="menu-how-to" data-t="howToPlay"></button>
+      <div class="field"><span data-t="sound"></span><div class="pills" id="menu-sound"></div></div>
+      <div class="field"><span data-t="music"></span><div class="pills" id="menu-music"></div></div>
+      <div class="buttons">
+        <button value="home" data-t="home"></button>
+        <button value="ok" class="primary" data-t="back"></button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- How to play: a booklet, with scenes that play while they are in view (js/how-to.js). -->
+  <dialog id="how-to">
+    <form method="dialog">
+      <button class="icon book-close" value="close" data-label="back"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg></button>
+      <header class="book-cover"><h2 data-t="howToPlay"></h2></header>
+      <div class="book">
+        <h3 data-t="htGoalH"></h3>
+        <div data-html="htGoal"></div>
+
+        <h3 data-t="htTurnH"></h3>
+        <p data-t="htTurn"></p>
+        <h4><i>1</i><span data-t="htPlaceH"></span></h4>
+        <div class="book-scene" data-scene="reinforce"></div>
+        <div data-html="htPlace"></div>
+        <h4><i>2</i><span data-t="htAttackH"></span></h4>
+        <div class="book-scene" data-scene="attack"></div>
+        <div data-html="htAttack"></div>
+        <h4><i>3</i><span data-t="htMoveH"></span></h4>
+        <div class="book-scene" data-scene="move"></div>
+        <div data-html="htMove"></div>
+
+        <h3 data-t="htRegionH"></h3>
+        <div class="book-scene" data-scene="region"></div>
+        <div data-html="htRegion"></div>
+
+        <h3 data-t="luck"></h3>
+        <div class="book-scene" data-scene="luck"></div>
+        <div data-html="htLuck"></div>
+
+        <h3 data-t="htSeaH"></h3>
+        <div class="book-scene" data-scene="sea"></div>
+        <div data-html="htSea"></div>
+
+        <h3 data-t="htPeopleH"></h3>
+        <div data-html="htPeople"></div>
+
+        <button value="close" class="primary wide book-done" data-t="back"></button>
+        <p class="credits" data-html="credits"></p>
       </div>
     </form>
   </dialog>

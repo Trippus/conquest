@@ -11,6 +11,7 @@ export const EN = {
   /* ---------- index.html ---------- */
   board: 'The map',
   home: 'To the start screen',
+  menu: 'Menu',
   players: 'Players',
   zoomIn: 'Zoom in',
   zoomOut: 'Zoom out',
@@ -22,11 +23,31 @@ export const EN = {
   continue: 'Continue the game',
   newGame: 'New game',
   howToPlay: 'How to play',
-  rules: `<li><b>Reinforce:</b> you get new armies every turn, more the more territories and whole continents you hold. Tap your territories to place them.</li>
-    <li><b>Attack:</b> pick one of your territories and a neighbour. The dice decide, and the bigger army usually has luck on its side.</li>
-    <li><b>Move:</b> at the end you may move armies once between your own territories.</li>
-    <li><b>Fortune of war:</b> conquer at least one territory in your turn and you get a ★. Cash the stars in for extra armies whenever you like. The more you save up, the more armies.</li>
-    <li><b>Victory:</b> complete your secret mission, or conquer the whole map.</li>`,
+  htGoalH: 'The goal',
+  htGoal: `<p>You win as soon as you have reached your goal in your own turn. You can always see it in the game, under <b>Goal</b> or <b>Mission</b>.</p>
+    <p><b>In a campaign</b> you must hold the regions the goal names. Your rivals each have a secret mission, so it is a race.</p>
+    <p><b>In free play</b> each player gets a secret mission, or you fight to conquer the whole map.</p>`,
+  htTurnH: 'Your turn',
+  htTurn: 'A turn has three steps, always in this order.',
+  htPlaceH: 'Reinforce',
+  htPlace: `<p>You get at least 3 new armies: one for every 3 territories you hold, plus a bonus for whole regions.</p>
+    <p>Tap your territories to place them, one at a time. <b>The rest on</b> puts all the last ones on one territory.</p>`,
+  htAttackH: 'Attack',
+  htAttack: `<p>Pick one of your territories with at least 2 armies, then a neighbour that is not yours. You roll up to 3 dice, the defender up to 2.</p>
+    <p>The highest dice are compared in pairs. The lower die of each pair costs its owner an army, and on a tie the defender wins.</p>
+    <p><b>Attack</b> rolls once. <b>Fight to the end</b> goes on until the territory is yours or you can go no further. When you take it, you choose how many armies move in.</p>
+    <p>You may attack as often as you like, or not at all.</p>`,
+  htMoveH: 'Move',
+  htMove: `<p>Last, you may move armies once, from one of your territories to another, if there is a way through your own land. At least 1 army must stay behind.</p>`,
+  htRegionH: 'Regions',
+  htRegion: `<p>The map is divided into regions, and the number by a region's name is its bonus. Hold the whole region when your turn begins, and you get that many extra armies. If someone takes just one territory from you, the bonus is gone.</p>`,
+  htLuck: `<p>Conquer at least one territory in your turn and you get a ★. Cash in your stars when you reinforce, or save them: 1&nbsp;★ gives 2 armies, 2&nbsp;★ give 5, 3&nbsp;★ give 9, and each ★ more gives 4 more.</p>
+    <p>Knock a player out and you get their stars.</p>`,
+  htSeaH: 'Sea routes',
+  htSea: `<p>Dotted lines across the sea join two territories as if they were neighbours. You can both attack and move along them.</p>`,
+  htPeopleH: 'Several at one screen',
+  htPeople: `<p>In free play several of you can share a phone or tablet. Lay it on the table like a board game, and pick it up on your turn.</p>
+    <p>Each of you has a secret mission. Tap <b>Mission</b> in your own turn to see it, so the others can't look.</p>`,
   credits: `Thanks to: emblems by Lorc, <a href="https://game-icons.net" target="_blank" rel="noopener">game-icons.net</a> (CC BY 3.0) ·
     paper from <a href="https://ambientcg.com" target="_blank" rel="noopener">ambientCG</a> (CC0)`,
   settings: 'Settings',

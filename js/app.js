@@ -8,12 +8,13 @@ import * as G from './engine.js';
 import { botAction } from './ai.js';
 import { MAPS, rulesFor, inLanguage } from './maps/index.js';
 import { MODERN } from './rules/modern.js';
-import { createBoard, PLAYER_COLORS as COLORS, sealIcon } from './board.js';
+import { createBoard, PLAYER_COLORS as COLORS, sealIcon, usePalette } from './board.js';
 import { mapShapes, regionShapes } from './map-shapes.js';
 import { Sound, Music } from './audio.js';
 import { openHowTo } from './how-to.js';
 import { guideNote, guideDone } from './guide.js';
 import { LANGUAGES, pickLanguage, stringsFor, translatePage } from './i18n.js';
+import { MEDALS, medalIcon, medalCounts, newMedal, newStats, recordGame } from './stats.js';
 import { TOGTER, newProgress, isOpen, upNext, nextTogt, freeMaps, record, offerEasy, togtArmies, togtStart } from './togter.js';
 
 // Saves only replay on the map they were played on: v1 was the test map, v2 the 30-territory world.
@@ -131,6 +132,26 @@ function saveProgress(progress) {
 }
 let progress = loadProgress();
 saveProgress(progress); // so a veteran is known as one after the first game saves settings too
+
+// The numbers of the games finished by one person against the computer (js/stats.js).
+const STATS = 'conquest.stats';
+function loadStats() {
+  try {
+    return { ...newStats(), ...JSON.parse(localStorage.getItem(STATS)) };
+  } catch {
+    return newStats();
+  }
+}
+let stats = loadStats();
+function countGame() {
+  if (game.statted) return;
+  stats = recordGame(stats, { won: game.seats[s.winner] === 'human', map: game.map, rounds: s.round, taken: game.taken ?? 0 });
+  try {
+    localStorage.setItem(STATS, JSON.stringify(stats));
+  } catch {}
+  game.statted = true;
+  save();
+}
 // A map in the free game: open, or still to be won in the togter.
 function isFree(id) {
   return freeMaps(progress, Object.keys(MAPS)).includes(id);
@@ -284,9 +305,14 @@ function showEnding(e) {
   $('ch-goal').textContent = (e.won ? (game.togt ? e.news : [e.how]) : [e.place]).join(' ');
   cardButtons(afterGame()?.label ?? L.toStart, { standings: true, easy: e.easy });
   openCard(game.togt ? togtOf(id).art : pictureOf(id), 'ending');
+  // A togt won on a harder level than before gives its medal.
+  const medal = e.won && e.medal;
+  $('ch-medal').hidden = !medal;
+  if (medal) $('ch-medal').innerHTML = `${medalIcon(medal)}<span><b>${L.medalWon[medal]}</b> ${L.medalNext[medal]}</span>`;
 }
 function openCard(art, kind) {
   showChapterArt(art);
+  $('ch-medal').hidden = true;
   const box = $('chapter');
   // Shown anew, so the words come in again one by one, also when the card was already up.
   const fromEnd = box.classList.contains('turning');
@@ -393,6 +419,8 @@ function act(a) {
   }
   s = r.state;
   game.actions.push(a);
+  const taken = r.events.filter((e) => e.type === 'conquer' && game.seats[e.p] === 'human').length;
+  if (taken) game.taken = (game.taken ?? 0) + taken;
   save();
   if (game.guide && guideDone(s)) endGuide();
   if (r.events.some((e) => e.type === 'turn' || e.type === 'win')) clearSel();
@@ -1019,6 +1047,7 @@ function openGameOver() {
   $('over-text').innerHTML = `<p>${how}</p>${mine}<ol class="standings">${rows.join('')}</ol>`;
   // People at the phone get the end card; a game of computer players only ends in the standings.
   const people = game.seats.filter((x) => x === 'human').length;
+  if (people === 1) countGame();
   const togt = game.togt ? togtOver() : { news: [] };
   ending = people ? { won: game.seats[s.winner] === 'human', how, place: me >= 0 && people === 1 ? L.yourPlace(me + 1, place.length) : '', ...togt } : null;
   const after = afterGame();
@@ -1046,19 +1075,21 @@ function togtOver() {
   const level = game.seats.find((x) => x !== 'human');
   const wasFree = freeMaps(progress, Object.keys(MAPS)).includes(game.togt);
   if (!game.counted) {
+    game.medal = won ? newMedal(progress.won[game.togt], level) : null;
     progress = record(progress, game.togt, won, level);
     saveProgress(progress);
     game.counted = true;
     save();
   }
   if (!won) return { news: [], easy: offerEasy(progress, game.togt, level) };
+  const medal = game.medal;
   const next = nextTogt(progress, game.togt);
   preloadArt(next?.art);
   const news = [
     !wasFree && L.newFreeMap(mapIn(game.togt).name),
     next ? L.nextUp(togtText(next.map).year, mapIn(next.map).name) : L.allTogterWon,
   ].filter(Boolean);
-  return { news };
+  return { news, medal };
 }
 
 // What comes after a finished game: a togt won goes on to the next, a togt lost is tried again, a
@@ -1410,12 +1441,12 @@ function renderTogter() {
       const won = progress.won[t.map];
       if (open) preloadArt(t.art);
       const li = document.createElement('li');
-      li.className = won ? 'won' : t === next ? 'next' : open ? '' : 'locked';
+      li.className = won ? `won ${won}` : t === next ? 'next' : open ? '' : 'locked';
       const b = document.createElement('button');
       b.type = 'button';
       b.disabled = !open;
       const text = togtText(t.map);
-      const state = won ? L.togtWon(L.levels[won]) : t === next ? L.togtNext : open ? L.togtOpen : `🔒 ${L.togtLocked}`;
+      const state = won ? `${medalIcon(won)}${L.togtWon(L.levels[won])}` : t === next ? L.togtNext : open ? L.togtOpen : `🔒 ${L.togtLocked}`;
       b.innerHTML = `<span class="togt-thumb" style="background-image: url('${pictureOf(t.map)}')"></span>
         <span class="togt-body"><span class="togt-year">${text.year}</span><b>${mapIn(t.map).name}</b><small>${text.teaser}</small><small class="togt-state">${state}</small></span>`;
       b.addEventListener('click', () => {
@@ -1428,6 +1459,28 @@ function renderTogter() {
   );
 }
 $('intro-togter').addEventListener('click', openTogter);
+
+// The medals and the numbers. Medals come from the togter won; the numbers from the games finished.
+function openStats() {
+  const counts = medalCounts(progress.won);
+  $('stats-medals').innerHTML = MEDALS.map((m) => `<div class="${counts[m] ? '' : 'none'}">${medalIcon(m)}<b>${counts[m]}</b><span>${L.medals[m]}</span></div>`).join('');
+  const won = TOGTER.filter((t) => progress.won[t.map]).length;
+  const rows = [
+    [L.statPlayed, stats.played],
+    [L.statWon, `${stats.won} (${L.percent(stats.played ? Math.round((100 * stats.won) / stats.played) : 0)})`],
+    [L.statStreak, L.streakText(stats.streak, stats.best)],
+    [L.statTaken, stats.taken],
+    [L.togterTitle, L.togtProgress(won, TOGTER.length)],
+  ];
+  $('stats-numbers').innerHTML = rows.map(([k, v]) => `<dt>${k}</dt><dd>${v}</dd>`).join('');
+  const fastest = Object.entries(stats.fastest).filter(([id]) => MAPS[id]).sort((a, b) => a[1] - b[1]);
+  $('stats-fastest').innerHTML = fastest.map(([id, n]) => `<li><span>${mapIn(id).name}</span><b>${L.inRounds(n)}</b></li>`).join('');
+  $('stats-numbers').hidden = !stats.played;
+  $('stats-empty').hidden = !!stats.played;
+  $('stats-fastest-h').hidden = $('stats-fastest').hidden = !fastest.length;
+  $('stats').showModal();
+}
+$('stats-btn').addEventListener('click', openStats);
 // The title is two lines that never wrap: shrink it when a line is wider than the card, which
 // happens on narrow phones and with large text.
 let titleWidth = 0;
@@ -1526,6 +1579,12 @@ function renderSettings() {
     applyTheme(theme);
     renderSettings();
   });
+  pills($('palette-pills'), Object.entries(L.palettes), x.palette ?? 'normal', (palette) => {
+    saveSettings({ ...loadSettings(), palette });
+    usePalette(palette);
+    if (game) render();
+    renderSettings();
+  });
   langPills($('lang-pills'), renderSettings);
 }
 
@@ -1589,6 +1648,7 @@ $('settings-btn').addEventListener('click', () => {
   $('settings').showModal();
 });
 applyTheme(loadSettings().theme);
+usePalette(loadSettings().palette);
 // Audio may only start from a tap. The music rests while the game is out of sight.
 document.addEventListener(
   'pointerdown',

@@ -30,6 +30,7 @@ npm run design-shots                          # stilprøverne som PNG (kræver n
 | `js/guide.js` | Den første runde som guide: hvilken lille seddel spillet kalder på, ud fra hvad spilleren gør |
 | `js/how-to.js` | Regelhæftet "Sådan spiller du": de små scener, der ligner bidder af kortet og spiller, mens de er i syne |
 | `js/togter.js` | Togterne i rækkefølge (ældst først), og hvad en sejr åbner: næste togt og kortet i Frit spil. Teksterne står i `js/lang/*.js` |
+| `js/stats.js` | Medaljer for togterne (bronze på Let, sølv på Normal, guld på Svær) og tallene i Statistik |
 | `js/audio.js` | Syntetiserede lyde (terninger, laksegl, horn, kort) og temamusikken, der går i løkke med en blød overgang |
 | `assets/music/`, `assets/togter/` | Temamusikken og billederne bag togternes årstal, lavet med AI (se `LICENSES.md`). AI'ens opdigtede ord på kortene er visket ud med `tools/smudge.mjs` |
 | `assets/maps/` | Et lille billede af hvert kort til Frit spils kortvalg og til togter uden eget billede, taget af `tools/map-shots.mjs` |

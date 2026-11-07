@@ -123,6 +123,7 @@
         <div class="intro-links">
           <button type="button" class="link" id="how-to-btn" data-t="howToPlay"></button>
           <button type="button" class="link" id="settings-btn" data-t="settings"></button>
+          <button type="button" class="link" id="stats-btn" data-t="stats"></button>
         </div>
         <div class="publisher">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="64 24 424 432" class="pub-logo" aria-hidden="true">
@@ -165,6 +166,7 @@
       </svg>
       <h2 class="ch-title" id="ch-title"></h2>
       <p class="ch-story" id="ch-story"></p>
+      <p class="ch-medal" id="ch-medal" hidden></p>
       <p class="ch-goal-h" id="ch-goal-h" data-t="yourGoal"></p>
       <div class="ch-mode" id="ch-mode" role="group"></div>
       <p class="ch-goal" id="ch-goal"></p>
@@ -219,6 +221,7 @@
       <div class="field"><span data-t="sound"></span><div class="pills" id="sound-pills"></div></div>
       <div class="field"><span data-t="music"></span><div class="pills" id="music-pills"></div></div>
       <div class="field"><span data-t="look"></span><div class="pills" id="theme-pills"></div></div>
+      <div class="field"><span data-t="playerColors"></span><div class="pills" id="palette-pills"></div></div>
       <div class="field"><span data-t="language"></span><div class="pills" id="lang-pills"></div></div>
       <div class="buttons"><button value="ok" class="primary" data-t="ok">OK</button></div>
     </form>
@@ -277,6 +280,20 @@
         <button value="keep" data-t="replaceKeep"></button>
         <button value="new" class="primary" data-t="replaceNew"></button>
       </div>
+    </form>
+  </dialog>
+
+  <!-- The medals won on the togter and the numbers of the games played (js/stats.js). -->
+  <dialog id="stats">
+    <form method="dialog">
+      <h2 data-t="stats"></h2>
+      <div class="medals" id="stats-medals"></div>
+      <p class="sub" data-t="statsMedalsNote"></p>
+      <dl class="numbers" id="stats-numbers"></dl>
+      <p class="sub" id="stats-empty" data-t="statsEmpty"></p>
+      <h3 id="stats-fastest-h" data-t="fastestH"></h3>
+      <ol class="fastest" id="stats-fastest"></ol>
+      <div class="buttons"><button value="ok" class="primary" data-t="back"></button></div>
     </form>
   </dialog>
 

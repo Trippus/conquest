@@ -12,7 +12,19 @@ import { EMBLEMS } from './emblems.js';
 
 // Ink-friendly player colours: red, blue, green, ochre, purple, teal. Design item 4 will settle
 // them (colour-blind check, symbols).
-export const PLAYER_COLORS = ['#a3261b', '#1f5fa8', '#3f7a26', '#c98a12', '#6b3f8f', '#1d7f7a'];
+// The players' colours. "clear" is for colour-blind players: red and green, blue and purple look
+// alike to many of them, so this set differs in lightness as well (checked by simulating the three
+// kinds of colour blindness; every pair stays at least 23 apart in CIELAB, the normal set falls to 8).
+export const PALETTES = {
+  normal: ['#a3261b', '#1f5fa8', '#3f7a26', '#c98a12', '#6b3f8f', '#1d7f7a'],
+  clear: ['#981600', '#003f9a', '#008146', '#d49020', '#cc3c92', '#4a4540'],
+};
+export const PLAYER_COLORS = [...PALETTES.normal];
+// Changes the colours in place: everything reading PLAYER_COLORS draws with the new ones.
+export function usePalette(name) {
+  PLAYER_COLORS.splice(0, PLAYER_COLORS.length, ...(PALETTES[name] ?? PALETTES.normal));
+  document.body.classList.toggle('clear-colors', name === 'clear');
+}
 // Each colour has an emblem too (js/emblems.js: lion, eagle, galleon, tower, wolf, crown), so the
 // players can be told apart without seeing colour. A small SVG of colour i for lists and dialogs:
 export const sealIcon = (i) =>

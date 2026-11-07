@@ -30,7 +30,7 @@ export const TOGTER = [
   { map: 'liberation', opponents: 3, home: 've', goal: ['ng', 'qu', 'pe'], bonus: 0.45, easy: { bonus: 0.2, guard: 1 }, art: 'assets/togter/liberation.jpg' },
   { map: 'west', opponents: 3, home: 'mi', goal: ['tx', 'ca', 'or'], bonus: 0.3, easy: { bonus: 0.2, guard: 1 }, art: 'assets/togter/west.jpg' },
   { map: 'ethiopia', opponents: 3, home: 'sh', goal: ['ti', 'kf', 'og'], bonus: 0.55, easy: { bonus: 0.6, guard: 2 }, art: 'assets/togter/ethiopia.jpg' },
-  { map: 'world', opponents: 3, goal: ['eu'], plusOne: true, bonus: 0.4 },
+  { map: 'world', opponents: 3, goal: ['eu'], plusOne: true, bonus: 0.4, art: 'assets/togter/world.jpg' },
 ];
 
 // The armies of a togt on a level. On Let the opponents start in full (novice: or weaker by that

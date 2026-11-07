@@ -118,7 +118,9 @@ button.wide { width: 100%; }
   pointer-events: none;
 }
 #hud > * { pointer-events: auto; }
-#home-btn, #ch-home { min-width: 40px; min-height: 40px; border-radius: 50%; background: var(--panel); box-shadow: var(--shadow); color: var(--accent); }
+/* The menu sits in the top right corner, in the game as on the start screen; the names start at the left. */
+#home-btn { order: 2; }
+#home-btn, #ch-home, #intro-menu { min-width: 40px; min-height: 40px; border-radius: 50%; background: var(--panel); box-shadow: var(--shadow); color: var(--accent); }
 /* The names only tell: touches go through them to the map, which pans and zooms under them. */
 #players { display: flex; flex-wrap: wrap; gap: 6px; margin: 0; padding: 0; list-style: none; flex: 1; min-width: 0; pointer-events: none; }
 #players.many { display: grid; grid-template-columns: repeat(2, minmax(0, max-content)); gap: 5px; }
@@ -539,7 +541,8 @@ dialog .big { font-family: var(--title); font-size: 20px; margin: 8px 0; }
   47% { opacity: .74; } 61% { opacity: 1; } 74% { opacity: .82; } 88% { opacity: .93; }
 }
 /* the menu, where it is in the game */
-#ch-home { position: fixed; z-index: 1; top: max(8px, env(safe-area-inset-top)); left: var(--gap); }
+#ch-home { position: fixed; z-index: 1; top: max(8px, env(safe-area-inset-top)); right: var(--gap); }
+#intro-menu { position: absolute; z-index: 1; top: max(8px, env(safe-area-inset-top)); right: var(--gap); }
 .ch-card { position: relative; margin: auto; width: min(460px, 100%); display: flex; flex-direction: column; align-items: center; text-shadow: 0 1px 10px rgb(0 0 0 / .75); }
 .ch-step { margin: 0 0 6px; font-size: 13px; letter-spacing: .22em; text-transform: uppercase; color: #b8a58c; }
 .ch-year { margin: 0; font: 700 min(76px, 19vw)/1.05 var(--title); letter-spacing: .06em; color: #e8c27a; }

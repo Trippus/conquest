@@ -1538,7 +1538,9 @@ function useLanguage(lang) {
 }
 /* ---------- the menu in the game, and how to play ---------- */
 
+// The same menu in the corner of the start screen and of the game; on the start screen it has no way home.
 function renderMenu() {
+  $('menu-home').hidden = !$('intro').hidden;
   soundPills($('menu-sound'), $('menu-music'), renderMenu);
   langPills($('menu-lang'), renderMenu);
 }
@@ -1554,6 +1556,7 @@ $('game-menu').addEventListener('close', () => {
 });
 $('menu-how-to').addEventListener('click', openHowTo);
 $('how-to-btn').addEventListener('click', openHowTo);
+$('intro-menu').addEventListener('click', openMenu);
 
 $('settings-btn').addEventListener('click', () => {
   renderSettings();

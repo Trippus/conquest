@@ -85,3 +85,14 @@ test('it is done when the second turn is under way or the game is over', () => {
   assert.equal(guideDone({ ...g.s, current: 1, phase: 'over' }), true);
   assert.equal(guideNote(map, { ...g.s, phase: 'over' }, NOTHING, []), null);
 });
+
+test('a game with a goal starts with it, the missing territories marked, until it is put away', () => {
+  const s = G.newGame(map, rules, { players: ['You', 'B', 'C'], seed: 4, mode: 'mission', goals: [{ type: 'regions', regions: [0, 1] }, null, null] });
+  const first = guideNote(map, s, NOTHING, []);
+  assert.equal(first.id, 'goal');
+  assert.ok(first.ok);
+  const goal = [0, 1].flatMap((r) => map.regions[r].members);
+  assert.deepEqual(first.marks, goal.filter((t) => s.owner[t] !== 0));
+  assert.equal(guideNote(map, s, NOTHING, [], { goal: true }).id, 'place');
+  assert.equal(guideNote(map, s, NOTHING, [{ type: 'place' }]).id, 'placeRest', 'playing on puts it away too');
+});

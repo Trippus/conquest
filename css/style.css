@@ -158,7 +158,7 @@ button.wide { width: 100%; }
 #stepper { display: flex; align-items: center; justify-content: center; gap: 12px; margin-bottom: 8px; }
 #stepper button { min-width: 56px; font-size: 24px; }
 #amount { min-width: 2.5em; text-align: center; font: 700 26px var(--title); }
-#hand-buttons { display: flex; gap: 6px; margin-left: auto; }
+#hand-buttons { display: flex; gap: 10px; margin-left: auto; }
 #hand-buttons button { white-space: nowrap; min-height: 34px; padding: 0 12px; font-size: 14px; border-radius: 999px; }
 #luck-btn.ready { background: var(--primary); color: var(--primary-ink); border-color: transparent; font-weight: 700; animation: glow 1.6s ease-in-out infinite alternate; }
 @keyframes glow { to { box-shadow: 0 0 0 4px rgb(255 210 90 / 0.45); } }
@@ -246,7 +246,8 @@ dialog .big { font-family: var(--title); font-size: 20px; margin: 8px 0; }
 .mission-map svg { display: block; width: 100%; max-height: 34vh; padding: 6px; box-sizing: border-box; border-radius: 10px; background: #efe4cc; }
 .mission-key { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 6px; margin: 6px 0 0; font-size: 14px; }
 .mission-key i { width: 14px; height: 14px; border-radius: 3px; border: 1px solid #5b4630; }
-.mission-key i.missing { margin-left: 10px; background: repeating-linear-gradient(45deg, #f6ecd4 0 2px, #5b4630 2px 3px); }
+.mission-key i.missing { margin-left: 10px; background: repeating-linear-gradient(45deg, #f6ecd4 0 2px, #4a3622 2px 3.4px); }
+.mission-map svg.framed { cursor: zoom-in; }
 
 
 /* new game: summary, then pills to change it */
@@ -327,6 +328,9 @@ dialog .big { font-family: var(--title); font-size: 20px; margin: 8px 0; }
 #guide::after { content: ''; position: absolute; left: 50%; bottom: -7px; width: 14px; height: 14px; margin-left: -7px; transform: rotate(45deg); background: #e6d5b2; }
 #guide p { margin: 0; font: 16px/1.4 var(--title); }
 #guide b { font-weight: 700; color: #7a2e1d; }
+#guide-ok { display: inline-block; vertical-align: baseline; min-height: 30px; margin: 4px 0 0 4px; padding: 0 14px; border-radius: 999px; font-size: 15px; pointer-events: auto;
+  background: #3a2a18; color: #f6ecd4; border-color: #3a2a18; }
+#guide-ok[hidden] { display: none; }
 #guide-skip { position: absolute; top: 2px; right: 2px; width: 40px; height: 40px; min-height: 0; padding: 0; border: none; background: none; box-shadow: none; color: #6b5338; font-size: 22px; line-height: 1; pointer-events: auto; }
 #bar .pulse { animation: glow 1s ease-in-out infinite alternate; }
 

@@ -87,6 +87,8 @@ export const DA = {
   turnMove: '<b>Flyt.</b> Flyt til sidst hære én gang mellem dine egne områder.',
   turnGoal: 'Dit mål kan du altid se i spillet, under Mål eller Mission.',
   guide: {
+    goal: 'Først dit mål: Hold {regions}. De markerede områder mangler du. Se dem igen under <b>{button}</b>.',
+    target: 'Først din mission: Slå {name} ud. Deres områder er markeret. Se dem igen under <b>{button}</b>.',
     place: 'Din tur! Du får nye hære hver tur. Tryk på et markeret område for at sætte en hær dér.',
     placeRest: 'Godt. Sæt resten. Hære samlet ét sted vinder lettere, så prøv <b>Resten på</b>.',
     toAttack: 'Alle hære står klar. Tryk på <b>Til angreb</b>.',
@@ -103,6 +105,7 @@ export const DA = {
   },
   guideGoal: (button) => ` Dit mål står under <b>${button}</b>.`,
   skipGuide: 'Luk guiden',
+  gotIt: 'Forstået',
   whatName: 'Hvad skal vi kalde dig?',
   nameNote: 'Dit navn og dit våbenskjold følger dig i alle spil.',
   startFirst: 'Begynd på første togt',

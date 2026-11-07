@@ -88,6 +88,8 @@ export const EN = {
   turnMove: '<b>Move.</b> Last, move armies once between your own territories.',
   turnGoal: 'You can always see your goal in the game, under Goal or Mission.',
   guide: {
+    goal: 'First your goal: hold {regions}. You still lack the marked territories. See them again under <b>{button}</b>.',
+    target: 'First your mission: knock out {name}. Their territories are marked. See them again under <b>{button}</b>.',
     place: 'Your turn! You get new armies every turn. Tap a marked territory to put an army there.',
     placeRest: 'Good. Place the rest. Armies together win more easily, so try <b>The rest on</b>.',
     toAttack: 'All your armies are ready. Tap <b>On to attack</b>.',
@@ -104,6 +106,7 @@ export const EN = {
   },
   guideGoal: (button) => ` Your goal is under <b>${button}</b>.`,
   skipGuide: 'Close the guide',
+  gotIt: 'Got it',
   whatName: 'What shall we call you?',
   nameNote: 'Your name and coat of arms go with you into every game.',
   startFirst: 'Begin the first campaign',

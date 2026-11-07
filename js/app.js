@@ -204,7 +204,7 @@ function startGame(order, speed, mode = 'mission', seed = (Math.random() * 2 ** 
     actions: [],
     // told: the opening card has been read (or skipped); until then, continuing shows it again
     ...(togt ? { togt } : {}),
-    ...(guide ? { guide } : {}),
+    ...(guide ? { guide: {} } : {}),
     ...(quiet ? { told: false } : {}),
   };
   s = G.newGame(map, rules, game.setup);
@@ -519,7 +519,7 @@ function render() {
     if (s.phase === 'attack') G.attackTargets(map, s, sel.from).forEach((t) => targets.add(t));
     if (s.phase === 'fortify') G.fortifyTargets(map, rules, s, sel.from).forEach((t) => targets.add(t));
   }
-  const note = game.guide ? guideNote(map, s, sel, game.actions) : null;
+  const note = game.guide ? guideNote(map, s, sel, game.actions, game.guide) : null;
   note?.marks?.forEach((t) => targets.add(t));
   const occ = s.occupy;
   // While choosing how many move in, the seals already show the split being chosen.
@@ -668,8 +668,15 @@ function renderGuide(note) {
   box.hidden = !note;
   document.querySelector('#bar .pulse')?.classList.remove('pulse');
   if (!note) return;
-  const goal = $('mission-btn').hidden ? '' : L.guideGoal($('mission-btn').textContent);
-  $('guide-text').innerHTML = L.guide[note.id].replace('{goal}', goal);
+  const m = s.mode === 'mission' ? s.players[s.current].mission : null;
+  const button = isGoal(s.current) ? L.goalButton : L.mission;
+  $('guide-text').innerHTML = L.guide[note.id]
+    .replace('{goal}', m ? L.guideGoal(button) : '')
+    .replace('{button}', button)
+    .replace('{regions}', m?.type === 'regions' ? andList(m.regions.map((r) => map.regions[r].name)) : '')
+    .replace('{name}', m?.type === 'eliminate' ? s.players[m.target].name : '');
+  guideOk.hidden = !note.ok;
+  $('guide-text').append(' ', guideOk);
   if (box.dataset.id !== note.id) {
     box.dataset.id = note.id;
     box.classList.remove('show');
@@ -684,6 +691,13 @@ function endGuide() {
   progress = { ...progress, guided: true };
   saveProgress(progress);
 }
+// The button that puts the goal away stands at the end of the note's words.
+const guideOk = $('guide-ok');
+guideOk.addEventListener('click', () => {
+  game.guide = { ...game.guide, goal: true };
+  save();
+  render();
+});
 $('guide-skip').addEventListener('click', () => {
   endGuide();
   render();
@@ -1095,10 +1109,10 @@ function openMission() {
   $('mission-note').textContent = goal ? L.goalNote : L.missionSecret;
   $('mission-dialog').showModal();
 }
-// The mission on a small map of the whole land: the regions to hold, outlined, with your territories
-// in them in your colour and the ones still missing hatched; or the player to knock out, in their
-// colour. Your other territories are there in a paler colour. Holding a number of territories has no
-// map.
+// The mission on a small map: the regions to hold, outlined, with your territories in them in your
+// colour and the ones still missing hatched; or the player to knock out, in their colour. Your other
+// territories are there in a paler colour. Holding a number of territories has no map. The map is
+// framed on the goal, so its hatching can be seen on a phone; a tap shows the whole land and back.
 let shapesFor = null; // the outlines of the map in play, traced once
 function missionMap(p) {
   const m = s.players[p].mission;
@@ -1115,12 +1129,42 @@ function missionMap(p) {
   const territories = map.territories.map((t, i) => shape(land[grid.MAP.territories[t.id].letter], fill(i))).join('');
   const outlined = m.type === 'regions' ? m.regions.map((r) => shape(regions[map.regions[r].id], 'fill="none" stroke-width="2.2"')).join('') : '';
   const key = m.type === 'regions' ? `<p class="mission-key"><i style="background:${yours}"></i>${L.keyYours}<i class="missing"></i>${L.keyMissing}</p>` : '';
-  return `<svg viewBox="0 0 ${grid.WIDTH} ${grid.HEIGHT}" aria-hidden="true">
-    <pattern id="missing" width="1.4" height="1.4" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="1.4" height="1.4" fill="#f6ecd4"/><path d="M0 0V1.4" stroke="#5b4630" stroke-width=".45"/></pattern>
+  const whole = `0 0 ${grid.WIDTH} ${grid.HEIGHT}`;
+  const near = frame([...goal].map((t) => land[grid.MAP.territories[map.territories[t].id].letter]));
+  return `<svg viewBox="${near ?? whole}" data-near="${near ?? ''}" data-whole="${whole}"${near ? ' class="framed"' : ''} aria-hidden="true">
+    <pattern id="missing" width="1.2" height="1.2" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="1.2" height="1.2" fill="#f6ecd4"/><path d="M0 0V1.2" stroke="#4a3622" stroke-width=".5"/></pattern>
     ${land['#'] ? shape(land['#'], 'fill="var(--rest)" opacity=".4"') : ''}
     <g stroke="#5b4630" stroke-width=".6" stroke-linejoin="round">${territories}</g>
     <g stroke="#2a1d10" stroke-linejoin="round">${outlined}</g></svg>${key}`;
 }
+// The box around the goal's outlines, with room around it and not too narrow for the dialog; none
+// when that is most of the map anyway.
+function frame(outlines) {
+  let [x0, y0, x1, y1] = [Infinity, Infinity, -Infinity, -Infinity];
+  for (const d of outlines) {
+    for (const [, x, y] of d.matchAll(/(-?[\d.]+)[ ,](-?[\d.]+)/g)) {
+      x0 = Math.min(x0, +x);
+      x1 = Math.max(x1, +x);
+      y0 = Math.min(y0, +y);
+      y1 = Math.max(y1, +y);
+    }
+  }
+  const pad = Math.max(x1 - x0, y1 - y0) * 0.15 + 2;
+  let [w, h] = [x1 - x0 + 2 * pad, y1 - y0 + 2 * pad];
+  [w, h] = [Math.max(w, h * 1.2), Math.max(h, w / 1.8)];
+  if (w * h > grid.WIDTH * grid.HEIGHT * 0.6) return null;
+  w = Math.min(w, grid.WIDTH);
+  h = Math.min(h, grid.HEIGHT);
+  const x = Math.min(Math.max((x0 + x1 - w) / 2, 0), grid.WIDTH - w);
+  const y = Math.min(Math.max((y0 + y1 - h) / 2, 0), grid.HEIGHT - h);
+  return [x, y, w, h].map((v) => +v.toFixed(2)).join(' ');
+}
+$('mission-map').addEventListener('click', () => {
+  const svg = $('mission-map').querySelector('svg');
+  if (!svg?.dataset.near) return;
+  const near = svg.getAttribute('viewBox') === svg.dataset.near;
+  svg.setAttribute('viewBox', near ? svg.dataset.whole : svg.dataset.near);
+});
 // The game waits while the mission is shown at the start.
 $('mission-dialog').addEventListener('close', () => schedule());
 

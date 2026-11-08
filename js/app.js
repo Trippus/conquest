@@ -976,7 +976,7 @@ function renderSetup() {
         if (name === 'map') {
           const picture = document.createElement('span');
           picture.className = 'map-picture';
-          picture.style.backgroundImage = `url('${thumbOf(value)}')`;
+          picture.innerHTML = thumbImg(value);
           b.prepend(picture);
         }
         b.setAttribute('aria-pressed', String(draft[name] === value));
@@ -1314,6 +1314,7 @@ function showIntro() {
   $('intro').hidden = false;
   // The picture of the game you are in or played last, else of the next togt.
   showIntroArt(togtOf(game?.map)?.art ?? next?.art ?? pictureOf('world'));
+  preloadThumbs();
 }
 
 // The start screen's picture. A new one comes up over the old, so nothing goes dark between them.
@@ -1433,6 +1434,16 @@ function pictureOf(id) {
 function thumbOf(id) {
   return togtOf(id)?.art?.replace('assets/togter/', 'assets/togter/small/') ?? `assets/maps/${id}.jpg`;
 }
+// As a picture that is unpacked before it is drawn, so a list scrolled quickly shows no empty frames
+// while the phone gets to it; fetched early, while the start screen is up (preloadThumbs).
+const thumbImg = (id) => `<img src="${thumbOf(id)}" alt="" decoding="sync" draggable="false">`;
+let thumbsLoaded = false;
+function preloadThumbs() {
+  if (thumbsLoaded) return;
+  thumbsLoaded = true;
+  const load = () => Object.keys(MAPS).forEach((id) => preloadArt(thumbOf(id)));
+  'requestIdleCallback' in window ? requestIdleCallback(load, { timeout: 2000 }) : setTimeout(load, 500);
+}
 function openTogter() {
   renderTogter();
   $('togter').showModal();
@@ -1456,7 +1467,7 @@ function renderTogter() {
       b.disabled = !open;
       const text = togtText(t.map);
       const state = won ? `${medalIcon(won)}${L.togtWon(L.levels[won])}` : t === next ? L.togtNext : open ? L.togtOpen : `🔒 ${L.togtLocked}`;
-      b.innerHTML = `<span class="togt-thumb" style="background-image: url('${thumbOf(t.map)}')"></span>
+      b.innerHTML = `<span class="togt-thumb">${thumbImg(t.map)}</span>
         <span class="togt-body"><span class="togt-year">${text.year}</span><b>${mapIn(t.map).name}</b><small>${text.teaser}</small><small class="togt-state">${state}</small></span>`;
       b.addEventListener('click', () => {
         $('togter').close();

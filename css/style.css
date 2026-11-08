@@ -610,6 +610,19 @@ dialog .big { font-family: var(--title); font-size: 20px; margin: 8px 0; }
    happened in place of the story) */
 #chapter.deal .ch-mode, #chapter.ending .ch-goal-h, #chapter.ending .ch-mode { display: none; }
 #chapter.ending .ch-year { font-size: min(64px, 15vw); }
+/* On a phone the longest stories pushed the button below the screen: tighter there, so it stays in view. */
+@media (max-height: 860px) {
+  #chapter { padding-top: calc(max(8px, env(safe-area-inset-top)) + 40px); padding-bottom: 16px; }
+  .ch-year, #chapter.ending .ch-year { font-size: min(52px, 13vw); }
+  .ch-rule { margin: 8px 0 6px; }
+  .ch-title { margin-bottom: 8px; font-size: 23px; }
+  .ch-story { margin-bottom: 12px; font-size: 16px; line-height: 1.45; }
+  .ch-mode { margin: 4px 0 8px; }
+  .ch-mode button { min-height: 34px; }
+  .ch-goal { margin-bottom: 16px; padding: 8px 12px; font-size: 15px; line-height: 1.4; }
+  .ch-medal { margin-bottom: 12px; }
+  #ch-standings, #ch-easy { margin-top: 8px; }
+}
 /* the medal a togt won gives, on the end card */
 .ch-medal { display: flex; align-items: center; gap: 14px; width: fit-content; margin: 0 auto 18px; max-width: 30em; font-size: 16px; line-height: 1.4; color: #f1e6d0; text-align: left; }
 .ch-medal b { color: #e8c27a; }

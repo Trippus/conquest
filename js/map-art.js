@@ -523,7 +523,6 @@ export function mapArt(grid, { keepClear = [], seaLines = [], compass = null } =
   // few boats (grid.RIVER_BOATS) where it runs more or less east–west. Roads (grid.ROADS) run the same
   // way, dashed. Caravans (grid.CARAVAN: camels, or llamas) walk near grid.CARAVANS ([x, y]). The
   // forests and dunes keep off them all.
-  const rivers = (grid.RIVERS ?? []).map(smooth).join('');
   const roads = (grid.ROADS ?? []).map(smooth).join('');
   const along = (line, step) =>
     line.slice(1).flatMap(([x2, y2], i) => {
@@ -595,7 +594,108 @@ export function mapArt(grid, { keepClear = [], seaLines = [], compass = null } =
     }
   }
 
-  return { land, sea, deco, rivers, roads };
+  return { land, sea, deco, rivers: riverShapes(grid.RIVERS ?? [], onLand), roads };
+}
+
+// The rivers as filled shapes rather than lines, so they can grow: each starts as a thread at its
+// source and widens downstream. One that reaches the sea runs on to the coast and opens there; a long
+// one splits into a small delta, two more arms fanning out to the coast. One that ends on another
+// river (a tributary) just meets it. Returns the soft wide band (halo) and the river itself (line).
+function riverShapes(lines, onLand) {
+  const halo = [];
+  const line = [];
+  const unit = ([x, y]) => {
+    const l = Math.hypot(x, y) || 1;
+    return [x / l, y / l];
+  };
+  const turn = ([x, y], a) => [x * Math.cos(a) - y * Math.sin(a), x * Math.sin(a) + y * Math.cos(a)];
+  // How far along a direction the land goes from a point, up to max (the coast, or max).
+  const toCoast = ([x, y], [dx, dy], max) => {
+    for (let d = 0; d <= max; d += 0.1) if (!onLand(x + dx * d, y + dy * d)) return Math.max(0, d - 0.15);
+    return null;
+  };
+  const ease = (t) => t * t * (3 - 2 * t);
+  for (const river of lines) {
+    let pts = sampleSmooth(river);
+    const end = pts.at(-1);
+    const back = pts[Math.max(0, pts.length - 9)];
+    const dir = unit([end[0] - back[0], end[1] - back[1]]);
+    // the sea just ahead: run on to the coast
+    const ahead = toCoast(end, dir, 2.4);
+    const toSea = ahead !== null || !onLand(end[0], end[1]);
+    if (ahead) for (let d = 0.2; d <= ahead; d += 0.2) pts.push([end[0] + dir[0] * d, end[1] + dir[1] * d]);
+    const s = lengths(pts);
+    const S = s.at(-1);
+    // thin at the source, full width three quarters of the way down (a long river sooner); wider again
+    // in the last stretch to the sea, like a river mouth
+    const full = Math.min(S * 0.75, 24);
+    const grow = (i) => Math.pow(Math.min(1, s[i] / full), 0.75);
+    const mouth = (i) => (toSea ? 1 + 1.2 * ease(Math.max(0, 1 - (S - s[i]) / 2.2)) : 1);
+    halo.push(band(pts, (i) => (0.16 + 0.64 * grow(i)) * mouth(i)));
+    line.push(band(pts, (i) => (0.04 + 0.28 * grow(i)) * mouth(i)));
+    // a delta for the long rivers: two arms leave a little before the mouth and fan out to the coast
+    if (!toSea || S < 30) continue;
+    const at = s.findIndex((v) => v >= S - 3.4);
+    const from = pts[at];
+    const along = unit([pts[at + 2][0] - pts[at - 2][0], pts[at + 2][1] - pts[at - 2][1]]);
+    for (const side of [-1, 1]) {
+      const way = turn(along, side * 0.6);
+      const mid = [from[0] + way[0] * 1.3, from[1] + way[1] * 1.3];
+      const reach = toCoast(mid, way, 4);
+      if (reach === null) continue;
+      const tip = [mid[0] + way[0] * reach, mid[1] + way[1] * reach];
+      // a gentle curve: out along the river first, then turning to the coast
+      const bend = [from[0] + along[0] * 1.2, from[1] + along[1] * 1.2];
+      const arm = Array.from({ length: 13 }, (_, k) => {
+        const t = k / 12;
+        const u = 1 - t;
+        return [u * u * from[0] + 2 * u * t * bend[0] + t * t * tip[0], u * u * from[1] + 2 * u * t * bend[1] + t * t * tip[1]];
+      });
+      halo.push(band(arm, (k) => 0.3 + 0.25 * (k / 12)));
+      line.push(band(arm, (k) => 0.1 + 0.1 * (k / 12)));
+    }
+  }
+  return { halo: halo.join(''), line: line.join('') };
+}
+
+// The points of smooth()'s curve, about every step apart.
+function sampleSmooth(p, step = 0.2) {
+  const pts = [p[0]];
+  for (let i = 0; i < p.length - 1; i++) {
+    const [a, b, c, e] = [p[i - 1] ?? p[i], p[i], p[i + 1], p[i + 2] ?? p[i + 1]];
+    const c1 = [b[0] + (c[0] - a[0]) / 6, b[1] + (c[1] - a[1]) / 6];
+    const c2 = [c[0] - (e[0] - b[0]) / 6, c[1] - (e[1] - b[1]) / 6];
+    const n = Math.max(2, Math.ceil(Math.hypot(c[0] - b[0], c[1] - b[1]) / step));
+    for (let k = 1; k <= n; k++) {
+      const t = k / n;
+      const u = 1 - t;
+      const w = [u * u * u, 3 * u * u * t, 3 * u * t * t, t * t * t];
+      pts.push([0, 1].map((j) => w[0] * b[j] + w[1] * c1[j] + w[2] * c2[j] + w[3] * c[j]));
+    }
+  }
+  return pts;
+}
+// How far along the points each one is.
+function lengths(pts) {
+  const s = [0];
+  for (let i = 1; i < pts.length; i++) s.push(s[i - 1] + Math.hypot(pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1]));
+  return s;
+}
+// A band along the points, width(i) wide at each, as a closed SVG path.
+function band(pts, width) {
+  const left = [];
+  const right = [];
+  pts.forEach(([x, y], i) => {
+    const [px, py] = pts[Math.max(0, i - 1)];
+    const [nx, ny] = pts[Math.min(pts.length - 1, i + 1)];
+    const l = Math.hypot(nx - px, ny - py) || 1;
+    const h = width(i) / 2;
+    const [ox, oy] = [(-(ny - py) / l) * h, ((nx - px) / l) * h];
+    left.push([x + ox, y + oy]);
+    right.push([x - ox, y - oy]);
+  });
+  const f = (v) => v.toFixed(2);
+  return `M${[...left, ...right.reverse()].map(([x, y]) => `${f(x)} ${f(y)}`).join('L')}Z`;
 }
 
 // A line through the points, smoothed (Catmull-Rom as cubic curves), as an SVG path.

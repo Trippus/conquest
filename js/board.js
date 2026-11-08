@@ -147,10 +147,11 @@ export function createBoard(svg, grid, map, { onTap, onRegion = () => {}, insets
     <g class="region-bands" pointer-events="none">${map.regions
       .map((r, i) => `<path data-region="${i}" d="${regionOutlines[r.id]}"/>`)
       .join('')}</g>
-    <g class="rivers" fill="none" stroke-linecap="round" stroke-linejoin="round" pointer-events="none">
-      <path d="${art.rivers}" stroke="#a9c4bf" stroke-width=".8" opacity=".55"/>
-      <path d="${art.rivers}" stroke="#5f8580" stroke-width=".3"/>
-      <path d="${art.roads}" stroke="#7a5236" stroke-width=".3" stroke-dasharray="1 .7" opacity=".85"/></g>
+    <!-- Rivers are shapes that widen downstream (map-art.js, riverShapes); roads are dashed lines. -->
+    <g class="rivers" pointer-events="none">
+      <path d="${art.rivers.halo}" fill="#a9c4bf" opacity=".55"/>
+      <path d="${art.rivers.line}" fill="#5f8580"/>
+      <path d="${art.roads}" fill="none" stroke="#7a5236" stroke-width=".3" stroke-dasharray="1 .7" stroke-linecap="round" stroke-linejoin="round" opacity=".85"/></g>
     <g class="art" pointer-events="none" opacity=".9">${art.land}</g>
     <!-- Crumpled paper over land and sea alike (CC0 texture, see LICENSES.md). Not blended
          (multiply): blending made every redraw costlier, and the land flickered while zooming. -->

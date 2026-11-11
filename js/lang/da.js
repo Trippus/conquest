@@ -164,9 +164,14 @@ export const DA = {
   adTag: 'Reklame',
   adSkip: 'Spring over',
   adCount: (s) => `Spillet fortsætter om ${s} s`,
-  adTitle: 'Her kommer en reklame',
-  adText: 'I app-udgaven vises en reklame her mellem spillene. Den betaler for, at spillet er gratis.',
-  adCta: 'Læs mere',
+  adCta: 'Spil gratis',
+  adNote: 'En prøve: i app-udgaven kommer en rigtig reklame her.',
+  // Trippus Games' other games, shown in the pause for now
+  adGames: {
+    sheep: ['Få fårene hjem', 'Skub foldene og få fårene hjem i den rigtige farve. Ingen tidsgrænse.'],
+    solitaire: ['Syvkabale', 'Klassisk syvkabale med fortryd, tip og en sejrsrunde af hoppende kort.'],
+    sudoku: ['Sudoku', 'Rolig sudoku i fire sværhedsgrader, med noter, tip og dagens opgave.'],
+  },
   history: 'Sådan gik det',
   newFreeMap: (name) => `${name} er nu med i Frit spil.`,
   nextUp: (year, name) => `Næste togt: ${name} (${year}).`,

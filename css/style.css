@@ -653,26 +653,28 @@ dialog .big { font-family: var(--title); font-size: 20px; margin: 8px 0; }
 @keyframes draw { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
 #chapter.leave { animation: leave .45s both; }
 /* ---------- the pause for an ad after a game (a stand-in) ---------- */
-/* Light and plain, like the ads of other apps, so the change from the candlelit game is felt as it will be. */
+/* Black, as most ads in games are, with the advertised game's own colour (--ad) glowing behind it. */
 #ad-break {
   position: fixed; inset: 0; z-index: 30; display: flex; flex-direction: column;
   padding: max(10px, env(safe-area-inset-top)) var(--gap) max(14px, env(safe-area-inset-bottom));
-  background: #f4f4f2; color: #202124; font-family: system-ui, sans-serif; text-shadow: none;
+  background: radial-gradient(ellipse 80% 45% at 50% 45%, color-mix(in srgb, var(--ad, #444) 45%, transparent), transparent 75%), #000;
+  color: #f1f1f1; font-family: system-ui, sans-serif; text-shadow: none;
   animation: rise-in .35s both;
 }
 #ad-break.out { animation: leave .35s both; }
 .ad-top { display: flex; align-items: center; gap: 10px; min-height: 44px; }
 .ad-tag { padding: 2px 8px; border-radius: 4px; background: #fbbc04; color: #202124; font-size: 13px; font-weight: 700; }
-.ad-count { flex: 1; font-size: 14px; color: #5f6368; }
-.ad-skip { min-height: 40px; padding: 0 16px; border: 1px solid #dadce0; border-radius: 999px; background: #fff; color: #202124; font: 600 15px system-ui, sans-serif; }
-.ad-body { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; text-align: center; max-width: 420px; margin: 0 auto; }
-.ad-picture { display: grid; place-items: center; width: min(280px, 70vw); aspect-ratio: 4 / 3; border-radius: 14px; background: #e3e3df; color: #9aa0a6; }
-.ad-picture svg { width: 30%; }
-.ad-title { margin: 8px 0 0; font-size: 22px; font-weight: 700; }
-.ad-text { margin: 0; font-size: 16px; line-height: 1.45; color: #5f6368; }
-.ad-cta { margin-top: 6px; padding: 10px 26px; border-radius: 999px; background: #1a73e8; color: #fff; font-weight: 600; }
-.ad-time { height: 4px; border-radius: 2px; background: #dadce0; overflow: hidden; }
-.ad-time span { display: block; height: 100%; background: #1a73e8; transform-origin: left; animation: ad-time var(--secs, 8s) linear both; }
+.ad-count { flex: 1; font-size: 14px; color: #a8a8a8; }
+.ad-skip { min-height: 40px; padding: 0 16px; border: 1px solid #555; border-radius: 999px; background: rgb(255 255 255 / .08); color: #f1f1f1; font: 600 15px system-ui, sans-serif; }
+.ad-body { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; text-align: center; max-width: 420px; margin: 0 auto; }
+.ad-icon { width: min(150px, 40vw); aspect-ratio: 1; border-radius: 22%; box-shadow: 0 10px 40px rgb(0 0 0 / .6); }
+.ad-maker { margin: 10px 0 0; font-size: 13px; color: #a8a8a8; }
+.ad-title { margin: 0; font-size: 26px; font-weight: 700; }
+.ad-text { margin: 0; font-size: 16px; line-height: 1.45; color: #cfcfcf; }
+.ad-cta { margin-top: 12px; padding: 12px 30px; border-radius: 999px; background: var(--ad, #1a73e8); color: #fff; font-weight: 700; box-shadow: 0 4px 18px color-mix(in srgb, var(--ad, #1a73e8) 50%, transparent); }
+.ad-note { margin: 0 0 10px; font-size: 12px; text-align: center; color: #777; }
+.ad-time { height: 4px; border-radius: 2px; background: #333; overflow: hidden; }
+.ad-time span { display: block; height: 100%; background: var(--ad, #1a73e8); transform-origin: left; animation: ad-time var(--secs, 8s) linear both; }
 @keyframes ad-time { to { transform: scaleX(0); } }
 @keyframes leave { to { opacity: 0; } }
 @media (prefers-reduced-motion: reduce) {

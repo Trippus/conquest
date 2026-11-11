@@ -165,9 +165,14 @@ export const EN = {
   adTag: 'Ad',
   adSkip: 'Skip',
   adCount: (s) => `The game goes on in ${s} s`,
-  adTitle: 'An ad goes here',
-  adText: 'In the app, an ad is shown here between games. It pays for the game being free.',
-  adCta: 'Learn more',
+  adCta: 'Play for free',
+  adNote: 'A trial: in the app, a real ad comes here.',
+  // Trippus Games' other games, shown in the pause for now
+  adGames: {
+    sheep: ['Bring the Sheep Home', 'Slide the pens and bring every sheep home to its colour. No time limit.'],
+    solitaire: ['Solitaire', 'Classic Klondike with undo, hints and a victory lap of bouncing cards.'],
+    sudoku: ['Sudoku', 'Calm sudoku in four levels, with notes, hints and a daily puzzle.'],
+  },
   history: 'What really happened',
   newFreeMap: (name) => `${name} is now in Free play.`,
   nextUp: (year, name) => `Next campaign: ${name} (${year}).`,

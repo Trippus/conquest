@@ -391,10 +391,23 @@ function onFromEnd(value) {
 // screen counting down with a way to skip, to feel how it plays before the Android app shows real
 // ads (memory: togter-plan). The music rests meanwhile, as it would for an ad.
 const AD_SECONDS = 8;
+// For now the pause shows Trippus Games' other games, one after the other; each in its own colour.
+const AD_GAMES = [['sheep', '#d9577e'], ['solitaire', '#1f8a4c'], ['sudoku', '#2f6db3']];
 function adBreak(then) {
   if (!game || game.adShown || game.togt === TOGTER[0].map) return then();
   game.adShown = true;
   const box = $('ad-break');
+  let turn = 0;
+  try {
+    turn = Number(localStorage.getItem('conquest.adTurn')) || 0;
+    localStorage.setItem('conquest.adTurn', String(turn + 1));
+  } catch {
+    /* the same game each time is fine */
+  }
+  const [id, colour] = AD_GAMES[turn % AD_GAMES.length];
+  box.style.setProperty('--ad', colour);
+  $('ad-icon').src = `assets/ads/${id}.png`;
+  [$('ad-title').textContent, $('ad-text').textContent] = L.adGames[id];
   const playing = Music.enabled;
   Music.pause();
   let left = AD_SECONDS;

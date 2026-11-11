@@ -387,15 +387,15 @@ function onFromEnd(value) {
 }
 
 // The pause for an ad after a finished game, before what comes next: once a game, after every togt
-// but the first (the one that teaches the game) and every free game. A stand-in for now, a light
-// screen counting down with a way to skip, to feel how it plays before the Android app shows real
-// ads (memory: togter-plan). The music rests meanwhile, as it would for an ad.
+// and every free game, never before one has been played. A stand-in for now, a dark screen counting
+// down with a way to skip, to feel how it plays before the Android app shows real ads (memory:
+// togter-plan). The music rests meanwhile, as it would for an ad.
 const AD_SECONDS = 8;
 const AD_SKIP_AFTER = 5; // seconds before the way to skip comes, as with real ads
 // For now the pause shows Trippus Games' other games, one after the other; each in its own colour.
 const AD_GAMES = [['sheep', '#d9577e'], ['solitaire', '#1f8a4c'], ['sudoku', '#2f6db3']];
 function adBreak(then) {
-  if (!game || game.adShown || game.togt === TOGTER[0].map) return then();
+  if (!game || game.adShown) return then();
   game.adShown = true;
   const box = $('ad-break');
   let turn = 0;

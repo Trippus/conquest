@@ -151,6 +151,24 @@
     </div></div>
   </section>
 
+  <!-- A pause for an ad after a finished game. A stand-in for now, to feel how it plays (js/app.js adBreak). -->
+  <section id="ad-break" hidden>
+    <div class="ad-top">
+      <span class="ad-tag" data-t="adTag"></span>
+      <span class="ad-count" id="ad-count" aria-live="polite"></span>
+      <button type="button" class="ad-skip" id="ad-skip" data-t="adSkip"></button>
+    </div>
+    <div class="ad-body">
+      <div class="ad-picture" aria-hidden="true">
+        <svg viewBox="0 0 24 24"><path d="M4 5h16v14H4zM4 15l5-5 4 4 3-3 4 4" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/><circle cx="16" cy="9" r="1.6" fill="currentColor"/></svg>
+      </div>
+      <p class="ad-title" data-t="adTitle"></p>
+      <p class="ad-text" data-t="adText"></p>
+      <span class="ad-cta" data-t="adCta" aria-hidden="true"></span>
+    </div>
+    <div class="ad-time" aria-hidden="true"><span id="ad-time"></span></div>
+  </section>
+
   <!-- A togt begins: the year, the war and the story, before the map comes into view. -->
   <section id="chapter" hidden>
     <div class="ch-art" id="ch-art" aria-hidden="true"></div>

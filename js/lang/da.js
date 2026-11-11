@@ -160,6 +160,13 @@ export const DA = {
   tryAgain: 'Prøv igen',
   tryEasy: 'Prøv igen med lette modstandere',
   nextTogt: 'Næste togt',
+  // The pause for an ad after a game; a stand-in until the Android app shows real ones.
+  adTag: 'Reklame',
+  adSkip: 'Spring over',
+  adCount: (s) => `Spillet fortsætter om ${s} s`,
+  adTitle: 'Her kommer en reklame',
+  adText: 'I app-udgaven vises en reklame her mellem spillene. Den betaler for, at spillet er gratis.',
+  adCta: 'Læs mere',
   history: 'Sådan gik det',
   newFreeMap: (name) => `${name} er nu med i Frit spil.`,
   nextUp: (year, name) => `Næste togt: ${name} (${year}).`,

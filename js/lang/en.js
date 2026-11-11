@@ -161,6 +161,13 @@ export const EN = {
   tryAgain: 'Try again',
   tryEasy: 'Try again with easy opponents',
   nextTogt: 'Next campaign',
+  // The pause for an ad after a game; a stand-in until the Android app shows real ones.
+  adTag: 'Ad',
+  adSkip: 'Skip',
+  adCount: (s) => `The game goes on in ${s} s`,
+  adTitle: 'An ad goes here',
+  adText: 'In the app, an ad is shown here between games. It pays for the game being free.',
+  adCta: 'Learn more',
   history: 'What really happened',
   newFreeMap: (name) => `${name} is now in Free play.`,
   nextUp: (year, name) => `Next campaign: ${name} (${year}).`,

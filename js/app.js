@@ -375,21 +375,62 @@ $('chapter').addEventListener('click', (e) => {
 });
 $('ch-home').addEventListener('click', openMenu);
 $('ch-standings').addEventListener('click', () => $('game-over').showModal());
-// On from the end card: its words go out, and the next card's picture comes up over its own.
+// On from the end card: its words go out, then the pause for an ad, and the next card's picture
+// comes up over the end card's own.
 function onFromEnd(value) {
   const box = $('chapter');
   // a full address: in a CSS variable a relative one would be read from the style sheet's folder
   const src = $('ch-art').dataset.src;
   box.style.setProperty('--picture', src ? `url("${new URL(src, location.href)}")` : 'none');
   box.classList.add('turning');
-  setTimeout(() => goOn(value), 600);
+  setTimeout(() => adBreak(() => goOn(value)), 600);
+}
+
+// The pause for an ad after a finished game, before what comes next: once a game, after every togt
+// but the first (the one that teaches the game) and every free game. A stand-in for now, a light
+// screen counting down with a way to skip, to feel how it plays before the Android app shows real
+// ads (memory: togter-plan). The music rests meanwhile, as it would for an ad.
+const AD_SECONDS = 8;
+function adBreak(then) {
+  if (!game || game.adShown || game.togt === TOGTER[0].map) return then();
+  game.adShown = true;
+  const box = $('ad-break');
+  const playing = Music.enabled;
+  Music.pause();
+  let left = AD_SECONDS;
+  let timer = 0;
+  const tick = () => {
+    $('ad-count').textContent = L.adCount(left);
+    if (left-- <= 0) done();
+  };
+  const done = () => {
+    clearInterval(timer);
+    $('ad-skip').onclick = null;
+    box.classList.add('out');
+    if (playing) Music.play();
+    then();
+    setTimeout(() => {
+      box.hidden = true;
+      box.classList.remove('out');
+    }, 350);
+  };
+  box.style.setProperty('--secs', `${AD_SECONDS}s`);
+  // the bar runs anew each time
+  $('ad-time').style.animation = 'none';
+  void $('ad-time').offsetWidth;
+  $('ad-time').style.animation = '';
+  box.hidden = false;
+  tick();
+  timer = setInterval(tick, 1000);
+  $('ad-skip').onclick = done;
+  $('ad-skip').focus({ preventScroll: true });
 }
 $('ch-easy').addEventListener('click', () => onFromEnd('easy'));
 $('ch-go').addEventListener('click', () => {
   const box = $('chapter');
   if (box.classList.contains('ending')) {
     const next = afterGame()?.value;
-    return next ? onFromEnd(next) : goOn('home');
+    return next ? onFromEnd(next) : adBreak(() => goOn('home'));
   }
   game.told = true;
   save();
@@ -605,7 +646,7 @@ function renderBar(note) {
     text = L.won(subject(s.winner), soloYou(s.winner));
     button(L.toStart, showIntro);
     const after = afterGame();
-    if (after) button(after.label, () => goOn(after.value), { primary: true });
+    if (after) button(after.label, () => adBreak(() => goOn(after.value)), { primary: true });
   } else if (isBot()) {
     phase = `${L.round(s.round)} · ${L.phaseNames[s.phase]}`;
     text = L.thinking(name);
@@ -1063,7 +1104,8 @@ function openGameOver() {
 }
 $('game-over').addEventListener('close', () => {
   $('bar').hidden = false;
-  goOn($('game-over').returnValue);
+  const value = $('game-over').returnValue;
+  if (value) adBreak(() => goOn(value));
 });
 
 // What the end card says (showEnding), while it is the game shown.

@@ -391,6 +391,7 @@ function onFromEnd(value) {
 // screen counting down with a way to skip, to feel how it plays before the Android app shows real
 // ads (memory: togter-plan). The music rests meanwhile, as it would for an ad.
 const AD_SECONDS = 8;
+const AD_SKIP_AFTER = 5; // seconds before the way to skip comes, as with real ads
 // For now the pause shows Trippus Games' other games, one after the other; each in its own colour.
 const AD_GAMES = [['sheep', '#d9577e'], ['solitaire', '#1f8a4c'], ['sudoku', '#2f6db3']];
 function adBreak(then) {
@@ -414,6 +415,7 @@ function adBreak(then) {
   let timer = 0;
   const tick = () => {
     $('ad-count').textContent = L.adCount(left);
+    $('ad-skip').hidden = AD_SECONDS - left < AD_SKIP_AFTER;
     if (left-- <= 0) done();
   };
   const done = () => {
@@ -436,7 +438,6 @@ function adBreak(then) {
   tick();
   timer = setInterval(tick, 1000);
   $('ad-skip').onclick = done;
-  $('ad-skip').focus({ preventScroll: true });
 }
 $('ch-easy').addEventListener('click', () => onFromEnd('easy'));
 $('ch-go').addEventListener('click', () => {
